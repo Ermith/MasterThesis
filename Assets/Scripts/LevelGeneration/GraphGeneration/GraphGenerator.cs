@@ -7,8 +7,8 @@ public class BaseVertex
     static char c = 'A';
     char _c;
 
-    public List<Lock> Locks = new();
-    public List<Key> Keys = new();
+    public List<Lock<BaseVertex>> Locks = new();
+    public List<Key<BaseVertex>> Keys = new();
 
     public BaseVertex()
     {
@@ -53,7 +53,8 @@ class GraphGenerator
         int count = 4;
         for (int i = 0; i < count; i++)
         {
-            cycleRule.Apply(Graph.GetRandomEdge(), Graph);
+            
+            cycleRule.Apply(Graph.GetRandomEdge(), Graph, new LockedDoor<BaseVertex>());
             extensionRule.Apply(Graph.GetRandomEdge(), Graph);
         }
 

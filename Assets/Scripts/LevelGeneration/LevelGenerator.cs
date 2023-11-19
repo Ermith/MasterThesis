@@ -20,6 +20,7 @@ public class LevelGenerator : MonoBehaviour
     MapBuilder<BaseVertex> _mapBuilder;
 
     // Intermediate Results
+    public IGraph<BaseVertex> Graph { get; private set; }
     public GraphDrawing<BaseVertex> GraphDrawing { get; private set; }
     public ASuperTile[,] SuperTileGrid;
     public ATile[,] TileGrid;
@@ -29,6 +30,7 @@ public class LevelGenerator : MonoBehaviour
         _graph = new UndirectedAdjecencyGraph<BaseVertex>();
         _graphGenerator = new GraphGenerator(_graph);
         _graphGenerator.Generate();
+        Graph = _graph;
 
         _graphDrawer = new GraphDrawer<BaseVertex>(_graph);
         GraphDrawing = _graphDrawer.Draw();
