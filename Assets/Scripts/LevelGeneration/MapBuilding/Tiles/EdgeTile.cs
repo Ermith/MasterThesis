@@ -28,8 +28,8 @@ public class EdgeTile : ATile
             {
                 subTileGrid[x + i, y + j] =
                     IsEdge(i, j) 
-                    ? new Wall()
-                    : new Floor();
+                    ? new WallSubTile()
+                    : new FloorSubTile();
             }
     }
 }

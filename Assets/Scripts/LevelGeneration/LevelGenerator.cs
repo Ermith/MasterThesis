@@ -12,39 +12,55 @@ public class LevelGenerator : MonoBehaviour
     public int SuperHeight = 3;
     public GameObject WallBlueprint;
     public GameObject FloorBlueprint;
+    public GameObject DoorBlueprint;
+    public GameObject KeyBlueprint;
     public EnemyController EnemyBlueprint;
 
     IGraph<BaseVertex> _graph;
     GraphGenerator _graphGenerator;
     GraphDrawer<BaseVertex> _graphDrawer;
-    MapBuilder<BaseVertex> _mapBuilder;
+    MapBuilder _mapBuilder;
 
     // Intermediate Results
     public IGraph<BaseVertex> Graph { get; private set; }
     public GraphDrawing<BaseVertex> GraphDrawing { get; private set; }
+    public Dictionary<Key, BaseVertex> KeyVertexMapping;
+    public Dictionary<Lock, BaseVertex> LockVertexMapping;
     public ASuperTile[,] SuperTileGrid;
     public ATile[,] TileGrid;
     public ASubTile[,] SubTileGrid;
     private void Awake()
     {
+
+        DoorKey.KeyBlueprint = KeyBlueprint;
         _graph = new UndirectedAdjecencyGraph<BaseVertex>();
         _graphGenerator = new GraphGenerator(_graph);
         _graphGenerator.Generate();
         Graph = _graph;
+        KeyVertexMapping = _graphGenerator.KeyMapping;
+        LockVertexMapping = _graphGenerator.LockMapping;
 
         _graphDrawer = new GraphDrawer<BaseVertex>(_graph);
         GraphDrawing = _graphDrawer.Draw();
 
-        _mapBuilder = new MapBuilder<BaseVertex>(GraphDrawing, SuperWidth, SuperHeight);
+        _mapBuilder = new MapBuilder(GraphDrawing, SuperWidth, SuperHeight);
         SuperTileGrid = _mapBuilder.SuperTileGrid();
         TileGrid = _mapBuilder.TileGrid(SuperTileGrid, out IEnumerable<EnemyParams> enemies);
         SubTileGrid = _mapBuilder.SubTileGrid(TileGrid);
 
-        ASubTile.Register<Wall>(WallBlueprint);
-        ASubTile.Register<Floor>(FloorBlueprint);
+        ASubTile.Register<WallSubTile>((ASubTile st) => Instantiate(WallBlueprint));
+        ASubTile.Register<FloorSubTile>((ASubTile st) => Instantiate(FloorBlueprint));
+        ASubTile.Register<DoorSubTile>((ASubTile st) =>
+        {
+            var door = st as DoorSubTile;
+            GameObject doorObject = Instantiate(DoorBlueprint);
+            doorObject.GetComponent<Door>().DoorLock = door.DoorLock;
+            return doorObject;
+        });
+
 
         GameObject level = new("Level");
-        GameObject geometry = new("Gemetry");
+        GameObject geometry = new("Geometry");
         Vector3 offset = new(100, 0, 100);
         geometry.transform.parent = level.transform;
 

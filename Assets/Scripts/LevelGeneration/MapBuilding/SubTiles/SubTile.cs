@@ -11,17 +11,27 @@ using UnityEngine.EventSystems;
 
 public abstract class ASubTile
 {
-    private static Dictionary<Type, GameObject> _objects = new();
-    public static void Register<T>(GameObject obj) where T : ASubTile
+    private static Dictionary<Type, Func<ASubTile, GameObject>> _spawnFunctions = new();
+
+    public List<GameObject> Objects = new();
+    public static void Register<T>(Func<ASubTile, GameObject> spawnFunction) where T : ASubTile
     {
-        _objects[typeof(T)] = obj;
+        _spawnFunctions[typeof(T)] = spawnFunction;
     }
 
     public virtual GameObject SpawnObject(int x, int y)
     {
-        var obj = GameObject.Instantiate(_objects[this.GetType()]);
-        obj.transform.position = new Vector3(x, 0, y);
-        obj.name = GetType().Name;
-        return obj;
+        var tileObj = _spawnFunctions[GetType()](this);
+        Vector3 pos = new(x, 0, y);
+        tileObj.transform.position = pos;
+        tileObj.name = GetType().Name;
+
+        foreach (var obj in Objects)
+        {
+            var keyObj = GameObject.Instantiate(obj, new Vector3(0, 0, 0), Quaternion.identity, tileObj.transform);
+            keyObj.transform.localPosition = Vector3.zero;
+        }
+
+        return tileObj;
     }
 }

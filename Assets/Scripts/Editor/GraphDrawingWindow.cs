@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
+using System.Linq;
 using System.Text;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -117,7 +118,8 @@ public class GraphDrawingWindow : EditorWindow
 
         foreach ((BaseVertex vertex, (int x, int y)) in drawParams.VertexPositions)
         {
-            int count = vertex.Locks.Count;
+            Lock[] locks = vertex.GetLocks().ToArray();
+            int count = locks.Length;
             Color color = count > 0 ? Color.blue : Color.white;
             string name = count > 0 ? $"{count}" : string.Empty;
             Vector3 location = new Vector3(x, y) * spacing * scale + offset;
@@ -126,9 +128,9 @@ public class GraphDrawingWindow : EditorWindow
         }
 
         foreach ((BaseVertex vertex, (int x, int y)) in drawParams.VertexPositions)
-            foreach (Key<BaseVertex> key in vertex.Keys)
+            foreach (Key key in vertex.GetKeys())
             {
-                (int xTo, int yTo) = drawParams.VertexPositions[key.Lock.Location];
+                (int xTo, int yTo) = drawParams.VertexPositions[_levelGenerator.LockVertexMapping[key.Lock]];
 
                 Vector3 from = new(x, y);
                 Vector3 to = new(xTo, yTo);

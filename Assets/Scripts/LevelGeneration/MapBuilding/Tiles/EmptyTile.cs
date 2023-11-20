@@ -11,7 +11,10 @@ public class EmptyTile : ATile
         for (int i = 0; i < WIDTH; i++)
             for (int j = 0; j < HEIGHT; j++)
             {
-                subTileGrid[x + i, y + j] = new Floor();
+                FloorSubTile floor = new();
+                subTileGrid[x + i, y + j] = floor;
             }
+
+        subTileGrid[x + 1, y + 1].Objects = Objects;
     }
 }

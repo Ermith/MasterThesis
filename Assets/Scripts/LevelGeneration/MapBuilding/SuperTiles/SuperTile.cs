@@ -27,6 +27,9 @@ public abstract class ASuperTile
     public int Width { get; set; }
     public int Height { get; set; }
 
+    public List<Lock> Locks { get; set; }
+    public List<Key> Keys { get; set;  }
+
     public Directions Exits { get; set; }
 
     public ASuperTile(int width, int height, Directions exits = Directions.None)
@@ -34,6 +37,8 @@ public abstract class ASuperTile
         Width = width;
         Height = height;
         Exits = exits;
+        Locks = new();
+        Keys = new();
     }
 
     public abstract EnemyParams BuildTiles(int x, int y, ATile[,] tileGrid);

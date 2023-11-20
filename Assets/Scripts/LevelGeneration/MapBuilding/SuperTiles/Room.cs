@@ -33,17 +33,20 @@ public class Room : ASuperTile
         if (Exits.East()) exits.Add((Width - 1, midY));
         if (Exits.West()) exits.Add((0, midY));
 
-
         for (int i = 0; i < Width; i++)
             for (int j = 0; j < Height; j++)
             {
-
                 Directions edgeFlags = EdgeDirectinons(i, j);
+                ATile tile;
 
-                tileGrid[x + i, y + j] =
-                    exits.Contains((i, j)) || edgeFlags.None()
-                    ? new EmptyTile()
-                    : new EdgeTile(edgeFlags);
+                if (exits.Contains((i, j)))
+                    tile = new DoorTile(edgeFlags);
+                else if (!edgeFlags.None())
+                    tile = new EdgeTile(edgeFlags);
+                else
+                    tile = new EmptyTile();
+
+                tileGrid[x + i, y + j] = tile;
             }
 
         List<(int, int)> patrol = new();
@@ -63,6 +66,12 @@ public class Room : ASuperTile
         if (Exits.South())
             foreach ((int px, int py) in GetShortPath(midX, Height - 1, midX, midY))
                 patrol.Add(((x + px) * ATile.WIDTH + ATile.WIDTH / 2, (y + py) * ATile.HEIGHT + ATile.HEIGHT / 2));
+
+        foreach (Key k in Keys)
+            k.Implement(tileGrid, x, y, Width, Height);
+
+        foreach (Lock l in Locks)
+            l.Implement(tileGrid, x, y, Width, Height);
 
         EnemyParams enemyParams = new();
         enemyParams.Patrol = patrol;

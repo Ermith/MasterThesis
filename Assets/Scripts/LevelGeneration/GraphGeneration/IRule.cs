@@ -5,12 +5,41 @@ using UnityEngine;
 public interface IRule<T>
 {
     public bool IsPossible();
-    public void Apply(IEdge<T> edge, IGraph<T> graph, Lock<T> l = null);
+    public void Apply(IEdge<T> edge, IGraph<T> graph, Lock l = null);
 }
 
-public class ExtensionRule : IRule<BaseVertex>
+public abstract class BaseRule : IRule<BaseVertex>
 {
-    public void Apply(IEdge<BaseVertex> edge, IGraph<BaseVertex> graph, Lock<BaseVertex> l = null)
+    private GraphGenerator _generator;
+    public BaseRule(GraphGenerator generator)
+    {
+        _generator = generator;
+    }
+
+    public abstract void Apply(IEdge<BaseVertex> edge, IGraph<BaseVertex> graph, Lock l = null);
+
+    public abstract bool IsPossible();
+
+    internal void RegisterLock(Lock l, BaseVertex vertex)
+    {
+        vertex.AddLock(l);
+        _generator.RegisterLock(l, vertex);
+    }
+
+    internal void RegisterKey(Key k, BaseVertex vertex)
+    {
+        vertex.AddKey(k);
+        _generator.RegisterKey(k, vertex);
+    }
+}
+
+public class ExtensionRule : BaseRule
+{
+    public ExtensionRule(GraphGenerator generator) : base(generator) 
+    {
+    }
+
+    public override void Apply(IEdge<BaseVertex> edge, IGraph<BaseVertex> graph, Lock l = null)
     {
         BaseVertex newVertex = new();
         graph.RemoveEdge(edge.From, edge.To);
@@ -19,24 +48,24 @@ public class ExtensionRule : IRule<BaseVertex>
         graph.AddEdge(newVertex, edge.To);
 
         if (l == null) return;
-        Key<BaseVertex> k = l.GetNewKey();
-
-        edge.To.Locks.Add(l);
-        l.Location = edge.To;
-
-        newVertex.Keys.Add(k);
-        k.Location = newVertex;
+        Key k = l.GetNewKey();
+        RegisterLock(l, edge.To);
+        RegisterKey(k, newVertex);
     }
 
-    public bool IsPossible()
+    public override bool IsPossible()
     {
         return true;
     }
 }
 
-public class CycleRule : IRule<BaseVertex>
+public class CycleRule : BaseRule
 {
-    public void Apply(IEdge<BaseVertex> edge, IGraph<BaseVertex> graph, Lock<BaseVertex> l = null)
+    public CycleRule(GraphGenerator generator) : base(generator)
+    {
+    }
+
+    public override void Apply(IEdge<BaseVertex> edge, IGraph<BaseVertex> graph, Lock l = null)
     {
         BaseVertex a = new();
         BaseVertex b = new();
@@ -51,16 +80,12 @@ public class CycleRule : IRule<BaseVertex>
         graph.AddEdge(b, edge.To);
 
         if (l == null) return;
-        Key<BaseVertex> k = l.GetNewKey();
-        
-        edge.To.Locks.Add(l);
-        l.Location = edge.To;
-
-        a.Keys.Add(k);
-        k.Location = a;
+        Key k = l.GetNewKey();
+        RegisterKey(k, edge.To);
+        RegisterLock(l, a);
     }
 
-    public bool IsPossible()
+    public override bool IsPossible()
     {
         return true;
     }

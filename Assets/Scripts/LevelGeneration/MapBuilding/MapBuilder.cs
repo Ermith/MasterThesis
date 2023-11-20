@@ -2,15 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
+using System.Linq;
 using Unity.VisualScripting;
 
-class MapBuilder<T>
+class MapBuilder
 {
-    private GraphDrawing<T> _graphDrawing;
+    private GraphDrawing<BaseVertex> _graphDrawing;
     private int _superWidth, _superHeight;
     private int _width, _height;
 
-    public MapBuilder(GraphDrawing<T> graphDrawing, int superWidth, int superHeight)
+    public MapBuilder(GraphDrawing<BaseVertex> graphDrawing, int superWidth, int superHeight)
     {
         _graphDrawing = graphDrawing;
         _superWidth = superWidth;
@@ -78,9 +79,8 @@ class MapBuilder<T>
             }
         }
         
-        foreach ((var _, (int x, int y)) in _graphDrawing.VertexPositions)
+        foreach ((var vertex, (int x, int y)) in _graphDrawing.VertexPositions)
         {
-
             var north = TryGetTile(x, y - 1, superTileGrid);
             var south = TryGetTile(x, y + 1, superTileGrid);
             var east = TryGetTile(x + 1, y, superTileGrid);
@@ -93,6 +93,8 @@ class MapBuilder<T>
             if (west != null && west is Hallway hallway && hallway.Exits.East()) exits |= Directions.West;
 
             superTileGrid[x, y] = new Room(_superWidth, _superHeight, exits);
+            superTileGrid[x, y].Locks = vertex.GetLocks().ToList();
+            superTileGrid[x, y].Keys = vertex.GetKeys().ToList();
         }
 
         return superTileGrid;

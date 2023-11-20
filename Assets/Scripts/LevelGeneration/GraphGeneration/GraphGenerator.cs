@@ -7,8 +7,30 @@ public class BaseVertex
     static char c = 'A';
     char _c;
 
-    public List<Lock<BaseVertex>> Locks = new();
-    public List<Key<BaseVertex>> Keys = new();
+    private List<Lock> _locks = new();
+    private List<Key> _keys = new();
+
+    public void AddLock(Lock l)
+    {
+        _locks.Add(l);
+    }
+
+    public void AddKey(Key k)
+    {
+        _keys.Add(k);
+    }
+
+    public IEnumerable<Lock> GetLocks()
+    {
+        foreach(Lock l in _locks)
+            yield return l;
+    }
+
+    public IEnumerable<Key> GetKeys()
+    {
+        foreach(Key k in _keys)
+            yield return k;
+    }
 
     public BaseVertex()
     {
@@ -20,14 +42,23 @@ public class BaseVertex
         return $"{_c}";
     }
 }
-class GraphGenerator
+public class GraphGenerator
 {
     public IGraph<BaseVertex> Graph { get; private set; }
+    public Dictionary<Lock, BaseVertex> LockMapping = new();
+    public Dictionary<Key, BaseVertex> KeyMapping = new();
 
     public GraphGenerator(IGraph<BaseVertex> graph)
     {
         Graph = graph;
     }
+
+    public void RegisterLock(Lock l, BaseVertex vertex) => LockMapping[l] = vertex;
+    public void RegisterKey(Key k, BaseVertex vertex) => KeyMapping[k] = vertex;
+
+    public BaseVertex GetLockVertex(Lock l) => LockMapping[l];
+    public BaseVertex GetKeyVertex(Key k) => KeyMapping[k];
+
 
     public void Generate()
     {
@@ -46,15 +77,15 @@ class GraphGenerator
         Graph.AddEdge(B, D);
         Graph.AddEdge(C, D);
 
-        CycleRule cycleRule = new();
-        ExtensionRule extensionRule = new();
+        CycleRule cycleRule = new(this);
+        ExtensionRule extensionRule = new(this);
         UnityEngine.Random.InitState(7);
 
         int count = 4;
         for (int i = 0; i < count; i++)
         {
             
-            cycleRule.Apply(Graph.GetRandomEdge(), Graph, new LockedDoor<BaseVertex>());
+            cycleRule.Apply(Graph.GetRandomEdge(), Graph, new DoorLock());
             extensionRule.Apply(Graph.GetRandomEdge(), Graph);
         }
 

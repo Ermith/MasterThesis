@@ -3,42 +3,47 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
-public interface Lock<T>
+public interface Lock
 {
-    public Key<T> GetNewKey();
-    public T Location { get; set; }
+    public Key GetNewKey();
+    public void Implement(ATile[,] tileGrid, int x, int y, int width, int height);
 }
 
-public interface Key<T>
+public interface Key
 {
-    Lock<T> Lock { get; }
-    public T Location { get; set; }
+    Lock Lock { get; }
+    public void Implement(ATile[,] tileGrid, int x, int y, int width, int height);
 }
 
-public class LockedDoor<T> : Lock<T>
+public class DoorLock : Lock
 {
-    public LockedDoor(T location = default)
+    public Key GetNewKey() => new DoorKey(this);
+
+    public void Implement(ATile[,] tileGrid, int x, int y, int width, int height)
     {
-        Location = location;
+        for (int i = x; i < x + width; i++)
+            for (int j = y; j < y + height; j++)
+                if (tileGrid[i, j] is DoorTile door)
+                    door.Lock = this;
     }
-
-    public T Location { get; set; }
-
-    public Key<T> GetNewKey() => new DoorKey<T>(this, Location);
 }
 
-public class DoorKey<T> : Key<T>
+public class DoorKey : Key
 {
-    public DoorKey(Lock<T> l, T location = default)
+    public static GameObject KeyBlueprint;
+    public DoorKey(Lock l)
     {
         _lock = l;
-        Location = location;
     }
 
-    private readonly Lock<T> _lock;
+    private readonly Lock _lock;
 
-    public Lock<T> Lock => _lock;
+    public Lock Lock => _lock;
 
-    public T Location { get; set; }
+    public void Implement(ATile[,] tileGrid, int x, int y, int width, int height)
+    {
+        tileGrid[x + width / 2, y + height / 2].Objects.Add(KeyBlueprint);
+    }
 }
