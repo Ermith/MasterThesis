@@ -31,5 +31,7 @@ public class EdgeTile : ATile
                     ? new WallSubTile()
                     : new FloorSubTile();
             }
+
+        subTileGrid[x + 1, y + 1].Objects = Objects;
     }
 }
