@@ -5,6 +5,8 @@ using System.Data.SqlTypes;
 using System.Linq;
 using Unity.VisualScripting;
 
+using URandom = UnityEngine.Random;
+
 class MapBuilder
 {
     private GraphDrawing<BaseVertex> _graphDrawing;
@@ -58,7 +60,18 @@ class MapBuilder
                 else if (x == xTo) exits = Directions.West;
                 else exits = Directions.East | Directions.West;
 
-                superTileGrid[x, y] = new Hallway(_superWidth, _superHeight, exits);
+                ASuperTile tile;
+                float t = URandom.Range(0f, 1f);
+                if (t > 0.80f)
+                    tile = new HallwayWithRooms(_superWidth, _superHeight, exits);
+                else if (t > 0.60f)
+                    tile = new WideHallway(_superWidth, _superHeight, exits);
+                else if (t > 0.50)
+                    tile = new FilledRoom(_superWidth, _superHeight, true, exits);
+                else
+                    tile = new Hallway(_superWidth, _superHeight, exits);
+
+                superTileGrid[x, y] = tile;
             }
 
         foreach ((int x, int yFrom, int yTo) in _graphDrawing.VerticalLines)
@@ -73,9 +86,22 @@ class MapBuilder
                 else exits = Directions.North | Directions.South;
 
                 if (tile != null)
+                {
                     tile.Exits |= exits;
+                    continue;
+                }
+
+                float t = URandom.Range(0f, 1f);
+                if (t > 0.40f)
+                    tile = new HallwayWithRooms(_superWidth, _superHeight, exits);
+                else if (t > 0.60f)
+                    tile = new WideHallway(_superWidth, _superHeight, exits);
+                else if (t > 0.50)
+                    tile = new FilledRoom(_superWidth, _superHeight, true, exits);
                 else
-                    superTileGrid[x, y] = new Hallway(_superWidth, _superHeight, exits);
+                    tile = new Hallway(_superWidth, _superHeight, exits);
+
+                superTileGrid[x, y] = tile;
             }
         }
         
@@ -92,7 +118,13 @@ class MapBuilder
             if (east != null && east is Hallway eHallway && eHallway.Exits.West()) exits |= Directions.East;
             if (west != null && west is Hallway hallway && hallway.Exits.East()) exits |= Directions.West;
 
-            superTileGrid[x, y] = new Room(_superWidth, _superHeight, exits);
+            ASuperTile tile;
+            if (URandom.Range(0f, 1f) > 0.4f)
+                tile = new FilledRoom(_superWidth, _superHeight, false, exits);
+            else
+                tile = new Room(_superWidth, _superHeight, exits);
+
+            superTileGrid[x, y] = tile;
             superTileGrid[x, y].Locks = vertex.GetLocks().ToList();
             superTileGrid[x, y].Keys = vertex.GetKeys().ToList();
         }

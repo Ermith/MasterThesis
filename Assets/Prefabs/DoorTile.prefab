@@ -30,7 +30,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2635403507754587274}
-  - {fileID: 1123624447826355773}
+  - {fileID: 3497577707554476957}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -151,6 +151,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2635403507403632614}
     m_Modifications:
+    - target: {fileID: 1448806552440500766, guid: 8d6d044c788136d4e8c9bfae10432214, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448806552440500766, guid: 8d6d044c788136d4e8c9bfae10432214, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3099954277238900666, guid: 8d6d044c788136d4e8c9bfae10432214, type: 3}
       propertyPath: m_Name
       value: Floor
@@ -201,8 +209,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8d6d044c788136d4e8c9bfae10432214, type: 3}
---- !u!4 &1123624447826355773 stripped
+--- !u!4 &3497577707554476957 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 3099954277238900670, guid: 8d6d044c788136d4e8c9bfae10432214, type: 3}
+  m_CorrespondingSourceObject: {fileID: 1448806552440500766, guid: 8d6d044c788136d4e8c9bfae10432214, type: 3}
   m_PrefabInstance: {fileID: 2635403506745696643}
   m_PrefabAsset: {fileID: 0}

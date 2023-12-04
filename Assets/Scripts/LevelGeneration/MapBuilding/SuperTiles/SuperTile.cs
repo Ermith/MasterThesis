@@ -20,6 +20,9 @@ public static class DirectionsExtensions
     public static bool South(this Directions directions) => (directions & Directions.South) != Directions.None;
     public static bool East(this Directions directions) => (directions & Directions.East) != Directions.None;
     public static bool West(this Directions directions) => (directions & Directions.West) != Directions.None;
+
+    public static Directions GetAll() =>
+        Directions.South | Directions.North | Directions.East | Directions.West;
 } 
 
 public abstract class ASuperTile
@@ -41,17 +44,44 @@ public abstract class ASuperTile
         Keys = new();
     }
 
+    internal Directions EdgeDirectinons(int x, int y, int width, int height)
+    {
+        Directions directions = Directions.None;
+
+        if (x == 0) directions |= Directions.West;
+        if (y == 0) directions |= Directions.North;
+        if (x == width - 1) directions |= Directions.East;
+        if (y == height - 1) directions |= Directions.South;
+
+        return directions;
+    }
+
     public abstract EnemyParams BuildTiles(int x, int y, ATile[,] tileGrid);
 
-    internal IEnumerable<(int, int)> GetShortPath(int startX, int startY, int endX, int endY)
+    internal IEnumerable<(int, int)> GetShortPath(int startX, int startY, int endX, int endY, bool yFirst = false)
     {
-        int step = MathF.Sign(endX - startX);
-        for (int x = startX; x != endX; x += step)
-            yield return (x, startY);
 
-        step = MathF.Sign(endY - startY);
-        for (int y = startY; y != endY; y += step)
-            yield return (endX, y);
+        if (yFirst)
+        {
+            int step = MathF.Sign(endY - startY);
+            for (int y = startY; y != endY; y += step)
+                yield return (startX, y);
+
+            step = MathF.Sign(endX - startX);
+            for (int x = startX; x != endX; x += step)
+                yield return (x, endY);
+
+        } else
+        {
+            int step = MathF.Sign(endX - startX);
+            for (int x = startX; x != endX; x += step)
+                yield return (x, startY);
+
+            step = MathF.Sign(endY - startY);
+            for (int y = startY; y != endY; y += step)
+                yield return (endX, y);
+        }
+
 
         yield return (endX, endY);
     }

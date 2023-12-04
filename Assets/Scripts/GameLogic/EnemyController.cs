@@ -83,7 +83,7 @@ public class EnemyController : MonoBehaviour
 
     private void ResolvePatrol()
     {
-        if (_patrolPositions == null || !_patrolEnabled) return;
+        if (_patrolPositions == null || _patrolPositions.Length < 1 || !_patrolEnabled) return;
 
         Vector3 position = _patrolPositions[_patrolIndex];
         LookAt(position);

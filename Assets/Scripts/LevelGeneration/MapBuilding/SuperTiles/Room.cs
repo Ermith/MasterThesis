@@ -7,17 +7,6 @@ using UnityEngine;
 
 public class Room : ASuperTile
 {
-    private Directions EdgeDirectinons(int x, int y)
-    {
-        Directions directions = Directions.None;
-
-        if (x == 0) directions |= Directions.West;
-        if (y == 0) directions |= Directions.North;
-        if (x == Width - 1) directions |= Directions.East;
-        if (y == Height - 1) directions |= Directions.South;
-
-        return directions;
-    }
 
     public Room(int width, int height, Directions exits = Directions.None) : base(width, height, exits)
     {
@@ -36,7 +25,7 @@ public class Room : ASuperTile
         for (int i = 0; i < Width; i++)
             for (int j = 0; j < Height; j++)
             {
-                Directions edgeFlags = EdgeDirectinons(i, j);
+                Directions edgeFlags = EdgeDirectinons(i, j, Width, Height);
                 ATile tile;
 
                 if (exits.Contains((i, j)))
@@ -48,6 +37,12 @@ public class Room : ASuperTile
 
                 tileGrid[x + i, y + j] = tile;
             }
+
+        foreach (Key k in Keys)
+            k.Implement(tileGrid, x, y, Width, Height);
+
+        foreach (Lock l in Locks)
+            l.Implement(tileGrid, x, y, Width, Height);
 
         List<(int, int)> patrol = new();
 
@@ -66,12 +61,6 @@ public class Room : ASuperTile
         if (Exits.South())
             foreach ((int px, int py) in GetShortPath(midX, Height - 1, midX, midY))
                 patrol.Add(((x + px) * ATile.WIDTH + ATile.WIDTH / 2, (y + py) * ATile.HEIGHT + ATile.HEIGHT / 2));
-
-        foreach (Key k in Keys)
-            k.Implement(tileGrid, x, y, Width, Height);
-
-        foreach (Lock l in Locks)
-            l.Implement(tileGrid, x, y, Width, Height);
 
         EnemyParams enemyParams = new();
         enemyParams.Patrol = patrol;

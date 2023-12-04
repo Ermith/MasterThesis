@@ -42,6 +42,7 @@ public class BaseVertex
         return $"{_c}";
     }
 }
+
 public class GraphGenerator
 {
     public IGraph<BaseVertex> Graph { get; private set; }
@@ -81,7 +82,7 @@ public class GraphGenerator
         ExtensionRule extensionRule = new(this);
         UnityEngine.Random.InitState(7);
 
-        int count = 4;
+        int count = 2;
         for (int i = 0; i < count; i++)
         {
             
