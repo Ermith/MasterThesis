@@ -29,6 +29,7 @@ public class Room : ASuperTile
         }
 
         description.PatrolPath = patrol;
+        description.PatrolLooped = false;
 
         foreach (Key k in Keys)
             k.Implement(description);

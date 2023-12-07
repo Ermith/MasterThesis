@@ -17,6 +17,7 @@ public class EnemyController : MonoBehaviour
     int _patrolIndex = 0;
     int _patrolStep = 1;
     bool _patrolEnabled = true;
+    bool _patrolRetrace;
     Action _positionReached = null;
 
     Vector3 _lookFrom;
@@ -76,10 +77,11 @@ public class EnemyController : MonoBehaviour
         _positionReached = callback;
     }
 
-    public void Patrol(Vector3[] positions, int index = 0)
+    public void Patrol(Vector3[] positions, int index = 0, bool retrace = true)
     {
         _patrolPositions = positions;
         _patrolIndex = index;
+        _patrolRetrace = retrace;
     }
 
     private void ResolvePatrol()
@@ -91,6 +93,14 @@ public class EnemyController : MonoBehaviour
         MoveTo(position, () =>
         {
             int count = _patrolPositions.Length;
+
+            if (!_patrolRetrace)
+            {
+                _patrolIndex++;
+                _patrolIndex %= count;
+                return;
+            }
+
             _patrolIndex += _patrolStep;
             if (_patrolIndex < 0 || _patrolIndex >= count)
             {

@@ -29,6 +29,7 @@ public class Hallway : ASuperTile
             }
 
         description.PatrolPath = patrol;
+        description.PatrolLooped = false;
         
 
         Directions midWalls = ~Exits;

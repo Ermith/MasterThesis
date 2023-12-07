@@ -56,6 +56,7 @@ public class FilledRoom : ASuperTile
         }
 
         description.PatrolPath = patrol;
+        description.PatrolLooped = true;
 
         foreach (Key k in Keys)
             k.Implement(description);

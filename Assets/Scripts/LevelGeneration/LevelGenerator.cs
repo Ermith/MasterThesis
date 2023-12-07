@@ -86,7 +86,13 @@ public class LevelGenerator : MonoBehaviour
                 patrol.Add(new Vector3(x, 0, z) * scale + offset);
             }
 
-            Instantiate(EnemyBlueprint, spawn, Quaternion.identity, level.transform).Patrol(patrol.ToArray(), enemy.Spawn);
+            var enemyInstance = Instantiate(
+                EnemyBlueprint,
+                spawn,
+                Quaternion.identity,
+                level.transform);
+
+            enemyInstance.Patrol(patrol.ToArray(), enemy.Spawn, enemy.Retrace);
         }
 
         // Just offset it for now

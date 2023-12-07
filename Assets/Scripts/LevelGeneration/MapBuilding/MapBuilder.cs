@@ -73,7 +73,7 @@ class MapBuilder
 
                 superTileGrid[x, y] = tile;
 
-                if (tile is Hallway)
+                //if (tile is Hallway)
                     tile.Locks.Add(new EnemyLock());
             }
 
@@ -133,7 +133,7 @@ class MapBuilder
             superTileGrid[x, y].Keys = vertex.GetKeys().ToList();
 
             //if (tile is FilledRoom room)
-            //    room.Locks.Add(new EnemyLock());
+                tile.Locks.Add(new EnemyLock());
         }
 
         return superTileGrid;

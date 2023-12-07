@@ -76,7 +76,7 @@ public class WideHallway : ASuperTile
         }
         //*/
         keyPoints.Add((midX + 1, midY - 1));
-        /*/
+        //*/
         if (Exits.East())
         {
             keyPoints.Add((Width - 1, midY - 1));
@@ -84,7 +84,7 @@ public class WideHallway : ASuperTile
         }
         //*/
         keyPoints.Add((midX + 1, midY + 1));
-        /*/
+        //*/
         if (Exits.South())
         {
             keyPoints.Add((midX + 1, Height - 1));
@@ -92,7 +92,7 @@ public class WideHallway : ASuperTile
         }
         //*/
         keyPoints.Add((midX - 1, midY + 1));
-        /*/
+        //*/
         if (Exits.West())
         {
             keyPoints.Add((0, midY + 1));
@@ -111,6 +111,7 @@ public class WideHallway : ASuperTile
         }
 
         description.PatrolPath = patrol;
+        description.PatrolLooped = true;
 
         foreach (Lock l in Locks) l.Implement(description);
         foreach (Key k in Keys) k.Implement(description);

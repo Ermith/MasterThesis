@@ -29,6 +29,7 @@ public class HallwayWithRooms : Hallway
             }
 
         description.PatrolPath = patrol;
+        description.PatrolLooped = false;
 
         Directions midWalls = ~Exits;
         tileGrid[x + midX, y + midY] = new EdgeTile(midWalls);
