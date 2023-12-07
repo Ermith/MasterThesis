@@ -3,62 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
-public class DoorTile : ATile
+public class DoorTile : EdgeTile
 {
-    Directions DoorExit;
     public DoorLock Lock = null;
+    public Directions DoorExits;
 
-    public DoorTile(Directions doorExit)
+    public DoorTile(Directions edges, Directions freeExits, Directions doorExits) : base(edges, freeExits)
     {
-        DoorExit = doorExit;
+        DoorExits = doorExits;
     }
 
     public override void BuildSubTiles(int x, int y, ASubTile[,] subTileGrid)
     {
-        if (DoorExit.West())
+        base.BuildSubTiles(x, y, subTileGrid);
+        List<(int, int)> doors = new();
+        if (DoorExits.North()) doors.Add((x + 1, y));
+        if (DoorExits.South()) doors.Add((x + 1, y + 2));
+        if (DoorExits.West()) doors.Add((x, y + 1));
+        if (DoorExits.East()) doors.Add((x + 2, y + 1));
+
+        foreach ((int dx, int dy)  in doors)
         {
             DoorSubTile door = new();
             door.DoorLock = Lock;
-            subTileGrid[x, y + 0] = new WallSubTile();
-            subTileGrid[x, y + 1] = door;
-            subTileGrid[x, y + 2] = new WallSubTile();
+            subTileGrid[dx, dy] = door;
         }
-
-        if (DoorExit.East())
-        {
-            DoorSubTile door = new();
-            door.DoorLock = Lock;
-            subTileGrid[x + 2, y + 0] = new WallSubTile();
-            subTileGrid[x + 2, y + 1] = door;
-            subTileGrid[x + 2, y + 2] = new WallSubTile();
-        }
-
-        if (DoorExit.North())
-        {
-            DoorSubTile door = new();
-            door.DoorLock = Lock;
-            subTileGrid[x + 0, y] = new WallSubTile();
-            subTileGrid[x + 1, y] = door;
-            subTileGrid[x + 2, y] = new WallSubTile();
-        }
-
-        if (DoorExit.South())
-        {
-            DoorSubTile door = new();
-            door.DoorLock = Lock;
-            subTileGrid[x + 0, y + 2] = new WallSubTile();
-            subTileGrid[x + 1, y + 2] = door;
-            subTileGrid[x + 2, y + 2] = new WallSubTile();
-        }
-
-        for (int i = 0; i < WIDTH; i++)
-            for (int j = 0; j < HEIGHT; j++)
-            {
-                if (subTileGrid[x + i, y + j] == null)
-                    subTileGrid[x + i, y + j] = new FloorSubTile();
-            }
-
-        subTileGrid[x + 1, y + 1].Objects = Objects;
     }
 }

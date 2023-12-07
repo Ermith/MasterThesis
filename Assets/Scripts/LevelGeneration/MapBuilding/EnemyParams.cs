@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 public class EnemyParams
 {
-    public (int, int) Spawn;
+    public int Spawn;
     public IEnumerable<(int, int)> Patrol;
 }

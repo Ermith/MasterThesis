@@ -76,7 +76,7 @@ public class LevelGenerator : MonoBehaviour
         geometry.transform.localScale *= scale;
         foreach (EnemyParams enemy in enemies)
         {
-            (int spawnX, int spawnZ) = enemy.Spawn;
+            (int spawnX, int spawnZ) = enemy.Patrol.ToList()[enemy.Spawn];
             Vector3 spawn = new(spawnX, 0, spawnZ);
             spawn *= scale;
 
@@ -86,7 +86,7 @@ public class LevelGenerator : MonoBehaviour
                 patrol.Add(new Vector3(x, 0, z) * scale + offset);
             }
 
-            Instantiate(EnemyBlueprint, spawn, Quaternion.identity, level.transform).Patrol(patrol.ToArray());
+            Instantiate(EnemyBlueprint, spawn, Quaternion.identity, level.transform).Patrol(patrol.ToArray(), enemy.Spawn);
         }
 
         // Just offset it for now

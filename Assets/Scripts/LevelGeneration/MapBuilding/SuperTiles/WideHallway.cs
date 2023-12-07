@@ -13,152 +13,108 @@ public class WideHallway : ASuperTile
         Exits = exits;
     }
 
-    public override EnemyParams BuildTiles(int x, int y, ATile[,] tileGrid)
+    public override List<EnemyParams> BuildTiles(int x, int y, ATile[,] tileGrid)
     {
-        int xmid = x + Width / 2;
-        int ymid = y + Height / 2;
+        SuperTileDescription description = CreateDescription(x, y, tileGrid);
+        int midX = Width / 2;
+        int midY = Height / 2;
 
-        if (Exits.North())
-            for (int i = y; i < ymid; i++)
+        tileGrid[x + midX, y + midY] = new ColumnTile(DirectionsExtensions.GetAll());
+
+        foreach ((int i, int j) in EdgeLocations(3, 3))
+        {
+            Directions edgeFlags = EdgeDirectinons(i, j, 3, 3);
+            edgeFlags = edgeFlags.Without(Exits);
+
+            tileGrid[x + midX + i - 1, y + midY + j - 1] = new EdgeTile(edgeFlags);
+            description.FreeTiles.Add((midX + i - 1, midY + j - 1));
+        }
+
+        foreach ((Directions dir, (int ex, int ey)) in description.ExitsTiles)
+            foreach ((int px, int py) in GetShortPath(midX, midY, ex, ey))
             {
-                ATile midTile = i % 2 == 1
-                    ? new ColumnTile(Directions.None)
-                    : new EmptyTile();
+                // Neighbor 1 and Neighbor 2
+                int nx1, ny1;
+                int nx2, ny2;
+                Directions edges1, edges2;
 
-                EdgeTile westTile = new(Directions.West);
-                EdgeTile eastTile = new(Directions.East);
-
-                if (i == y)
+                if (dir.North() || dir.South())
                 {
-                    westTile.Edges |= Directions.North;
-                    eastTile.Edges |= Directions.North;
+                    nx1 = px - 1; ny1 = py;
+                    nx2 = px + 1; ny2 = py;
+
+                    edges1 = EdgeDirectinons(0, ny1, 3, Height);
+                    edges2 = EdgeDirectinons(2, ny2, 3, Height);
+
+                } else
+                {
+                    nx1 = px; ny1 = py - 1;
+                    nx2 = px; ny2 = py + 1;
+
+                    edges1 = EdgeDirectinons(nx1, 0, Width, 3);
+                    edges2 = EdgeDirectinons(nx2, 2, Width, 3);
                 }
 
-                tileGrid[xmid, i] = midTile;
-                tileGrid[xmid - 1, i] = westTile;
-                tileGrid[xmid + 1, i] = eastTile;
+                tileGrid[x + nx1, y + ny1] ??= new EdgeTile(edges1);
+                tileGrid[x + nx2, y + ny2] ??= new EdgeTile(edges2);
+                tileGrid[x + px, y + py] ??= new ColumnTile(dir.Opposite(), mid: false);
+
+                description.FreeTiles.Add((nx1, ny1));
+                description.FreeTiles.Add((nx2, ny2));
             }
-
-        if (Exits.South())
-            for (int i = ymid + 1; i < y + Height; i++)
-            {
-                ATile midTile = i % 2 == 0
-                    ? new ColumnTile(Directions.None)
-                    : new EmptyTile();
-
-                tileGrid[xmid, i] = midTile;
-                EdgeTile t1 = new(Directions.West);
-                EdgeTile t2 = new(Directions.East);
-
-                if (i == y + Height - 1)
-                {
-                    t1.Edges |= Directions.South;
-                    t2.Edges |= Directions.South;
-                }
-
-                tileGrid[xmid - 1, i] = t1;
-                tileGrid[xmid + 1, i] = t2;
-            }
-
-        if (Exits.West())
-            for (int i = x; i < xmid; i++)
-            {
-                ATile midTile = i % 2 == 0
-                    ? new ColumnTile(Directions.None)
-                    : new EmptyTile();
-
-                EdgeTile northTile = new(Directions.North);
-                EdgeTile southTile = new(Directions.South);
-
-                if (i == x)
-                {
-                    northTile.Edges |= Directions.West;
-                    southTile.Edges |= Directions.West;
-                }
-
-                tileGrid[i, ymid] = midTile;
-                tileGrid[i, ymid - 1] = northTile;
-                tileGrid[i, ymid + 1] = southTile;
-            }
-
-        if (Exits.East())
-            for (int i = xmid + 1; i < x + Width; i++)
-            {
-                ATile midTile = i % 2 == 0
-                    ? new ColumnTile(Directions.None)
-                    : new EmptyTile();
-
-                EdgeTile northTile = new(Directions.North);
-                EdgeTile southTile = new(Directions.South);
-
-                if (i == x + Width - 1)
-                {
-                    northTile.Edges |= Directions.East;
-                    southTile.Edges |= Directions.East;
-                }
-
-                tileGrid[i, ymid] = midTile;
-                tileGrid[i, ymid - 1] = northTile;
-                tileGrid[i, ymid + 1] = southTile;
-            }
-
-        if (tileGrid[xmid - 1, ymid] == null)
-            tileGrid[xmid - 1, ymid] = new EdgeTile(Directions.West);
-
-        if (tileGrid[xmid + 1, ymid] == null)
-            tileGrid[xmid + 1, ymid] = new EdgeTile(Directions.East);
-
-        if (tileGrid[xmid, ymid - 1] == null)
-            tileGrid[xmid, ymid - 1] = new EdgeTile(Directions.North);
-
-        if (tileGrid[xmid, ymid + 1] == null)
-            tileGrid[xmid, ymid + 1] = new EdgeTile(Directions.South);
-
-
-        if (tileGrid[xmid - 1, ymid - 1] == null)
-            tileGrid[xmid - 1, ymid - 1] = new EdgeTile(Directions.West | Directions.North);
-
-        if (tileGrid[xmid + 1, ymid - 1] == null)
-            tileGrid[xmid + 1, ymid - 1] = new EdgeTile(Directions.East | Directions.North);
-
-        if (tileGrid[xmid - 1, ymid + 1] == null)
-            tileGrid[xmid - 1, ymid + 1] = new EdgeTile(Directions.West | Directions.South);
-
-        if (tileGrid[xmid + 1, ymid + 1] == null)
-            tileGrid[xmid + 1, ymid + 1] = new EdgeTile(Directions.East | Directions.South);
-
-        tileGrid[xmid, ymid] = new ColumnTile(
-            Directions.North
-            | Directions.South
-            | Directions.West
-            | Directions.East
-            );
-
 
 
         List<(int, int)> patrol = new();
-        xmid = Width / 2;
-        ymid = Height / 2;
+        List<(int, int)> keyPoints = new();
 
-        if (Exits.West())
-            foreach ((int px, int py) in GetShortPath(0, ymid, xmid, ymid))
-                patrol.Add(((x + px) * ATile.WIDTH + ATile.WIDTH / 2, (y + py + 1) * ATile.HEIGHT + ATile.HEIGHT / 2));
-
+        keyPoints.Add((midX - 1, midY - 1));
+        //*/
         if (Exits.North())
-            foreach ((int px, int py) in GetShortPath(xmid, 0, xmid, ymid))
-                patrol.Add(((x + px + 1) * ATile.WIDTH + ATile.WIDTH / 2, (y + py) * ATile.HEIGHT + ATile.HEIGHT / 2));
-
+        {
+            keyPoints.Add((midX - 1, 0));
+            keyPoints.Add((midX + 1, 0));
+        }
+        //*/
+        keyPoints.Add((midX + 1, midY - 1));
+        /*/
         if (Exits.East())
-            foreach ((int px, int py) in GetShortPath(Width - 1, ymid, xmid, ymid))
-                patrol.Add(((x + px) * ATile.WIDTH + ATile.WIDTH / 2, (y + py + 1) * ATile.HEIGHT + ATile.HEIGHT / 2));
-
+        {
+            keyPoints.Add((Width - 1, midY - 1));
+            keyPoints.Add((Width - 1, midY + 1));
+        }
+        //*/
+        keyPoints.Add((midX + 1, midY + 1));
+        /*/
         if (Exits.South())
-            foreach ((int px, int py) in GetShortPath(xmid, Height - 1, xmid, ymid))
-                patrol.Add(((x + px + 1) * ATile.WIDTH + ATile.WIDTH / 2, (y + py) * ATile.HEIGHT + ATile.HEIGHT / 2));
+        {
+            keyPoints.Add((midX + 1, Height - 1));
+            keyPoints.Add((midX - 1, Height - 1));
+        }
+        //*/
+        keyPoints.Add((midX - 1, midY + 1));
+        /*/
+        if (Exits.West())
+        {
+            keyPoints.Add((0, midY + 1));
+            keyPoints.Add((0, midY - 1));
+        }
+        //*/
+        
 
-        EnemyParams enemyParams = new();
-        enemyParams.Patrol = patrol;
-        enemyParams.Spawn = patrol[0];
-        return enemyParams;
+        for (int i = 0; i < keyPoints.Count; i++)
+        {
+            (int currentX, int currentY) = keyPoints[i];
+            (int nextX, int nextY) = keyPoints[(i + 1) % keyPoints.Count];
+
+            foreach ((int px, int py) in GetShortPath(currentX, currentY, nextX, nextY))
+                patrol.Add(ATile.FromSuperMid(x + px, y + py));
+        }
+
+        description.PatrolPath = patrol;
+
+        foreach (Lock l in Locks) l.Implement(description);
+        foreach (Key k in Keys) k.Implement(description);
+
+        return description.Enemies;
     }
 }

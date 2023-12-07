@@ -76,9 +76,10 @@ public class EnemyController : MonoBehaviour
         _positionReached = callback;
     }
 
-    public void Patrol(Vector3[] positions)
+    public void Patrol(Vector3[] positions, int index = 0)
     {
         _patrolPositions = positions;
+        _patrolIndex = index;
     }
 
     private void ResolvePatrol()

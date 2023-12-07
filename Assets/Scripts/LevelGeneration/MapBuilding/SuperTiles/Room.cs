@@ -12,60 +12,31 @@ public class Room : ASuperTile
     {
     }
 
-    public override EnemyParams BuildTiles(int x, int y, ATile[,] tileGrid)
+    public override List<EnemyParams> BuildTiles(int x, int y, ATile[,] tileGrid)
     {
+        SuperTileDescription description = CreateDescription(x, y, tileGrid);
+        BuildSubRoom(x, y, Width, Height, description, Exits, internalRoom: false);
         int midX = Width / 2;
         int midY = Height / 2;
-        List<(int, int)> exits = new();
-        if (Exits.North()) exits.Add((midX, 0));
-        if (Exits.South()) exits.Add((midX, Height - 1));
-        if (Exits.East()) exits.Add((Width - 1, midY));
-        if (Exits.West()) exits.Add((0, midY));
-
-        for (int i = 0; i < Width; i++)
-            for (int j = 0; j < Height; j++)
-            {
-                Directions edgeFlags = EdgeDirectinons(i, j, Width, Height);
-                ATile tile;
-
-                if (exits.Contains((i, j)))
-                    tile = new DoorTile(edgeFlags);
-                else if (!edgeFlags.None())
-                    tile = new EdgeTile(edgeFlags);
-                else
-                    tile = new EmptyTile();
-
-                tileGrid[x + i, y + j] = tile;
-            }
-
-        foreach (Key k in Keys)
-            k.Implement(tileGrid, x, y, Width, Height);
-
-        foreach (Lock l in Locks)
-            l.Implement(tileGrid, x, y, Width, Height);
 
         List<(int, int)> patrol = new();
 
-        if (Exits.West())
-            foreach ((int px, int py) in GetShortPath(0, midY, midX, midY))
-                patrol.Add(((x + px) * ATile.WIDTH + ATile.WIDTH / 2, (y + py) * ATile.HEIGHT + ATile.HEIGHT / 2));
+        foreach (Directions dir in Exits.Enumerate())
+        {
+            (int ex, int ey) = description.ExitsTiles[dir];
+            foreach ((int px, int py) in GetShortPath(ex, ey, midX, midY))
+                patrol.Add(ATile.FromSuperMid(x + px, y + py));
+        }
 
-        if (Exits.North())
-            foreach ((int px, int py) in GetShortPath(midX, 0, midX, midY))
-                patrol.Add(((x + px) * ATile.WIDTH + ATile.WIDTH / 2, (y + py) * ATile.HEIGHT + ATile.HEIGHT / 2));
+        description.PatrolPath = patrol;
 
-        if (Exits.East())
-            foreach ((int px, int py) in GetShortPath(Width - 1, midY, midX, midY))
-                patrol.Add(((x + px) * ATile.WIDTH + ATile.WIDTH / 2, (y + py) * ATile.HEIGHT + ATile.HEIGHT / 2));
+        foreach (Key k in Keys)
+            k.Implement(description);
 
-        if (Exits.South())
-            foreach ((int px, int py) in GetShortPath(midX, Height - 1, midX, midY))
-                patrol.Add(((x + px) * ATile.WIDTH + ATile.WIDTH / 2, (y + py) * ATile.HEIGHT + ATile.HEIGHT / 2));
+        foreach (Lock l in Locks)
+            l.Implement(description);
 
-        EnemyParams enemyParams = new();
-        enemyParams.Patrol = patrol;
-        enemyParams.Spawn = ((x + midX) * ATile.WIDTH + ATile.WIDTH / 2, (y + midY) * ATile.HEIGHT + ATile.HEIGHT / 2);
-        return enemyParams;
+        return description.Enemies;
     }
 }
 

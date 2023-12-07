@@ -8,9 +8,11 @@ using System.Xml.Serialization;
 public class ColumnTile : ATile
 {
     Directions Directions { get; set; }
-    public ColumnTile(Directions directions)
+    bool Mid;
+    public ColumnTile(Directions directions, bool mid = true)
     {
         Directions = directions;
+        Mid = mid;
     }
 
     public override void BuildSubTiles(int x, int y, ASubTile[,] subTileGrid)
@@ -33,12 +35,12 @@ public class ColumnTile : ATile
         if (Directions.East())
             for (int i = xmid + 1; i < x + WIDTH; i++)
                 subTileGrid[i, ymid] = new WallSubTile();
-
-        subTileGrid[xmid, ymid] = new WallSubTile();
+        
+        if (Mid)
+            subTileGrid[xmid, ymid] = new WallSubTile();
 
         for (int i = x; i < x + WIDTH; i++)
             for (int j = y; j < y + HEIGHT; j++)
-                if (subTileGrid[i, j] == null)
-                    subTileGrid[i, j] = new FloorSubTile();
+                subTileGrid[i, j] ??= new FloorSubTile();
     }
 }

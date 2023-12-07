@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using URandom = UnityEngine.Random;
 
 public class BaseVertex
 {
@@ -89,6 +90,11 @@ public class GraphGenerator
             cycleRule.Apply(Graph.GetRandomEdge(), Graph, new DoorLock());
             extensionRule.Apply(Graph.GetRandomEdge(), Graph);
         }
+
+
+        //foreach (var vertex in Graph.GetVertices())
+        //    if (URandom.value > 0.5f)
+        //        vertex.AddLock(new EnemyLock());
 
         // Graph from the paper
         //PredefinedGraph();

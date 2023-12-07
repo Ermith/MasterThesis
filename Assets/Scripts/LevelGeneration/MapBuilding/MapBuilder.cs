@@ -62,16 +62,19 @@ class MapBuilder
 
                 ASuperTile tile;
                 float t = URandom.Range(0f, 1f);
-                if (t > 0.80f)
+                if (t > 0.75f)
                     tile = new HallwayWithRooms(_superWidth, _superHeight, exits);
-                else if (t > 0.60f)
+                else if (t > 0.50f)
                     tile = new WideHallway(_superWidth, _superHeight, exits);
-                else if (t > 0.50)
-                    tile = new FilledRoom(_superWidth, _superHeight, true, exits);
+                else if (t > 0.25)
+                    tile = new FilledRoom(_superWidth, _superHeight, false, exits);
                 else
                     tile = new Hallway(_superWidth, _superHeight, exits);
 
                 superTileGrid[x, y] = tile;
+
+                if (tile is Hallway)
+                    tile.Locks.Add(new EnemyLock());
             }
 
         foreach ((int x, int yFrom, int yTo) in _graphDrawing.VerticalLines)
@@ -92,16 +95,17 @@ class MapBuilder
                 }
 
                 float t = URandom.Range(0f, 1f);
-                if (t > 0.40f)
+                if (t > 0.8f)
                     tile = new HallwayWithRooms(_superWidth, _superHeight, exits);
-                else if (t > 0.60f)
+                else if (t > 0.50f)
                     tile = new WideHallway(_superWidth, _superHeight, exits);
-                else if (t > 0.50)
-                    tile = new FilledRoom(_superWidth, _superHeight, true, exits);
+                else if (t > 0.25f)
+                    tile = new FilledRoom(_superWidth, _superHeight, false, exits);
                 else
                     tile = new Hallway(_superWidth, _superHeight, exits);
 
                 superTileGrid[x, y] = tile;
+                tile.Locks.Add(new EnemyLock());
             }
         }
         
@@ -113,20 +117,23 @@ class MapBuilder
             var west = TryGetTile(x - 1, y, superTileGrid);
 
             Directions exits = Directions.None;
-            if (north != null && north is Hallway nHallway && nHallway.Exits.South()) exits |= Directions.North;
-            if (south != null && south is Hallway sHallway && sHallway.Exits.North()) exits |= Directions.South;
-            if (east != null && east is Hallway eHallway && eHallway.Exits.West()) exits |= Directions.East;
-            if (west != null && west is Hallway hallway && hallway.Exits.East()) exits |= Directions.West;
+            if (north != null && north is ASuperTile nTile && nTile.Exits.South()) exits |= Directions.North;
+            if (south != null && south is ASuperTile sTile && sTile.Exits.North()) exits |= Directions.South;
+            if (east != null && east is ASuperTile eTile && eTile.Exits.West()) exits |= Directions.East;
+            if (west != null && west is ASuperTile wTile && wTile.Exits.East()) exits |= Directions.West;
 
             ASuperTile tile;
             if (URandom.Range(0f, 1f) > 0.4f)
-                tile = new FilledRoom(_superWidth, _superHeight, false, exits);
+                tile = new FilledRoom(_superWidth, _superHeight, true, exits);
             else
                 tile = new Room(_superWidth, _superHeight, exits);
 
             superTileGrid[x, y] = tile;
             superTileGrid[x, y].Locks = vertex.GetLocks().ToList();
             superTileGrid[x, y].Keys = vertex.GetKeys().ToList();
+
+            //if (tile is FilledRoom room)
+            //    room.Locks.Add(new EnemyLock());
         }
 
         return superTileGrid;
@@ -144,7 +151,9 @@ class MapBuilder
                 if (superTileGrid[x, y] != null)
                 {
                     var enemyParams = superTileGrid[x, y].BuildTiles(x * _superWidth, y * _superHeight, tileGrid);
-                    enemies.Add(enemyParams);
+
+                    foreach (var enemy in enemyParams)
+                        enemies.Add(enemy);
                 }
 
         enemiesParams = enemies.ToArray();

@@ -10,110 +10,94 @@ public class HallwayWithRooms : Hallway
     {
     }
 
-    private void BuildSubRoom(int x, int y, int width, int height, ATile[,] tileGrid, Directions roomExits)
+    public override List<EnemyParams> BuildTiles(int x, int y, ATile[,] tileGrid)
     {
-        for (int i = 0; i < width; i++)
-        {
-            var edges = EdgeDirectinons(i, 0, width, height);
-            var exits = (i == width / 2 && roomExits.North()) ? Directions.North : Directions.None;
-            tileGrid[i + x, y] = new EdgeTile(edges, exits);
+        SuperTileDescription description = CreateDescription(x, y, tileGrid);
 
-            edges = EdgeDirectinons(i, width - 1, width, height);
-            exits = (i == width / 2 && roomExits.South()) ? Directions.South : Directions.None;
-            tileGrid[i + x, y + height - 1] = new EdgeTile(edges, exits);
+        int midX = Width / 2;
+        int midY = Height / 2;
+        List<(int, int)> patrol = new();
+
+        foreach ((Directions dir, (int ex, int ey)) in description.ExitsTiles)
+            foreach ((int px, int py) in GetShortPath(midX, midY, ex, ey))
+            {
+                if ((px, py) == (midX, midY)) continue;
+
+                description.FreeTiles.Add((px, py));
+                patrol.Add(ATile.FromSuperMid(x + px, y + py));
+                tileGrid[x + px, y + py] = new EdgeTile(dir.Perpendicular()); ;
+            }
+
+        description.PatrolPath = patrol;
+
+        Directions midWalls = ~Exits;
+        tileGrid[x + midX, y + midY] = new EdgeTile(midWalls);
+        description.FreeTiles.Add((midX, midY));
+
+        Directions nwExits, neExits, swExits, seExits;
+        nwExits = neExits = swExits = seExits = Directions.None;
+        int roomWidth = (Width - 1) / 2;
+        int roomHeight = (Height - 1) / 2;
+
+        if (Exits.North())
+        {
+            nwExits |= Directions.East;
+            neExits |= Directions.West;
+            var tile = description.Get(midX, roomHeight / 2) as EdgeTile;
+            tile.Exits |= nwExits | neExits;
         }
 
-        for (int i = 0; i < height; i++)
+        if (Exits.South())
         {
-            var edges = EdgeDirectinons(0, i, width, height);
-            var exits = (i == height / 2 && roomExits.West()) ? Directions.West : Directions.None;
-            var tile = tileGrid[x, i + y] as EdgeTile ?? new EdgeTile(edges);
-            tile.Exits |= exits;
-            tileGrid[x, i + y] = tile;
-
-
-            edges = EdgeDirectinons(width - 1, i, width, height);
-            exits = (i == height / 2 && roomExits.East()) ? Directions.East : Directions.None;
-
-            tile = tileGrid[x + width - 1, i + y] as EdgeTile ?? new EdgeTile(edges);
-            tile.Exits |= exits;
-            tileGrid[x + width - 1, i + y] = tile;
+            swExits |= Directions.East;
+            seExits |= Directions.West;
+            var tile = description.Get(midX, midY + 1 + roomHeight / 2) as EdgeTile;
+            tile.Exits |= swExits | seExits;
         }
 
-        for (int i = x; i < x + width; i++)
-            for (int j = y; j < y + height; j++)
-                if (tileGrid[i, j] == null)
-                    tileGrid[i, j] = new EmptyTile();
-    }
+        if (Exits.West())
+        {
+            nwExits |= Directions.South;
+            swExits |= Directions.North;
+            var tile = description.Get(roomWidth / 2, midY) as EdgeTile;
+            tile.Exits |= nwExits | swExits;
+        }
 
-    public override EnemyParams BuildTiles(int x, int y, ATile[,] tileGrid)
-    {
-        EnemyParams enemyParams = base.BuildTiles(x, y, tileGrid);
+        if (Exits.East())
+        {
+            neExits |= Directions.South;
+            seExits |= Directions.North;
+            var tile = description.Get(midX + 1 + roomWidth / 2, midY) as EdgeTile;
+            tile.Exits |= neExits | seExits;
+        }
 
-        int roomWidth = Width / 2;
-        int roomHeight = Height / 2;
-
-        var nw = Directions.None;
-        if (Exits.West()) nw |= Directions.South;
-        if (Exits.North()) nw |= Directions.East;
-
-        var ne = Directions.None;
-        if (Exits.East()) ne |= Directions.South;
-        if (Exits.North()) ne |= Directions.West;
-
-        var sw = Directions.None;
-        if (Exits.West()) sw |= Directions.North;
-        if (Exits.South()) sw |= Directions.East;
-
-        var se = Directions.None;
-        if (Exits.East()) se |= Directions.North;
-        if (Exits.South()) se |= Directions.West;
-
-
-        if (Exits.North() || Exits.West())
+        if (!nwExits.None())
             BuildSubRoom(
-                x + 0,
-                y + 0,
+                x, y,
                 roomWidth, roomHeight,
-                tileGrid, nw
-                );
+                description, nwExits);
 
-        if (Exits.North() || Exits.East())
+        if (!neExits.None()) 
             BuildSubRoom(
-                x + Width / 2 + 1,
-                y + 0,
+                x + midX + 1, y,
                 roomWidth, roomHeight,
-                tileGrid, ne
-                );
+                description, neExits);
 
-        if (Exits.South() || Exits.West())
+        if (!swExits.None())
             BuildSubRoom(
-                x + 0,
-                y + Height / 2 + 1,
+                x, y + midY + 1,
                 roomWidth, roomHeight,
-                tileGrid, sw
-                );
+                description, swExits);
 
-        if (Exits.South() || Exits.East())
+        if (!seExits.None())
             BuildSubRoom(
-                x + Width / 2 + 1,
-                y + Height / 2 + 1,
+                x + midX + 1, y + midY + 1,
                 roomWidth, roomHeight,
-                tileGrid, se
-                );
+                description, seExits);
 
-        if (tileGrid[x + Width / 2, y + roomHeight / 2] is EdgeTile northEdge)
-            northEdge.Exits = Directions.East | Directions.West;
+        foreach (Lock l in Locks) l.Implement(description);
+        foreach (Key k in Keys) k.Implement(description);
 
-        if (tileGrid[x + Width / 2, y + Width - roomHeight / 2] is EdgeTile southEdge)
-            southEdge.Exits = Directions.East | Directions.West;
-
-        if (tileGrid[x + roomWidth / 2, y + Height / 2] is EdgeTile eastEdge)
-            eastEdge.Exits = Directions.North | Directions.South;
-
-        if (tileGrid[x + Width - roomWidth / 2, y + Height / 2] is EdgeTile westEdge)
-            westEdge.Exits = Directions.North | Directions.South;
-
-        return enemyParams;
+        return description.Enemies;
     }
 }
