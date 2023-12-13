@@ -112,7 +112,7 @@ public class PlayerController : MonoBehaviour
         IsHidden = Refuge;
         Refuge = false;
 
-        GetComponent<MeshRenderer>().material.color = IsHidden ? Color.black : Color.white;
+        //GetComponent<MeshRenderer>().material.color = IsHidden ? Color.black : Color.white;
     }
 
     private void CreateSound(float range)

@@ -67,18 +67,18 @@ public class CameraController : MonoBehaviour
 
             case CameraModeType.ThirdPerson:
                 SetParams(
-                    distance: 10f,
+                    distance: ThirdPersonDistance,
                     horizontalRotation: true,
                     verticalRotation: true,
-                    damping: 0.1f);
+                    damping: ThirdPersonDampTime);
                 break;
 
             case CameraModeType.TopDown:
                 SetParams(
-                    distance: 20f,
+                    distance: TopDownDistance,
                     horizontalRotation: true,
                     verticalRotation: false,
-                    damping: 0.1f);
+                    damping: TopDownDampTime);
 
                 SetRotation(_horizontalRotation, TopDownInclanation);
 
