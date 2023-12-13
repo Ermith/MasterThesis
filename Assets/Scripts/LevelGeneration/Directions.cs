@@ -68,6 +68,18 @@ public static class DirectionsExtensions
         if (directions.East()) yield return Directions.East;
     }
 
+    public static Vector3 ToVector3(this Directions directions)
+    {
+        Vector3 vector = new();
+        if (directions.North()) vector += Vector3.back;
+        if (directions.South()) vector += Vector3.forward;
+        if (directions.West()) vector += Vector3.left;
+        if (directions.East()) vector += Vector3.right;
+
+        // This will be useful
+        return vector;
+    }
+
     public static Directions GetRandom()
     {
         var dirs = Directions.None;

@@ -5,12 +5,11 @@ using UnityEngine;
 
 public class Sight : MonoBehaviour
 {
-    MeshFilter _meshFilter;
-    MeshRenderer _meshRenderer;
-    Mesh _mesh;
-    GameObject _visionCone;
-    Color _baseColor;
-    Color _highlightColor = Color.red;
+    private MeshFilter _meshFilter;
+    private MeshRenderer _meshRenderer;
+    private Mesh _mesh;
+    private Color _baseColor;
+    private Color _highlightColor = Color.red;
 
     public int Segments = 20;
     public float Angle = 90 * Mathf.Deg2Rad;
@@ -19,22 +18,16 @@ public class Sight : MonoBehaviour
     public bool VisionConeVisible = true;
     public bool VisionConeHilighted = false;
 
-    [HideInInspector]
-    public float HeightCorrection = 0;
-
     // Start is called before the first frame update
     void Start()
     {
-        _visionCone = new GameObject();
-        _visionCone.name = "Vision Cone";
-        _visionCone.transform.position = transform.position;
-        _visionCone.transform.parent = transform;
-        _meshRenderer = _visionCone.AddComponent<MeshRenderer>();
+        _meshRenderer = this.AddComponent<MeshRenderer>();
         _meshRenderer.material = VisionConeMaterial;
         _meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         _meshRenderer.receiveShadows = false;
+
         _baseColor = _meshRenderer.material.color;
-        _meshFilter = _visionCone.AddComponent<MeshFilter>();
+        _meshFilter = this.AddComponent<MeshFilter>();
         _mesh = new Mesh();
         _meshFilter.mesh = _mesh;
     }
@@ -42,7 +35,8 @@ public class Sight : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        _visionCone.SetActive(VisionConeVisible);
+        //SetActive(VisionConeVisible);
+        _meshRenderer.enabled = VisionConeVisible;
         if (VisionConeVisible)
             RenderVisionCone();
         
@@ -52,7 +46,7 @@ public class Sight : MonoBehaviour
     {
         var triangles = new int[(Segments - 1) * 3];
         var vertices = new Vector3[Segments + 1];
-        vertices[Segments] = Vector3.zero;// + Vector3.down * HeightCorrection;
+        vertices[Segments] = Vector3.zero;
 
         for (int segment = 0; segment < Segments; segment++)
         {
@@ -65,8 +59,16 @@ public class Sight : MonoBehaviour
 
             bool hit = Physics.Raycast(transform.position, segmentDir, out RaycastHit hitInfo, Range);
             vertices[segment] = hit
-                ? vertexDir * hitInfo.distance// + Vector3.down * HeightCorrection
-                : vertexDir * Range;// + Vector3.down * HeightCorrection;
+                ? vertexDir * hitInfo.distance
+                : vertexDir * Range;
+
+            Vector3 scale = transform.lossyScale;
+            Vector3 invertedScale = new(
+                1 / scale.x,
+                1 / scale.y,
+                1 / scale.z);
+
+            vertices[segment].Scale(invertedScale);
 
             if (segment == Segments - 1) continue;
 

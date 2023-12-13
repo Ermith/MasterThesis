@@ -14,6 +14,10 @@ public class LevelGenerator : MonoBehaviour
     public GameObject FloorBlueprint;
     public GameObject DoorBlueprint;
     public GameObject KeyBlueprint;
+    public GameObject SecurityCameraBlueprint;
+    public GameObject SecurityCameraSourceBlueprint;
+    public GameObject TrapBlueprint;
+    public GameObject SoundTrapBlueprint;
     public EnemyController EnemyBlueprint;
 
     IGraph<BaseVertex> _graph;
@@ -32,7 +36,12 @@ public class LevelGenerator : MonoBehaviour
     private void Awake()
     {
 
-        DoorKey.KeyBlueprint = KeyBlueprint;
+        DoorKey.Blueprint = KeyBlueprint;
+        SecurityCameraLock.Blueprint = SecurityCameraBlueprint;
+        SecurityCameraKey.Blueprint = SecurityCameraSourceBlueprint;
+        TrapLock.Blueprint = TrapBlueprint;
+        SoundTrapLock.Blueprint = SoundTrapBlueprint;
+
         _graph = new UndirectedAdjecencyGraph<BaseVertex>();
         _graphGenerator = new GraphGenerator(_graph);
         _graphGenerator.Generate();

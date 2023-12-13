@@ -88,7 +88,7 @@ public class GraphGenerator
         {
             
             cycleRule.Apply(Graph.GetRandomEdge(), Graph, new DoorLock());
-            extensionRule.Apply(Graph.GetRandomEdge(), Graph);
+            extensionRule.Apply(Graph.GetRandomEdge(), Graph, new SecurityCameraLock());
         }
 
 

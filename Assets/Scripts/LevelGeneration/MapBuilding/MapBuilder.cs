@@ -75,6 +75,13 @@ class MapBuilder
 
                 //if (tile is Hallway)
                     tile.Locks.Add(new EnemyLock());
+
+
+                t = URandom.value;
+                if (t > 0.75f)
+                    tile.Locks.Add(new TrapLock());
+                else if (t > 0.5f)
+                    tile.Locks.Add(new SoundTrapLock());
             }
 
         foreach ((int x, int yFrom, int yTo) in _graphDrawing.VerticalLines)
@@ -106,6 +113,13 @@ class MapBuilder
 
                 superTileGrid[x, y] = tile;
                 tile.Locks.Add(new EnemyLock());
+
+
+                t = URandom.value;
+                if (t > 0.75f)
+                    tile.Locks.Add(new TrapLock());
+                else if (t > 0.5f)
+                    tile.Locks.Add(new SoundTrapLock());
             }
         }
         
@@ -134,6 +148,14 @@ class MapBuilder
 
             //if (tile is FilledRoom room)
                 tile.Locks.Add(new EnemyLock());
+
+
+            float t = URandom.value;
+            if (t > 0.75f)
+                tile.Locks.Add(new TrapLock());
+            else if (t > 0.5f)
+                tile.Locks.Add(new SoundTrapLock());
+            
         }
 
         return superTileGrid;

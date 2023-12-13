@@ -29,7 +29,6 @@ public class EnemyController : MonoBehaviour
     {
         _characterController = GetComponent<CharacterController>();
         _sight = GetComponent<Sight>();
-        _sight.HeightCorrection = _characterController.height / 2;
         _audition = GetComponent<Audition>();
         _audition.SoundResponse += SoundResponse;
     }

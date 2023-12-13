@@ -13,7 +13,7 @@ public abstract class ASubTile
 {
     private static Dictionary<Type, Func<ASubTile, GameObject>> _spawnFunctions = new();
 
-    public List<GameObject> Objects = new();
+    public List<Func<GameObject>> Objects = new();
     public static void Register<T>(Func<ASubTile, GameObject> spawnFunction) where T : ASubTile
     {
         _spawnFunctions[typeof(T)] = spawnFunction;
@@ -28,7 +28,8 @@ public abstract class ASubTile
 
         foreach (var obj in Objects)
         {
-            var keyObj = GameObject.Instantiate(obj, new Vector3(0, 0, 0), Quaternion.identity, tileObj.transform);
+            var keyObj = obj();
+            keyObj.transform.parent = tileObj.transform;
             keyObj.transform.localPosition = Vector3.zero;
         }
 
