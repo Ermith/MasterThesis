@@ -35,16 +35,15 @@ public class PlayerController : MonoBehaviour
         _lineRenderer.endColor = Color.red;
         _lineRenderer.startWidth = 0.1f;
         _lineRenderer.endWidth = 0.1f;
-        if (Camera != null) Camera.Target = transform;
     }
 
     // Update is called once per frame
     void Update()
     {
         // Camera
-        if (Input.GetKey(KeyCode.F1)) Camera.CameraMode = CameraModeType.FirstPerson;
-        if (Input.GetKey(KeyCode.F2)) Camera.CameraMode = CameraModeType.ThirdPerson;
-        if (Input.GetKey(KeyCode.F3)) Camera.CameraMode = CameraModeType.TopDown;
+        if (Input.GetKey(KeyCode.F1)) Camera.SwitchMode(CameraModeType.FirstPerson);
+        if (Input.GetKey(KeyCode.F2)) Camera.SwitchMode(CameraModeType.TopDown);
+        if (Input.GetKey(KeyCode.F3)) Camera.SwitchMode(CameraModeType.ThirdPerson);
 
         //Movement
         Vector3 inputDir = Vector3.zero;
