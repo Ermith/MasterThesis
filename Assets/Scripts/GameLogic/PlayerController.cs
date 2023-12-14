@@ -25,10 +25,12 @@ public class PlayerController : MonoBehaviour
     private bool _wasMoving = false;
     private float walkTime = 0f;
     private LineRenderer _lineRenderer;
+    private Renderer _visual;
 
     // Start is called before the first frame update
     void Start()
     {
+        _visual = transform.Find("Visual").GetComponent<Renderer>();
         _characterContrroller = GetComponent<CharacterController>();
         _lineRenderer = GetComponent<LineRenderer>();
         _lineRenderer.startColor = Color.red;
@@ -45,6 +47,9 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.F2)) Camera.SwitchMode(CameraModeType.TopDown);
         if (Input.GetKey(KeyCode.F3)) Camera.SwitchMode(CameraModeType.ThirdPerson);
 
+        SwitchVisual(Camera.CameraMode != CameraModeType.FirstPerson);
+        Camera.BobEnabled = Camera.CameraMode == CameraModeType.FirstPerson;
+
         //Movement
         Vector3 inputDir = Vector3.zero;
         if (Input.GetKey(KeyCode.W)) inputDir += Vector3.forward;
@@ -55,14 +60,21 @@ public class PlayerController : MonoBehaviour
 
         float speed = WalkingSpeed;
         float radius = WalkingRadius;
+        StepFrequency = 0.7f;
+        Camera.BobDuration = 0.35f;
+        Camera.BobScale = 0.075f;
         if (Input.GetKey(KeyCode.LeftShift))
         {
             speed = RunningSpeed;
             radius = RunningRadius;
+            StepFrequency = 0.4f;
+            Camera.BobDuration = 0.2f;
+            Camera.BobScale = 0.15f;
         }
 
         bool isMoving = inputDir != Vector3.zero;
 
+        if (isMoving) Camera.BobStart(); else Camera.BobEnd();
         if (isMoving && !_wasMoving) walkTime = 0;
         if (isMoving) walkTime += Time.deltaTime;
         if (isMoving && walkTime > StepFrequency)
@@ -118,5 +130,12 @@ public class PlayerController : MonoBehaviour
     private void CreateSound(float range)
     {
         GameController.AudioManager.AudibleEffect(gameObject, transform.position + Vector3.down * _characterContrroller.height / 2, range);
+    }
+
+    private void SwitchVisual(bool visible)
+    {
+        _visual.shadowCastingMode = visible
+            ? UnityEngine.Rendering.ShadowCastingMode.On
+            : UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
     }
 }

@@ -102,7 +102,7 @@ MonoBehaviour:
   WalkingRadius: 1.5
   RunningRadius: 5
   Camera: {fileID: 0}
-  StepFrequency: 5
+  StepFrequency: 0.5
   Projectile: {fileID: 8520847064218726488, guid: c09c916153dd54c4f8cd75a232a00f21, type: 3}
   IsHidden: 0
   Refuge: 0

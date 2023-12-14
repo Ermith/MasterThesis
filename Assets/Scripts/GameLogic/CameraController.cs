@@ -29,6 +29,15 @@ public class CameraController : MonoBehaviour
     private Vector3 _direction;
     private Vector3 _velocity;
     private Vector3 _pivotPosition;
+
+    // Camera Bob
+    private enum BobState { None, RightStep, RightRise, LeftStep, LeftRise }
+    public float BobDuration = 0.35f;
+    public float BobScale = 0.075f;
+    public bool BobEnabled = true;
+    private BobState _bobState = BobState.LeftStep;
+    private float _bobTime = 0f;
+    private Vector3 _previousOffset;
     #endregion
 
     #region PUBLIC_INTERFACE
@@ -91,6 +100,17 @@ public class CameraController : MonoBehaviour
         CameraMode = cameraMode;
     }
 
+    public void BobStart()
+    {
+        if (_bobState == BobState.None)
+            _bobState = BobState.LeftStep;
+    }
+
+    public void BobEnd()
+    {
+        _bobState = BobState.None;
+    }
+
     #endregion
 
     private Vector3 SphericalToCartezian(float polar, float elevation)
@@ -137,9 +157,63 @@ public class CameraController : MonoBehaviour
         transform.position = _pivotPosition + _direction * _distance;
     }
 
+    private void CameraBob()
+    {
+        Vector3 left = (-transform.up - transform.right) * BobScale;
+        Vector3 right = (-transform.up + transform.right) * BobScale;
+        Vector3 mid = transform.up * BobScale;
+
+        Vector3 targetOffset = _bobState switch
+        {
+            BobState.None => Vector3.zero,
+            BobState.RightStep => right,
+            BobState.LeftStep => left,
+            BobState.RightRise => mid,
+            BobState.LeftRise => mid,
+            _ => Vector3.zero
+        };
+
+        Func<float, float> ease = _bobState switch
+        {
+            BobState.LeftRise | BobState.RightRise => (float t) => t* t,
+            _ => (float t) => t
+        };
+
+
+        _bobTime += Time.deltaTime;
+        var t = _bobTime / BobDuration;
+        float smoothStart = t * t;
+        float smoothEnd = 1 - (1 - t) * (1 - t);
+        float mix = (1 - t) * smoothStart  + t * smoothEnd;
+
+        var offset = Vector3.Lerp(_previousOffset, targetOffset, mix);
+
+        if (t >= 1)
+        {
+            _previousOffset = targetOffset;
+            _bobTime = 0;
+            _bobState = _bobState switch
+            {
+                BobState.LeftStep => BobState.LeftRise,
+                BobState.LeftRise => BobState.RightStep,
+                BobState.RightStep => BobState.RightRise,
+                BobState.RightRise => BobState.LeftStep,
+                _ => BobState.None,
+            };
+        }
+
+        transform.position += offset;
+    }
+
+    private void ResolveEffects()
+    {
+        if (BobEnabled)
+            CameraBob();
+    }
+
     private void Awake()
     {
-        SwitchMode(CameraModeType.ThirdPerson);
+        SwitchMode(CameraModeType.FirstPerson);
     }
 
     // Update is called once per frame
@@ -147,5 +221,6 @@ public class CameraController : MonoBehaviour
     {
         ResolveRotation();
         ResolveMovement();
+        ResolveEffects();
     }
 }
