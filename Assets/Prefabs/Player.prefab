@@ -101,6 +101,9 @@ MonoBehaviour:
   RunningSpeed: 5
   WalkingRadius: 1.5
   RunningRadius: 5
+  PeekAngle: 20
+  PeekDuration: 0.25
+  PeekOffset: {x: 1, y: -0.5, z: 0}
   Camera: {fileID: 0}
   StepFrequency: 0.5
   Projectile: {fileID: 8520847064218726488, guid: c09c916153dd54c4f8cd75a232a00f21, type: 3}

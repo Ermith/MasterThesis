@@ -10,6 +10,9 @@ public class PlayerController : MonoBehaviour
     public float RunningSpeed = 5f;
     public float WalkingRadius = 1.5f;
     public float RunningRadius = 5f;
+    public float PeekAngle = 20f;
+    public float PeekDuration = 0.15f;
+    public Vector3 PeekOffset = new Vector3(1, -0.5f, 0);
     public CameraController Camera;
     public float StepFrequency = 5f;
     public Projectile Projectile;
@@ -26,11 +29,19 @@ public class PlayerController : MonoBehaviour
     private float walkTime = 0f;
     private LineRenderer _lineRenderer;
     private Renderer _visual;
+    private Transform _viewPoint;
+    private Vector3 _viewPointPosition;
+    private Vector3 _viewPointOffset;
+    private Vector3 _viewPointOffsetFrom;
+    private Vector3 _viewPointOffsetTarget;
+    private float _peekTime;
 
     // Start is called before the first frame update
     void Start()
     {
         _visual = transform.Find("Visual").GetComponent<Renderer>();
+        _viewPoint = transform.Find("ViewPoint");
+        _viewPointPosition = _viewPoint.localPosition;
         _characterContrroller = GetComponent<CharacterController>();
         _lineRenderer = GetComponent<LineRenderer>();
         _lineRenderer.startColor = Color.red;
@@ -43,12 +54,21 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         // Camera
-        if (Input.GetKey(KeyCode.F1)) Camera.SwitchMode(CameraModeType.FirstPerson);
-        if (Input.GetKey(KeyCode.F2)) Camera.SwitchMode(CameraModeType.TopDown);
-        if (Input.GetKey(KeyCode.F3)) Camera.SwitchMode(CameraModeType.ThirdPerson);
+        if (Input.GetKeyDown(KeyCode.F1)) Camera.SwitchMode(CameraModeType.FirstPerson);
+        if (Input.GetKeyDown(KeyCode.F2)) Camera.SwitchMode(CameraModeType.TopDown);
+        if (Input.GetKeyDown(KeyCode.F3)) Camera.SwitchMode(CameraModeType.ThirdPerson);
 
         SwitchVisual(Camera.CameraMode != CameraModeType.FirstPerson);
         Camera.BobEnabled = Camera.CameraMode == CameraModeType.FirstPerson;
+
+        // peeking
+        Vector3 peekLeft = new(-PeekOffset.x, PeekOffset.y, PeekOffset.z);
+        if (Input.GetKeyDown(KeyCode.E)) { StartPeek(false); }
+        if (Input.GetKeyDown(KeyCode.Q)) { StartPeek(true); }
+        if (Input.GetKeyUp(KeyCode.E)) { EndPeek(); }
+        if (Input.GetKeyUp(KeyCode.Q)) { EndPeek(); }
+        ResolvePeek();
+
 
         //Movement
         Vector3 inputDir = Vector3.zero;
@@ -97,6 +117,7 @@ public class PlayerController : MonoBehaviour
 
         Vector3 direction = cameraDir * inputDir.z + camearaRight * inputDir.x;
         _characterContrroller.SimpleMove(direction * speed);
+        transform.forward = cameraDir;
 
         if (Input.GetKeyDown(KeyCode.V))
         {
@@ -108,7 +129,7 @@ public class PlayerController : MonoBehaviour
         }
 
         _lineRenderer.enabled = false;
-        if (Input.GetKey(KeyCode.Q))
+        if (Input.GetKey(KeyCode.T))
         {
             float maxDistance = 1000;
             bool hit = Physics.Raycast(transform.position, Camera.GetGroundDirection(), out RaycastHit hitInfo, maxDistance);
@@ -137,5 +158,35 @@ public class PlayerController : MonoBehaviour
         _visual.shadowCastingMode = visible
             ? UnityEngine.Rendering.ShadowCastingMode.On
             : UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+    }
+
+    private void StartPeek(bool left)
+    {
+        _peekTime = 0f;
+        float peekAngle = left ? PeekAngle : -PeekAngle;
+        Camera.CustomRotationStart(PeekDuration, new Vector3(0, 0, peekAngle));
+        Vector3 offset = PeekOffset;
+        if (left) offset.x *= -1;
+
+        _viewPointOffsetFrom = _viewPointOffset;
+        _viewPointOffsetTarget = offset;
+    }
+
+    private void ResolvePeek()
+    {
+        _peekTime += Time.deltaTime;
+        _peekTime = Mathf.Clamp(_peekTime, 0, PeekDuration);
+        float t = _peekTime / PeekDuration;
+
+        _viewPointOffset = Vector3.Lerp(_viewPointOffset, _viewPointOffsetTarget, Easing.SmoothStep(t));
+        _viewPoint.localPosition = _viewPointPosition + _viewPointOffset;
+    }
+
+    private void EndPeek()
+    {
+        _peekTime = PeekDuration - _peekTime;
+        _viewPointOffsetTarget = Vector3.zero;
+        _viewPointOffsetFrom = _viewPointOffset;
+        Camera.CustomRotationEnd();
     }
 }
