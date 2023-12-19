@@ -2,12 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
+    private enum MovementState { Standing, Walking, Running, Sliding};
+    private MovementState _movementState;
+
     public float WalkingSpeed = 2f;
     public float RunningSpeed = 5f;
+    public float SlidingSpeed = 7f;
     public float WalkingRadius = 1.5f;
     public float RunningRadius = 5f;
     public float PeekAngle = 20f;
@@ -16,6 +21,11 @@ public class PlayerController : MonoBehaviour
     public CameraController Camera;
     public float StepFrequency = 5f;
     public Projectile Projectile;
+
+    public float WalkingBob = 0.065f;
+    public float WalkStepFrequency = 0.7f;
+    public float RunBob = 0.15f;
+    public float RunStepFrequency = 0.4f;
 
     [HideInInspector]
     public bool IsHidden = false;
@@ -48,11 +58,18 @@ public class PlayerController : MonoBehaviour
         _lineRenderer.endColor = Color.red;
         _lineRenderer.startWidth = 0.1f;
         _lineRenderer.endWidth = 0.1f;
+
+        SetStandingState();
     }
 
     // Update is called once per frame
     void Update()
     {
+        GatherInput();
+        ResolveState();
+        SwitchState();
+
+        /*/
         // Camera
         if (Input.GetKeyDown(KeyCode.F1)) Camera.SwitchMode(CameraModeType.FirstPerson);
         if (Input.GetKeyDown(KeyCode.F2)) Camera.SwitchMode(CameraModeType.TopDown);
@@ -70,7 +87,7 @@ public class PlayerController : MonoBehaviour
         ResolvePeek();
 
 
-        //Movement
+        // Movement
         Vector3 inputDir = Vector3.zero;
         if (Input.GetKey(KeyCode.W)) inputDir += Vector3.forward;
         if (Input.GetKey(KeyCode.A)) inputDir += Vector3.left;
@@ -135,7 +152,6 @@ public class PlayerController : MonoBehaviour
             bool hit = Physics.Raycast(transform.position, Camera.GetGroundDirection(), out RaycastHit hitInfo, maxDistance);
             if (!hit) return;
 
-
             _lineRenderer.enabled = true;
             _lineRenderer.SetPositions(
                 new Vector3[] { transform.position, hitInfo.point }
@@ -144,13 +160,245 @@ public class PlayerController : MonoBehaviour
 
         IsHidden = Refuge;
         Refuge = false;
-
+        //*/
         //GetComponent<MeshRenderer>().material.color = IsHidden ? Color.black : Color.white;
     }
 
-    private void CreateSound(float range)
+    // State Computation
+    private Vector3 _inputDir = Vector3.zero;
+    private bool _runRequest = false;
+    private bool _slideRequest = false;
+    private float _slideTimer = 0f;
+    private float _turnX, _turnY;
+    private CameraModeType? _cameraModeRequest = null;
+    private PeekRequest? _peekRequest = null;
+    private float _slideDuration = 1.8f;
+
+    private enum PeekRequest { Left, Right, Return }
+    private bool _isPeeking;
+
+    // Steate Parameters
+    private float _movementSpeed;
+    private float _stepSoundRadius;
+    private float _stepPeriod;
+    private float _stepTimer;
+    private float _bobScale;
+    private bool _canPeek;
+    private bool _bobEnabled;
+
+    private void SetWalkingState()
     {
-        GameController.AudioManager.AudibleEffect(gameObject, transform.position + Vector3.down * _characterContrroller.height / 2, range);
+        SetState(
+            movementSpeed: WalkingSpeed,
+            stepSoundRadius: WalkingRadius,
+            stepPeriod: WalkStepFrequency,
+            bobScale: WalkingBob,
+            canPeek: false,
+            bobEnabled: true);
+
+        Camera.BobStart();
+
+        _movementState = MovementState.Walking;
+    }
+
+    private void SetRunningState()
+    {
+        SetState(
+            movementSpeed: RunningSpeed,
+            stepSoundRadius: RunningRadius,
+            stepPeriod: RunStepFrequency,
+            bobScale: RunBob,
+            canPeek: false,
+            bobEnabled: true);
+
+        Camera.BobStart();
+
+        _movementState = MovementState.Running;
+    }
+
+    private void SetStandingState()
+    {
+        Camera.BobEnd();
+
+        SetState(
+            canPeek: true
+            );
+
+
+        _movementState = MovementState.Standing;
+    }
+
+
+    private void SetSlidingState()
+    {
+        SetState(
+            stepPeriod: WalkStepFrequency,
+            stepSoundRadius: WalkingRadius,
+            movementSpeed: SlidingSpeed,
+            bobEnabled: false,
+            canPeek: false
+            );
+
+        _movementState = MovementState.Sliding;
+        _slideTimer = 0;
+        Camera.CustomOffsetStart(0.2f, Vector3.down, false);
+        Camera.CustomRotationStart(0.2f, new Vector3(10, 0, 10));
+        GameController.AudioManager.Play("Slide");
+    }
+
+    private void SetState(
+        float movementSpeed = 1f,
+        float stepSoundRadius = 1f,
+        float stepPeriod = 1f,
+        float bobScale = 1f,
+        bool canPeek = false,
+        bool bobEnabled = false)
+    {
+        _movementSpeed = movementSpeed;
+        _stepSoundRadius = stepSoundRadius;
+        _stepPeriod = stepPeriod;
+        _bobScale = bobScale;
+        _canPeek = canPeek;
+        _bobEnabled = bobEnabled;
+        Camera.BobEnabled = _bobEnabled;
+    }
+
+    private void SwitchState()
+    {
+        switch (_movementState)
+        {
+            case MovementState.Standing:
+                if (_inputDir != Vector3.zero && _runRequest) { SetRunningState();  }
+                if (_inputDir != Vector3.zero && !_runRequest) { SetWalkingState();  }
+                if (_movementState != MovementState.Standing) EndPeek();
+                break;
+
+
+            case MovementState.Walking:
+                if (_inputDir == Vector3.zero) { SetStandingState(); _stepTimer = 0f; }
+                else if (_runRequest) SetRunningState();
+                break;
+
+
+            case MovementState.Running:
+                if (_inputDir == Vector3.zero) { SetStandingState(); _stepTimer = 0f; }
+                else if (!_runRequest) SetWalkingState();
+                else if (_slideRequest) { SetSlidingState(); _stepTimer = 0f; }
+                break;
+
+            case MovementState.Sliding:
+                if (_slideTimer >= _slideDuration)
+                {
+                    SetStandingState();
+                    Camera.CustomOffsetEnd();
+                    Camera.CustomRotationEnd();
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    private void GatherInput()
+    {
+        // Camera
+        if (Input.GetKeyDown(KeyCode.F1)) _cameraModeRequest = CameraModeType.FirstPerson;
+        if (Input.GetKeyDown(KeyCode.F2)) _cameraModeRequest = CameraModeType.TopDown;
+        if (Input.GetKeyDown(KeyCode.F3)) _cameraModeRequest = CameraModeType.ThirdPerson;
+        _turnX = -Input.GetAxis("Mouse X");
+        _turnY = Input.GetAxis("Mouse Y");
+
+        //Movement
+        _inputDir = Vector3.zero;
+        if (Input.GetKey(KeyCode.W)) _inputDir += Vector3.forward;
+        if (Input.GetKey(KeyCode.A)) _inputDir += Vector3.left;
+        if (Input.GetKey(KeyCode.S)) _inputDir += Vector3.back;
+        if (Input.GetKey(KeyCode.D)) _inputDir += Vector3.right;
+        _inputDir.Normalize();
+        _runRequest = Input.GetKey(KeyCode.LeftShift);
+        _slideRequest = Input.GetKey(KeyCode.Space);
+
+        // Peeking
+        _peekRequest = null;
+        if (!_canPeek)
+            return;
+
+        if (Input.GetKeyDown(KeyCode.E)) { _peekRequest = PeekRequest.Right; }
+        if (Input.GetKeyDown(KeyCode.Q)) { _peekRequest = PeekRequest.Left; }
+        if (Input.GetKeyUp(KeyCode.E)) { _peekRequest = PeekRequest.Return; }
+        if (Input.GetKeyUp(KeyCode.Q)) { _peekRequest = PeekRequest.Return; }
+    }
+
+    private void ResolveState()
+    {
+        ResolveCamera();
+
+        string stepSound = "SmallStep";
+        if (_movementState == MovementState.Running) stepSound = "BigStep";
+
+        if (_movementState == MovementState.Walking || _movementState == MovementState.Running)
+        {
+            ResolveMovement();
+            _stepTimer += Time.deltaTime;
+            if (_stepTimer > _stepPeriod)
+            {
+                StepSound(stepSound, _stepSoundRadius);
+                _stepTimer %= _stepPeriod;
+            }
+        }
+
+        if (_movementState == MovementState.Sliding)
+            ResolveSliding();
+
+        if (_peekRequest != null)
+        {
+            if (_peekRequest.Value == PeekRequest.Left)
+                StartPeek(true);
+
+            if (_peekRequest == PeekRequest.Right)
+                StartPeek(false);
+
+            if (_peekRequest == PeekRequest.Return)
+                EndPeek();
+        }
+    }
+
+    private void ResolveCamera()
+    {
+        if (_cameraModeRequest != null)
+            Camera.SwitchMode(_cameraModeRequest.Value);
+
+        Camera.Rotate(_turnX, _turnY);
+        SwitchVisual(Camera.CameraMode != CameraModeType.FirstPerson);
+        Camera.BobEnabled = Camera.CameraMode == CameraModeType.FirstPerson && _bobEnabled;
+        Camera.BobDuration = _stepPeriod / 2f;
+        Camera.BobScale = _bobScale;
+    }
+
+    private void ResolveMovement()
+    {
+        Debug.Log("MOVEMENT");
+        Vector3 cameraDir = Camera.GetGroundDirection();
+        Vector3 camearaRight = -Vector3.Cross(cameraDir, Vector3.up);
+        Vector3 direction = cameraDir * _inputDir.z + camearaRight * _inputDir.x;
+
+        _characterContrroller.SimpleMove(direction * _movementSpeed);
+        transform.forward = direction;
+    }
+
+    private void ResolveSliding()
+    {
+        float t = Mathf.Clamp01(1 - _slideTimer / _slideDuration);
+        _characterContrroller.SimpleMove(transform.forward * t * _movementSpeed);
+
+        _slideTimer += Time.deltaTime;
+    }
+
+    private void StepSound(string sound, float range)
+    {
+        GameController.AudioManager.AudibleEffect(gameObject, transform.position, range);
+        GameController.AudioManager.Play(sound);
     }
 
     private void SwitchVisual(bool visible)
@@ -162,31 +410,20 @@ public class PlayerController : MonoBehaviour
 
     private void StartPeek(bool left)
     {
-        _peekTime = 0f;
         float peekAngle = left ? PeekAngle : -PeekAngle;
-        Camera.CustomRotationStart(PeekDuration, new Vector3(0, 0, peekAngle));
         Vector3 offset = PeekOffset;
         if (left) offset.x *= -1;
 
-        _viewPointOffsetFrom = _viewPointOffset;
-        _viewPointOffsetTarget = offset;
+        Camera.CustomRotationStart(PeekDuration, new Vector3(0, 0, peekAngle));
+        Camera.CustomOffsetStart(PeekDuration, offset, true);
+        _isPeeking = true;
     }
-
-    private void ResolvePeek()
-    {
-        _peekTime += Time.deltaTime;
-        _peekTime = Mathf.Clamp(_peekTime, 0, PeekDuration);
-        float t = _peekTime / PeekDuration;
-
-        _viewPointOffset = Vector3.Lerp(_viewPointOffset, _viewPointOffsetTarget, Easing.SmoothStep(t));
-        _viewPoint.localPosition = _viewPointPosition + _viewPointOffset;
-    }
-
     private void EndPeek()
     {
-        _peekTime = PeekDuration - _peekTime;
-        _viewPointOffsetTarget = Vector3.zero;
-        _viewPointOffsetFrom = _viewPointOffset;
+        if (!_isPeeking) return;
+
+        _isPeeking = false;
         Camera.CustomRotationEnd();
+        Camera.CustomOffsetEnd();
     }
 }

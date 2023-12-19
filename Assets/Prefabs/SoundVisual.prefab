@@ -97,4 +97,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Range: 1
-  Duration: 1
+  Duration: 0.5

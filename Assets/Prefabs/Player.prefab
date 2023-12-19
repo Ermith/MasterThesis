@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8421662841570130214}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.519, z: 0}
+  m_LocalPosition: {x: 0, y: 1.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -58,7 +58,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8421662841618415680}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -14.43, y: 0.88, z: -9.52}
+  m_LocalPosition: {x: -14.43, y: 0, z: -9.52}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -84,7 +84,7 @@ CharacterController:
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!114 &8421662841618415687
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -99,14 +99,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   WalkingSpeed: 2
   RunningSpeed: 5
+  SlidingSpeed: 7
   WalkingRadius: 1.5
   RunningRadius: 5
   PeekAngle: 20
-  PeekDuration: 0.25
+  PeekDuration: 0.2
   PeekOffset: {x: 1, y: -0.5, z: 0}
   Camera: {fileID: 0}
-  StepFrequency: 0.5
+  StepFrequency: 1
   Projectile: {fileID: 8520847064218726488, guid: c09c916153dd54c4f8cd75a232a00f21, type: 3}
+  WalkingBob: 0.05
+  WalkStepFrequency: 0.8
+  RunBob: 0.15
+  RunStepFrequency: 0.3
   IsHidden: 0
   Refuge: 0
 --- !u!120 &8421662841618415801
@@ -234,7 +239,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8421662842556223273}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 0.8, y: 1, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children: []

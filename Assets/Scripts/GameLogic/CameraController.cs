@@ -38,6 +38,7 @@ public class CameraController : MonoBehaviour
     private BobState _bobState = BobState.LeftStep;
     private float _bobTime = 0f;
     private Vector3 _previousOffset;
+    private Vector3 _bobOffset;
 
     // Custom rotation
     private float _customRotationDuration = 1f;
@@ -45,6 +46,15 @@ public class CameraController : MonoBehaviour
     private Vector3 _fromEulers;
     private Vector3 _toEulers;
     private Vector3 _rotationOffset;
+
+    // Custom offset
+    private float _customOffsetDuration = 1f;
+    private float _customOffsetTime = 0f;
+    private Vector3 _fromOffset;
+    private Vector3 _toOffset;
+    private Vector3 _offset;
+    private bool _isLocalOffset;
+
     #endregion
 
     #region PUBLIC_INTERFACE
@@ -110,7 +120,12 @@ public class CameraController : MonoBehaviour
     public void BobStart()
     {
         if (_bobState == BobState.None)
+        {
             _bobState = BobState.LeftStep;
+        }
+
+        _previousOffset = _bobOffset;
+        _bobTime = 0f;
     }
 
     public void BobEnd()
@@ -134,6 +149,23 @@ public class CameraController : MonoBehaviour
         _customRotationTime = 0f;
     }
 
+    public void CustomOffsetStart(float duration, Vector3 offset, bool local)
+    {
+        _customOffsetDuration = duration;
+        _customOffsetTime = 0f;
+        _fromOffset = _offset;
+        _toOffset = offset;
+        _isLocalOffset = local;
+    }
+
+    public void CustomOffsetEnd()
+    {
+        _fromOffset = _offset;
+        _toOffset = Vector3.zero;
+        _customOffsetDuration = _customOffsetTime;
+        _customOffsetTime = 0f;
+    }
+
     #endregion
 
     private Vector3 SphericalToCartezian(float polar, float elevation)
@@ -144,7 +176,7 @@ public class CameraController : MonoBehaviour
             Mathf.Sin(elevation),
             a * Mathf.Sin(polar));
     }
-    
+
     private void SetParams(
         float distance,
         bool horizontalRotation,
@@ -173,11 +205,10 @@ public class CameraController : MonoBehaviour
             _ => Vector3.zero
         };
 
-
         _bobTime += Time.deltaTime;
         var t = _bobTime / BobDuration;
 
-        var offset = Vector3.Lerp(_previousOffset, targetOffset, Easing.SmoothStep(t));
+        _bobOffset = Vector3.Lerp(_previousOffset, targetOffset, Easing.SmoothStep(t));
 
         if (t >= 1)
         {
@@ -193,7 +224,7 @@ public class CameraController : MonoBehaviour
             };
         }
 
-        transform.position += offset;
+        transform.position += _bobOffset;
     }
 
     private void CustomRotationEffect()
@@ -208,12 +239,32 @@ public class CameraController : MonoBehaviour
         transform.rotation = Quaternion.Euler(currentRotation);
     }
 
+    private void CustomOffsetEffect()
+    {
+        _customOffsetTime += Time.deltaTime;
+        _customOffsetTime = Mathf.Clamp(_customOffsetTime, 0, _customOffsetDuration);
+        float t = _customOffsetTime / _customOffsetDuration;
+
+        _offset = Vector3.Lerp(_fromOffset, _toOffset, Easing.SmoothStep(t));
+        Vector3 currentPosition = transform.position;
+
+        if (_isLocalOffset)
+            currentPosition += 
+                _offset.x * transform.right +
+                _offset.y * transform.up +
+                _offset.z * transform.forward;
+        else
+            currentPosition += _offset;
+
+        transform.position = currentPosition;
+    }
+
     private void SetRotation(float polar, float inclanation)
     {
         _horizontalRotation = polar;
 
         float pi = Mathf.PI;
-        _verticalRotation = Math.Clamp(inclanation, pi/2 + 0.001f, pi*3/2 - 0.001f);
+        _verticalRotation = Math.Clamp(inclanation, pi / 2 + 0.001f, pi * 3 / 2 - 0.001f);
     }
 
     private void ResolveRotation()
@@ -237,6 +288,7 @@ public class CameraController : MonoBehaviour
             CameraBob();
 
         CustomRotationEffect();
+        CustomOffsetEffect();
     }
 
     // Awake is called when the script instance is being loaded
