@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour
     private LineRenderer _lineRenderer;
     private Renderer _visual;
     private Transform _viewPoint;
+    private Animation _animation;
     private Vector3 _viewPointPosition;
     private Vector3 _viewPointOffset;
     private Vector3 _viewPointOffsetFrom;
@@ -53,6 +54,7 @@ public class PlayerController : MonoBehaviour
         _viewPoint = transform.Find("ViewPoint");
         _viewPointPosition = _viewPoint.localPosition;
         _characterContrroller = GetComponent<CharacterController>();
+        _animation = GetComponent<Animation>();
         _lineRenderer = GetComponent<LineRenderer>();
         _lineRenderer.startColor = Color.red;
         _lineRenderer.endColor = Color.red;
@@ -241,9 +243,15 @@ public class PlayerController : MonoBehaviour
 
         _movementState = MovementState.Sliding;
         _slideTimer = 0;
-        Camera.CustomOffsetStart(0.2f, Vector3.down, false);
-        Camera.CustomRotationStart(0.2f, new Vector3(10, 0, 10));
+
+        if (Camera.CameraMode == CameraModeType.FirstPerson || Camera.CameraMode == CameraModeType.ThirdPerson)
+            Camera.CustomOffsetStart(0.2f, Vector3.down, false);
+
+        if (Camera.CameraMode == CameraModeType.FirstPerson)
+            Camera.CustomRotationStart(0.2f, new Vector3(10, 0, 10));
+
         GameController.AudioManager.Play("Slide");
+        _animation.Play();
     }
 
     private void SetState(
@@ -410,11 +418,23 @@ public class PlayerController : MonoBehaviour
 
     private void StartPeek(bool left)
     {
+        if (Camera.CameraMode == CameraModeType.TopDown)
+            return;
+
         float peekAngle = left ? PeekAngle : -PeekAngle;
         Vector3 offset = PeekOffset;
         if (left) offset.x *= -1;
 
-        Camera.CustomRotationStart(PeekDuration, new Vector3(0, 0, peekAngle));
+        if (Camera.CameraMode == CameraModeType.FirstPerson)
+            Camera.CustomRotationStart(PeekDuration, new Vector3(0, 0, peekAngle));
+
+        if (Camera.CameraMode == CameraModeType.ThirdPerson)
+        {
+            offset.x *= 1.5f;
+            offset.z = 2;
+            offset.y = 0;
+        }
+
         Camera.CustomOffsetStart(PeekDuration, offset, true);
         _isPeeking = true;
     }

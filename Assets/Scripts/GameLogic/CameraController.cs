@@ -54,7 +54,6 @@ public class CameraController : MonoBehaviour
     private Vector3 _toOffset;
     private Vector3 _offset;
     private bool _isLocalOffset;
-
     #endregion
 
     #region PUBLIC_INTERFACE
