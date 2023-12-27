@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Linq;
 using Unity.VisualScripting;
-
+using UnityEngine;
 using URandom = UnityEngine.Random;
 
 class MapBuilder
@@ -12,6 +12,7 @@ class MapBuilder
     private GraphDrawing<BaseVertex> _graphDrawing;
     private int _superWidth, _superHeight;
     private int _width, _height;
+    private Vector3 _spawnPosition;
 
     public MapBuilder(GraphDrawing<BaseVertex> graphDrawing, int superWidth, int superHeight)
     {
@@ -180,5 +181,15 @@ class MapBuilder
 
         enemiesParams = enemies.ToArray();
         return tileGrid;
+    }
+
+    public Vector3 GetSpawnPosition()
+    {
+        (int x, int y) = _graphDrawing.VertexPositions[_graphDrawing.StartPosition];
+        return new Vector3(
+            (x + 0.5f) * _superWidth * ATile.WIDTH,
+            0,
+            (y + 0.5f) * _superHeight * ATile.HEIGHT
+            );
     }
 }

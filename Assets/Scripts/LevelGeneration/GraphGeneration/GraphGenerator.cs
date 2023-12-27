@@ -49,6 +49,7 @@ public class GraphGenerator
     public IGraph<BaseVertex> Graph { get; private set; }
     public Dictionary<Lock, BaseVertex> LockMapping = new();
     public Dictionary<Key, BaseVertex> KeyMapping = new();
+    private BaseVertex _start;
 
     public GraphGenerator(IGraph<BaseVertex> graph)
     {
@@ -61,6 +62,7 @@ public class GraphGenerator
     public BaseVertex GetLockVertex(Lock l) => LockMapping[l];
     public BaseVertex GetKeyVertex(Key k) => KeyMapping[k];
 
+    public BaseVertex GetStartVertex() => _start;
 
     public void Generate()
     {
@@ -69,6 +71,7 @@ public class GraphGenerator
         BaseVertex B = new();
         BaseVertex C = new();
         BaseVertex D = new();
+        _start = A;
 
         Graph.AddVertex(A);
         Graph.AddVertex(B);

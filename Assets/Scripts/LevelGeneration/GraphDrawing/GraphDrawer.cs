@@ -13,6 +13,7 @@ public struct GraphDrawing<T>
     public Dictionary<T, (int, int)> VertexPositions;
     public int MaximumX;
     public int MaximumY;
+    public BaseVertex StartPosition;
 }
 
 class GraphDrawer<T>
@@ -324,7 +325,7 @@ class GraphDrawer<T>
     }
 
 
-    public GraphDrawing<T> Draw()
+    public GraphDrawing<T> Draw(BaseVertex startVertex)
     {
         var (faces, embedding) = PlanarEmbedding(_graph);
 
@@ -391,6 +392,7 @@ class GraphDrawer<T>
             VerticalLines = verticalLines,
             MaximumX = maximumX,
             MaximumY = maximumY,
+            StartPosition = startVertex
         };
     }
 }

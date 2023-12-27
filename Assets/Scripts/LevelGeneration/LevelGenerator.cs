@@ -50,7 +50,7 @@ public class LevelGenerator : MonoBehaviour
         LockVertexMapping = _graphGenerator.LockMapping;
 
         _graphDrawer = new GraphDrawer<BaseVertex>(_graph);
-        GraphDrawing = _graphDrawer.Draw();
+        GraphDrawing = _graphDrawer.Draw(_graphGenerator.GetStartVertex());
 
         _mapBuilder = new MapBuilder(GraphDrawing, SuperWidth, SuperHeight);
         SuperTileGrid = _mapBuilder.SuperTileGrid();
@@ -106,6 +106,10 @@ public class LevelGenerator : MonoBehaviour
 
         // Just offset it for now
         level.transform.position = offset;
+
+        // Spawn player at the correct position
+        GameObject.Find("Player").transform.position = _mapBuilder.GetSpawnPosition() * scale + offset; 
+
     }
 
     private void Start()

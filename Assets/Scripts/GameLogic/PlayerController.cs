@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -187,6 +188,25 @@ public class PlayerController : MonoBehaviour
     private float _bobScale;
     private bool _canPeek;
     private bool _bobEnabled;
+
+    private bool _dying = false;
+
+    public void Die()
+    {
+        if (_dying) return;
+
+        _dying = true;
+        float duration = GameController.AudioManager.Play("DeathGrunt").clip.length;
+
+        StartCoroutine(WaitCoroutine(GameController.Restart, duration));
+    }
+
+    IEnumerator WaitCoroutine(Action action, float wait)
+    {
+        yield return new WaitForSeconds(wait);
+
+        action();
+    }
 
     private void SetWalkingState()
     {
@@ -386,7 +406,6 @@ public class PlayerController : MonoBehaviour
 
     private void ResolveMovement()
     {
-        Debug.Log("MOVEMENT");
         Vector3 cameraDir = Camera.GetGroundDirection();
         Vector3 camearaRight = -Vector3.Cross(cameraDir, Vector3.up);
         Vector3 direction = cameraDir * _inputDir.z + camearaRight * _inputDir.x;
@@ -445,5 +464,12 @@ public class PlayerController : MonoBehaviour
         _isPeeking = false;
         Camera.CustomRotationEnd();
         Camera.CustomOffsetEnd();
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        //Debug.Log("Collision!");
+        if (hit.collider.tag == "Trap")
+            Debug.Log("Trap");
     }
 }

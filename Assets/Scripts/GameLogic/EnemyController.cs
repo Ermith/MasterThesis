@@ -54,10 +54,13 @@ public class EnemyController : MonoBehaviour
             LookAt(player.transform.position);
             MoveTo(player.transform.position);
             _sight.VisionConeHilighted = true;
+
+            if ((player.transform.position - transform.position).magnitude < 2f)
+                player.Die();
         }
     }
 
-
+     
 
     public void LookInDirection(Vector3 direction)
     {

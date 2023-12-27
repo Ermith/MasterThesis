@@ -11,7 +11,7 @@ public class Door : MonoBehaviour
 
     void Start()
     {
-        _doorObject.GetComponent<Collider>().enabled = DoorLock == null;
+        _doorObject.GetComponent<Collider>().enabled = DoorLock != null;
         _doorObject.GetComponent<MeshRenderer>().material.color = 
             (DoorLock == null) ? Color.green : Color.red;
     }
