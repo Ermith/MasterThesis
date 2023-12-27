@@ -198,14 +198,7 @@ public class PlayerController : MonoBehaviour
         _dying = true;
         float duration = GameController.AudioManager.Play("DeathGrunt").clip.length;
 
-        StartCoroutine(WaitCoroutine(GameController.Restart, duration));
-    }
-
-    IEnumerator WaitCoroutine(Action action, float wait)
-    {
-        yield return new WaitForSeconds(wait);
-
-        action();
+        GameController.Instance.ExecuteAfter(GameController.Restart, duration);
     }
 
     private void SetWalkingState()
