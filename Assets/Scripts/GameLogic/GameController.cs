@@ -11,6 +11,9 @@ public class GameController : MonoBehaviour
 {
     public static GameController Instance;
     public static AudioManager AudioManager => Instance.GetComponent<AudioManager>();
+    private bool _paused = false;
+
+    public Canvas PauseCanvas;
 
     public static void Restart()
     {
@@ -44,6 +47,25 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (_paused) Resume();
+            else Pause();
+        }
+
+    }
+
+    public void Pause()
+    {
+        _paused = true;
+        Time.timeScale = 0f;
+        PauseCanvas.gameObject.SetActive(true);
+    }
+
+    public void Resume()
+    {
+        _paused = false;
+        Time.timeScale = 1f;
+        PauseCanvas.gameObject.SetActive(false);
     }
 }

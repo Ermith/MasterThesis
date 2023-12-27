@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.SocialPlatforms;
 
 [RequireComponent(typeof(CharacterController))]
@@ -198,7 +199,7 @@ public class PlayerController : MonoBehaviour
         _dying = true;
         float duration = GameController.AudioManager.Play("DeathGrunt").clip.length;
 
-        GameController.Instance.ExecuteAfter(GameController.Restart, duration);
+        GameController.Instance.ExecuteAfter(() => SceneManager.LoadScene("MainMenuScene"), duration);
     }
 
     private void SetWalkingState()
