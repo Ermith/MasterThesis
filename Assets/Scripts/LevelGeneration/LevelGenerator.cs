@@ -35,7 +35,7 @@ public class LevelGenerator : MonoBehaviour
     public ASubTile[,] SubTileGrid;
     private void Awake()
     {
-
+        //*/
         DoorKey.Blueprint = KeyBlueprint;
         SecurityCameraLock.Blueprint = SecurityCameraBlueprint;
         SecurityCameraKey.Blueprint = SecurityCameraSourceBlueprint;
@@ -44,17 +44,25 @@ public class LevelGenerator : MonoBehaviour
 
         _graph = new UndirectedAdjecencyGraph<BaseVertex>();
         _graphGenerator = new GraphGenerator(_graph);
+
+        Debug.Log("GENERATING GRAPH");
         _graphGenerator.Generate();
         Graph = _graph;
         KeyVertexMapping = _graphGenerator.KeyMapping;
         LockVertexMapping = _graphGenerator.LockMapping;
 
         _graphDrawer = new GraphDrawer<BaseVertex>(_graph);
+        Debug.Log("DRAWING THE GRAPH");
         GraphDrawing = _graphDrawer.Draw(_graphGenerator.GetStartVertex());
 
         _mapBuilder = new MapBuilder(GraphDrawing, SuperWidth, SuperHeight);
+        Debug.Log("CREATING SUPERTILES");
         SuperTileGrid = _mapBuilder.SuperTileGrid();
+
+        Debug.Log("CREATING TILES");
         TileGrid = _mapBuilder.TileGrid(SuperTileGrid, out IEnumerable<EnemyParams> enemies);
+
+        Debug.Log("Creating SUBTILES");
         SubTileGrid = _mapBuilder.SubTileGrid(TileGrid);
 
         ASubTile.Register<WallSubTile>((ASubTile st) => Instantiate(WallBlueprint));
@@ -73,6 +81,8 @@ public class LevelGenerator : MonoBehaviour
         Vector3 offset = new(100, 0, 100);
         geometry.transform.parent = level.transform;
 
+        Debug.Log("SPAWNING OBJECTS");
+
         for (int x = 0; x < SubTileGrid.GetLength(0); x++)
             for (int y = 0; y < SubTileGrid.GetLength(1); y++)
                 if (SubTileGrid[x, y] != null)
@@ -81,6 +91,7 @@ public class LevelGenerator : MonoBehaviour
                     obj.transform.parent = geometry.transform;
                 }
 
+        Debug.Log("Spawning Enemies");
         float scale = 3;
         geometry.transform.localScale *= scale;
         foreach (EnemyParams enemy in enemies)
@@ -107,8 +118,11 @@ public class LevelGenerator : MonoBehaviour
         // Just offset it for now
         level.transform.position = offset;
 
+        var playerSpawn = _mapBuilder.GetSpawnPosition() * scale + offset;
+        Debug.Log($"REPOSITIONING THE PLAYER {playerSpawn}");
         // Spawn player at the correct position
-        GameObject.Find("Player").transform.position = _mapBuilder.GetSpawnPosition() * scale + offset; 
+        GameObject.Find("Player").transform.position = playerSpawn; 
+        //*/
 
     }
 

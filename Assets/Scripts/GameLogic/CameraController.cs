@@ -278,6 +278,7 @@ public class CameraController : MonoBehaviour
         Vector3 to = Target.position;
         _pivotPosition = Vector3.SmoothDamp(from, to, ref _velocity, _damping);
 
+
         transform.position = _pivotPosition + _direction * _distance;
     }
 
@@ -291,7 +292,7 @@ public class CameraController : MonoBehaviour
     }
 
     // Awake is called when the script instance is being loaded
-    private void Awake()
+    private void Start()
     {
         SwitchMode(CameraModeType.FirstPerson);
     }

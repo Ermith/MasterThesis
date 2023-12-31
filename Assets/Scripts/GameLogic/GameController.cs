@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,9 +18,21 @@ public class GameController : MonoBehaviour
 
     public static void Restart()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Instance.StartCoroutine(RestartLoad());
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
     }
 
+    private static IEnumerator RestartLoad()
+    {
+        var a = SceneManager.UnloadSceneAsync(SceneManager.GetActiveScene().name);
+        while (!a.isDone) yield return null;
+        // yield return new WaitForEndOfFrame();
+        // Reset the player here
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+        //yield return null;
+    }
 
     public void ExecuteAfter(Action action, float time)
     {
@@ -36,7 +49,9 @@ public class GameController : MonoBehaviour
     // Awake is called before the Start method
     private void Awake()
     {
+        Debug.Log("Game Instance");
         Instance = this;
+        Time.timeScale = 1f;
     }
 
     // Start is called before the first frame update
