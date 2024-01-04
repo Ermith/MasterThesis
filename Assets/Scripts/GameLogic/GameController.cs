@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,6 +12,7 @@ public class GameController : MonoBehaviour
     public static GameController Instance;
     public static AudioManager AudioManager => Instance.GetComponent<AudioManager>();
     private bool _paused = false;
+    public static bool IsPaused => Instance._paused;
 
     public Canvas PauseCanvas;
 
@@ -20,7 +20,6 @@ public class GameController : MonoBehaviour
     {
         Instance.StartCoroutine(RestartLoad());
         //SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-
     }
 
     private static IEnumerator RestartLoad()
@@ -52,6 +51,8 @@ public class GameController : MonoBehaviour
         Debug.Log("Game Instance");
         Instance = this;
         Time.timeScale = 1f;
+        //UnityEngine.Random.InitState(-488536290);
+        Debug.Log(UnityEngine.Random.seed);
     }
 
     // Start is called before the first frame update
@@ -75,6 +76,7 @@ public class GameController : MonoBehaviour
         _paused = true;
         Time.timeScale = 0f;
         PauseCanvas.gameObject.SetActive(true);
+        ShowCursor(true);
     }
 
     public void Resume()
@@ -82,5 +84,24 @@ public class GameController : MonoBehaviour
         _paused = false;
         Time.timeScale = 1f;
         PauseCanvas.gameObject.SetActive(false);
+        ShowCursor(false);
+    }
+
+    private static void ShowCursor(bool show)
+    {
+        Cursor.lockState = show ? CursorLockMode.Confined : CursorLockMode.Locked;
+        Cursor.visible = show;
+    }
+
+    public static void NewGame()
+    {
+        SceneManager.LoadScene("GameScene");
+        ShowCursor(false);
+    }
+
+    public static void MainMenu()
+    {
+        SceneManager.LoadScene("MainMenuScene");
+        ShowCursor(true);
     }
 }

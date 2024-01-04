@@ -121,8 +121,10 @@ public class LevelGenerator : MonoBehaviour
         var playerSpawn = _mapBuilder.GetSpawnPosition() * scale + offset;
         Debug.Log($"REPOSITIONING THE PLAYER {playerSpawn}");
         // Spawn player at the correct position
-        GameObject.Find("Player").transform.position = playerSpawn; 
+        GameObject.Find("Player").transform.position = playerSpawn;
         //*/
+
+        FindObjectOfType<LevelCamera>().SetPosition(SubTileGrid.GetLength(0), SubTileGrid.GetLength(1), scale, offset);
 
     }
 

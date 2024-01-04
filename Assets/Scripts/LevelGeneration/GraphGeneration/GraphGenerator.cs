@@ -84,7 +84,6 @@ public class GraphGenerator
 
         CycleRule cycleRule = new(this);
         ExtensionRule extensionRule = new(this);
-        UnityEngine.Random.InitState(7);
 
         int count = 2;
         for (int i = 0; i < count; i++)

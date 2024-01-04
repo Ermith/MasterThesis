@@ -51,6 +51,9 @@ public class DoorKey : Key
 
     public void Implement(SuperTileDescription superTile)
     {
+        if (superTile.FreeTiles.Count == 0)
+            return;
+
         int tileIndex = URandom.Range(0, superTile.FreeTiles.Count - 1);
         (int x, int y) = superTile.FreeTiles.ToArray()[tileIndex];
         var tile = superTile.Get(x, y);

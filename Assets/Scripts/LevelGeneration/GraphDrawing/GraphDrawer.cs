@@ -113,6 +113,7 @@ class GraphDrawer<T>
             int left = -1;
             int right = 1;
 
+            /*/
             T[] propperEmbedding = PropperEmbedding(Vertices[minIndex]).ToArray();
 
             foreach (T neighbor in propperEmbedding)
@@ -129,6 +130,7 @@ class GraphDrawer<T>
                     break;
                 }
             }
+            //*/
 
             if (getRight)
                 return (minIndex, right);
@@ -206,9 +208,9 @@ class GraphDrawer<T>
         }
 
         Face outerFace = faces[0];
-        outerFace.SwitchWinding = true;
+        outerFace.SwitchWinding = false;
         Face specialFace = new Face(outerFace.Vertices, stNumbering, embedding);
-        specialFace.SwitchWinding = true;
+        specialFace.SwitchWinding = false;
         graph.AddVertex(specialFace);
 
 
@@ -253,7 +255,13 @@ class GraphDrawer<T>
         graph.RemoveVertex(specialFace);
         DFSParams<Face> dfsParams = graph.DepthFirstSearch(outerFace);
         IEnumerable<Face> orderedFaces =
-            graph.GetVertices().OrderBy((Face face) => -dfsParams.ExitTimes[face]);
+            graph.GetVertices().OrderBy((Face face) =>
+            {
+                if (dfsParams.ExitTimes.ContainsKey(face))
+                    return -dfsParams.ExitTimes[face];
+                else
+                    return 0;
+            });
 
         Dictionary<(T, T), int> edgeX = new();
         int x = 0;

@@ -12,12 +12,12 @@ public class MenuCotnroller : MonoBehaviour
 
     public void NewGame()
     {
-        SceneManager.LoadSceneAsync("GameScene");
+        GameController.NewGame();
     }
 
     public void MainMenu()
     {
-        SceneManager.LoadScene("MainMenuScene");
+        GameController.MainMenu();
     }
 
     public void QuitGame()

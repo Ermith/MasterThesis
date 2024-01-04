@@ -324,6 +324,16 @@ public class PlayerController : MonoBehaviour
 
     private void GatherInput()
     {
+        _turnX = 0f;
+        _turnY = 0f;
+        _runRequest = false;
+        _slideRequest = false;
+        _inputDir = Vector3.zero;
+        _peekRequest = null;
+
+        if (GameController.IsPaused)
+            return;
+
         // Camera
         if (Input.GetKeyDown(KeyCode.F1)) _cameraModeRequest = CameraModeType.FirstPerson;
         if (Input.GetKeyDown(KeyCode.F2)) _cameraModeRequest = CameraModeType.TopDown;
@@ -331,8 +341,10 @@ public class PlayerController : MonoBehaviour
         _turnX = -Input.GetAxis("Mouse X");
         _turnY = Input.GetAxis("Mouse Y");
 
+        if (Input.GetKeyDown(KeyCode.F1) || Input.GetKeyDown(KeyCode.F2) || Input.GetKeyDown(KeyCode.F3)) FindObjectOfType<LevelCamera>().GetComponent<Camera>().enabled = false;
+        if (Input.GetKeyDown(KeyCode.F4)) FindObjectOfType<LevelCamera>().GetComponent<Camera>().enabled = true;
+
         //Movement
-        _inputDir = Vector3.zero;
         if (Input.GetKey(KeyCode.W)) _inputDir += Vector3.forward;
         if (Input.GetKey(KeyCode.A)) _inputDir += Vector3.left;
         if (Input.GetKey(KeyCode.S)) _inputDir += Vector3.back;
@@ -342,7 +354,6 @@ public class PlayerController : MonoBehaviour
         _slideRequest = Input.GetKey(KeyCode.Space);
 
         // Peeking
-        _peekRequest = null;
         if (!_canPeek)
             return;
 
