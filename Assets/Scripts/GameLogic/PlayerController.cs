@@ -324,6 +324,7 @@ public class PlayerController : MonoBehaviour
 
     private void GatherInput()
     {
+        // reset input
         _turnX = 0f;
         _turnY = 0f;
         _runRequest = false;

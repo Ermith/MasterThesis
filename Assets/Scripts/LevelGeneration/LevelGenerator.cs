@@ -78,7 +78,7 @@ public class LevelGenerator : MonoBehaviour
 
         GameObject level = new("Level");
         GameObject geometry = new("Geometry");
-        Vector3 offset = new(100, 0, 100);
+        Vector3 offset = new(0, 0, 0);
         geometry.transform.parent = level.transform;
 
         Debug.Log("SPAWNING OBJECTS");
@@ -98,7 +98,7 @@ public class LevelGenerator : MonoBehaviour
         {
             (int spawnX, int spawnZ) = enemy.Patrol.ToList()[enemy.Spawn];
             Vector3 spawn = new(spawnX, 0, spawnZ);
-            spawn *= scale;
+            spawn = spawn * scale;
 
             List<Vector3> patrol = new();
             foreach ((int x, int z) in enemy.Patrol)
@@ -125,7 +125,6 @@ public class LevelGenerator : MonoBehaviour
         //*/
 
         FindObjectOfType<LevelCamera>().SetPosition(SubTileGrid.GetLength(0), SubTileGrid.GetLength(1), scale, offset);
-
     }
 
     private void Start()
