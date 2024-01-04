@@ -51,8 +51,9 @@ public class EnemyController : MonoBehaviour
         _sight.VisionConeHilighted = false;
         if (!player.IsHidden && _sight.CanSee(player.transform))
         {
+            _patrolEnabled = false;
             LookAt(player.transform.position);
-            MoveTo(player.transform.position);
+            MoveTo(player.transform.position, () => _patrolEnabled = true);
             _sight.VisionConeHilighted = true;
 
             if ((player.transform.position - transform.position).magnitude < 2f)
