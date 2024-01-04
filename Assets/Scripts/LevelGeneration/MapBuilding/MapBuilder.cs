@@ -115,7 +115,7 @@ class MapBuilder
                 superTileGrid[x, y] = tile;
                 tile.Locks.Add(new EnemyLock());
 
-
+                
                 t = URandom.value;
                 if (t > 0.75f && tile is not Hallway)
                     tile.Locks.Add(new TrapLock());
