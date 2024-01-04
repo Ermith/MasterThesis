@@ -61,8 +61,6 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-     
-
     public void LookInDirection(Vector3 direction)
     {
         _lookDirection = direction;

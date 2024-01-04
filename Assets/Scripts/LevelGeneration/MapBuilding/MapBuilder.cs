@@ -79,7 +79,7 @@ class MapBuilder
 
 
                 t = URandom.value;
-                if (t > 0.75f)
+                if (t > 0.75f && tile is not Hallway)
                     tile.Locks.Add(new TrapLock());
                 else if (t > 0.5f)
                     tile.Locks.Add(new SoundTrapLock());
@@ -117,7 +117,7 @@ class MapBuilder
 
 
                 t = URandom.value;
-                if (t > 0.75f)
+                if (t > 0.75f && tile is not Hallway)
                     tile.Locks.Add(new TrapLock());
                 else if (t > 0.5f)
                     tile.Locks.Add(new SoundTrapLock());
@@ -148,6 +148,8 @@ class MapBuilder
             superTileGrid[x, y].Keys = vertex.GetKeys().ToList();
 
             //if (tile is FilledRoom room)
+
+            if (vertex != _graphDrawing.StartPosition)
                 tile.Locks.Add(new EnemyLock());
 
 
