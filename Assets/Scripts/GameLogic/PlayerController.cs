@@ -478,4 +478,15 @@ public class PlayerController : MonoBehaviour
         if (hit.collider.tag == "Trap")
             Debug.Log("Trap");
     }
+
+    public void SetHidden(bool hidden)
+    {
+        IsHidden = hidden;
+        Refuge = hidden;
+
+        if (hidden)
+            GetComponentInChildren<MeshRenderer>().material.color = new Color(0.1f, 0.1f, 0.1f);
+        else
+            GetComponentInChildren<MeshRenderer>().material.color = Color.white;
+    }
 }

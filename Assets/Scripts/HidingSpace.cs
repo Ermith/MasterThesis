@@ -2,11 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HidingSpace : MonoBehaviour
+public class HidingSpace : SmartCollider
 {
-    private void OnTriggerStay(Collider other)
+    private void Start()
     {
-        if (other.tag == "Player")
-            other.GetComponent<PlayerController>().Refuge = true;
+        _triggerResponse += (PlayerController player) =>
+        {
+            player.SetHidden(true);
+            Debug.Log("Player in Hiding");
+        };
+
+        _triggerLeaveResponse += (PlayerController player) =>
+        {
+            player.SetHidden(false);
+            Debug.Log("NO PLAYER HIDE");
+        };
     }
 }
