@@ -199,7 +199,7 @@ public class PlayerController : MonoBehaviour
         _dying = true;
         float duration = GameController.AudioManager.Play("DeathGrunt").clip.length;
 
-        GameController.Instance.ExecuteAfter(() => SceneManager.LoadScene("MainMenuScene"), duration);
+        GameController.Instance.ExecuteAfter(GameController.MainMenu, duration);
     }
 
     private void SetWalkingState()
