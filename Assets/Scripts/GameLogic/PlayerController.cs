@@ -42,6 +42,7 @@ public class PlayerController : MonoBehaviour
     private LineRenderer _lineRenderer;
     private Renderer _visual;
     private Transform _viewPoint;
+    private Transform _aimPoint;
     private Animation _animation;
     private Vector3 _viewPointPosition;
     private Vector3 _viewPointOffset;
@@ -54,6 +55,7 @@ public class PlayerController : MonoBehaviour
     {
         _visual = transform.Find("Visual").GetComponent<Renderer>();
         _viewPoint = transform.Find("ViewPoint");
+        _aimPoint = transform.Find("AimPoint");
         _viewPointPosition = _viewPoint.localPosition;
         _characterContrroller = GetComponent<CharacterController>();
         _animation = GetComponent<Animation>();
@@ -172,6 +174,8 @@ public class PlayerController : MonoBehaviour
     private Vector3 _inputDir = Vector3.zero;
     private bool _runRequest = false;
     private bool _slideRequest = false;
+    private bool _aimRequest = false;
+    private bool _shootRequest = false;
     private float _slideTimer = 0f;
     private float _turnX, _turnY;
     private CameraModeType? _cameraModeRequest = null;
@@ -331,6 +335,8 @@ public class PlayerController : MonoBehaviour
         _slideRequest = false;
         _inputDir = Vector3.zero;
         _peekRequest = null;
+        _aimRequest = false;
+        _shootRequest = false;
 
         if (GameController.IsPaused)
             return;
@@ -362,6 +368,9 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Q)) { _peekRequest = PeekRequest.Left; }
         if (Input.GetKeyUp(KeyCode.E)) { _peekRequest = PeekRequest.Return; }
         if (Input.GetKeyUp(KeyCode.Q)) { _peekRequest = PeekRequest.Return; }
+
+        if (Input.GetMouseButton(1) || Input.GetKey(KeyCode.T)) _aimRequest = true;
+        if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.V)) && _aimRequest) _shootRequest = true;
     }
 
     private void ResolveState()
@@ -384,6 +393,9 @@ public class PlayerController : MonoBehaviour
 
         if (_movementState == MovementState.Sliding)
             ResolveSliding();
+
+        if (_movementState != MovementState.Running)
+            Shooting();
 
         if (_peekRequest != null)
         {
@@ -426,6 +438,31 @@ public class PlayerController : MonoBehaviour
         _characterContrroller.SimpleMove(transform.forward * t * _movementSpeed);
 
         _slideTimer += Time.deltaTime;
+    }
+
+    private void Shooting()
+    {
+        _lineRenderer.enabled = false;
+        if (_aimRequest)
+        {
+            float maxDistance = 1000;
+            bool hit = Physics.Raycast(_aimPoint.position, Camera.GetGroundDirection(), out RaycastHit hitInfo, maxDistance);
+            if (!hit) return;
+
+            _lineRenderer.enabled = true;
+            _lineRenderer.SetPositions(
+                new Vector3[] { _aimPoint.position, hitInfo.point }
+            );
+        }
+
+        if (_shootRequest)
+        {
+            Projectile projectile = Instantiate(Projectile);
+            projectile.Shoot(_aimPoint.position, Camera.GetGroundDirection(), (Vector3 pos, GameObject target) =>
+            {
+                GameController.AudioManager.AudibleEffect(projectile.gameObject, pos, 10f);
+            });
+        }
     }
 
     private void StepSound(string sound, float range)
