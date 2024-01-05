@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using URandom = UnityEngine.Random;
+
 public class Hallway : ASuperTile
 {
     public Hallway(int width, int height, Directions exits = Directions.None) : base(width, height, exits)
@@ -25,7 +27,11 @@ public class Hallway : ASuperTile
                 if ((px, py) == (midX, midY)) continue;
 
                 description.FreeTiles.Add((px, py));
-                tileGrid[x + px, y + py] = new EdgeTile(dir.Perpendicular());
+
+                if ((px + py) % 2 == 0)
+                    tileGrid[x + px, y + py] = new EdgeTile(dir.Perpendicular());
+                else
+                    tileGrid[x + px, y + py] = new RefugeEdgeTile(dir.Perpendicular(), dir.Perpendicular());
             }
 
         description.PatrolPath = patrol;

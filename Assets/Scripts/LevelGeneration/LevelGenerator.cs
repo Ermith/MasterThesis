@@ -18,6 +18,7 @@ public class LevelGenerator : MonoBehaviour
     public GameObject SecurityCameraSourceBlueprint;
     public GameObject TrapBlueprint;
     public GameObject SoundTrapBlueprint;
+    public GameObject HalfRefugeBlueprint;
     public EnemyController EnemyBlueprint;
 
     IGraph<BaseVertex> _graph;
@@ -73,6 +74,14 @@ public class LevelGenerator : MonoBehaviour
             GameObject doorObject = Instantiate(DoorBlueprint);
             doorObject.GetComponent<Door>().DoorLock = door.DoorLock;
             return doorObject;
+        });
+
+        ASubTile.Register<HalfRefugeSubTile>((ASubTile st) =>
+        {
+            var halfRefuge = st as HalfRefugeSubTile;
+            GameObject obj = Instantiate(HalfRefugeBlueprint);
+            obj.transform.forward = halfRefuge.Orientation.ToVector3();
+            return obj;
         });
 
 
