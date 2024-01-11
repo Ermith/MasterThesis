@@ -4,8 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-public class DoorSubTile : ASubTile
+interface UsableObject
 {
-    public DoorLock DoorLock = null;
-    public Directions Orientation = Directions.North;
+    void Use();
 }

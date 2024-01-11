@@ -71,9 +71,11 @@ public class LevelGenerator : MonoBehaviour
         ASubTile.Register<DoorSubTile>((ASubTile st) =>
         {
             var door = st as DoorSubTile;
-            GameObject doorObject = Instantiate(DoorBlueprint);
-            doorObject.GetComponent<Door>().DoorLock = door.DoorLock;
-            return doorObject;
+            GameObject doorTileObject = Instantiate(DoorBlueprint);
+            var doorObject = doorTileObject.GetComponentInChildren<Door>();
+            doorObject.DoorLock = door.DoorLock;
+            doorObject.transform.forward = door.Orientation.ToVector3();
+            return doorTileObject;
         });
 
         ASubTile.Register<HalfRefugeSubTile>((ASubTile st) =>
