@@ -6,5 +6,6 @@ using System.Threading.Tasks;
 
 interface UsableObject
 {
-    void Use();
+    void Use(PlayerController player);
+    string UsePrompt();
 }

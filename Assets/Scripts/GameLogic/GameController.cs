@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro.EditorUtilities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,6 +16,9 @@ public class GameController : MonoBehaviour
     public static bool IsPaused => Instance._paused;
 
     public Canvas PauseCanvas;
+    public Canvas HUDCanvas;
+
+    private Transform _interactText;
 
     public static void Restart()
     {
@@ -53,11 +57,25 @@ public class GameController : MonoBehaviour
         Time.timeScale = 1f;
         //UnityEngine.Random.InitState(-488536290);
         Debug.Log(UnityEngine.Random.seed);
+        _interactText = HUDCanvas.transform.Find("Interact Text");
     }
 
     // Start is called before the first frame update
     void Start()
     {
+    }
+
+    public static void ShowInteraction(string text)
+    {
+
+
+        Instance._interactText.gameObject.SetActive(true);
+        Instance._interactText.GetComponentInChildren<TMPro.TMP_Text>().text = $"Press F to : {text}";
+    }
+
+    public static void HideInteraction()
+    {
+        Instance._interactText.gameObject.SetActive(false);
     }
 
     // Update is called once per frame

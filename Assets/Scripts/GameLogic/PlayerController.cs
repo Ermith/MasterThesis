@@ -176,6 +176,7 @@ public class PlayerController : MonoBehaviour
     private bool _slideRequest = false;
     private bool _aimRequest = false;
     private bool _shootRequest = false;
+    private bool _useRequest = false;
     private float _slideTimer = 0f;
     private float _turnX, _turnY;
     private CameraModeType? _cameraModeRequest = null;
@@ -337,6 +338,7 @@ public class PlayerController : MonoBehaviour
         _peekRequest = null;
         _aimRequest = false;
         _shootRequest = false;
+        _useRequest = false;
 
         if (GameController.IsPaused)
             return;
@@ -369,8 +371,12 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.E)) { _peekRequest = PeekRequest.Return; }
         if (Input.GetKeyUp(KeyCode.Q)) { _peekRequest = PeekRequest.Return; }
 
+        // Aiming and Shooting
         if (Input.GetMouseButton(1) || Input.GetKey(KeyCode.T)) _aimRequest = true;
         if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.V)) && _aimRequest) _shootRequest = true;
+
+        // Use
+        if (Input.GetKeyDown(KeyCode.F)) _useRequest = true;
     }
 
     private void ResolveState()
@@ -408,6 +414,8 @@ public class PlayerController : MonoBehaviour
             if (_peekRequest == PeekRequest.Return)
                 EndPeek();
         }
+
+        Use();
     }
 
     private void ResolveCamera()
@@ -463,6 +471,19 @@ public class PlayerController : MonoBehaviour
                 GameController.AudioManager.AudibleEffect(projectile.gameObject, pos, 10f);
             });
         }
+    }
+
+    private void Use()
+    {
+        bool hit = Physics.Raycast(_viewPoint.position, Camera.GetGroundDirection(), out RaycastHit hitInfo, 2f);
+        if (!hit) { GameController.HideInteraction(); return; }
+
+        var usableObject = hitInfo.collider.gameObject.transform.GetComponentInParent<UsableObject>();
+
+        if (usableObject == null) return;
+
+        GameController.ShowInteraction(usableObject.UsePrompt());
+        if (_useRequest) usableObject.Use(this);
     }
 
     private void StepSound(string sound, float range)

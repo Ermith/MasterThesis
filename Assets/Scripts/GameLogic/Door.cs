@@ -29,18 +29,21 @@ public class Door : MonoBehaviour, UsableObject
 
     }
 
-    public void Use()
+    public void Use(PlayerController player)
     {
-        if (_open) Close(); else Open();
+        Vector3 playerDir = (player.transform.position - transform.position).normalized;
+        float dot = Vector3.Dot(transform.forward, playerDir);
+        if (_open) Close(); else Open(dot < 0);
     }
 
     [ContextMenu("Open Door")]
-    public void Open()
+    public void Open(bool forward)
     {
         if (_clopenCoroutine != null)
             StopCoroutine(_clopenCoroutine);
 
-        _clopenCoroutine = StartCoroutine(ClopenCoroutine(Duration, 90, Easing.SmoothStep));
+        float openAngle = forward ? -90f : 90f;
+        _clopenCoroutine = StartCoroutine(ClopenCoroutine(Duration, openAngle, Easing.SmoothStep));
         _open = true;
     }
 
@@ -55,22 +58,26 @@ public class Door : MonoBehaviour, UsableObject
         _open = false;
     }
 
-    IEnumerator ClopenCoroutine(float timeSpan, float endRotation, Func<float, float> easing)
+    IEnumerator ClopenCoroutine(float timeSpan, float endAngle, Func<float, float> easing)
     {
         float timer = 0;
-        float startRotation = _hinge.localRotation.eulerAngles.y;
-        float rotationSpan = (endRotation - startRotation);
+        Quaternion startRotation = _hinge.localRotation;
+        Quaternion endRotation = Quaternion.Euler(0, endAngle, 0);
 
         while (timer <= timeSpan)
         {
             float t = easing(timer / timeSpan);
-            float yRotation = startRotation + rotationSpan * t;
-            _hinge.localRotation = Quaternion.Euler(0, yRotation, 0);
+            _hinge.localRotation = Quaternion.Lerp(startRotation, endRotation, t);
             timer += Time.deltaTime;
             yield return null;
         }
 
-        _hinge.localRotation = Quaternion.Euler(0, endRotation, 0);
+        _hinge.localRotation = endRotation;
         _clopenCoroutine = null;
+    }
+
+    public string UsePrompt()
+    {
+        return _open ? "Close Door" : "Open Door";
     }
 }
