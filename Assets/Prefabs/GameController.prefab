@@ -1,0 +1,112 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7717243770803640202
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7717243770803640205}
+  - component: {fileID: 7717243770803640203}
+  - component: {fileID: 7717243770803640206}
+  m_Layer: 0
+  m_Name: GameController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7717243770803640205
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7717243770803640202}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -7.4048576, y: 9.494008, z: -7.64573}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7717243770803640203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7717243770803640202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d31301f5e95138e45981ff734898dee1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PauseCanvas: {fileID: 0}
+  HUDCanvas: {fileID: 0}
+--- !u!114 &7717243770803640206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7717243770803640202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f2fdc11e37a4b44d94a798701fb04a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Music:
+    Name: 
+    Clip: {fileID: 0}
+    Volume: 1
+    Pitch: 1
+    SpacialBlend: 0
+    AudioSource: {fileID: 0}
+  Sounds:
+  - Name: SmallStep
+    Clip: {fileID: 8300000, guid: f831c5aa030d53c4a835727200a07891, type: 3}
+    Volume: 0.5
+    Pitch: 1
+    SpacialBlend: 0
+    AudioSource: {fileID: 0}
+  - Name: BigStep
+    Clip: {fileID: 8300000, guid: 263e22655a7feac498828cfc812ec563, type: 3}
+    Volume: 1
+    Pitch: 1
+    SpacialBlend: 0
+    AudioSource: {fileID: 0}
+  - Name: Slide
+    Clip: {fileID: 8300000, guid: cf373f637253ace4eaf31048b2391133, type: 3}
+    Volume: 1
+    Pitch: 0.7
+    SpacialBlend: 0
+    AudioSource: {fileID: 0}
+  - Name: GlassShatter
+    Clip: {fileID: 8300000, guid: 589cb6facf147ea43acad7eab04de724, type: 3}
+    Volume: 1
+    Pitch: 1
+    SpacialBlend: 0
+    AudioSource: {fileID: 0}
+  - Name: DeathGrunt
+    Clip: {fileID: 8300000, guid: b1b1313dd16675b4b96c1daee63331a7, type: 3}
+    Volume: 1
+    Pitch: 1
+    SpacialBlend: 0
+    AudioSource: {fileID: 0}
+  - Name: AlarmSiren
+    Clip: {fileID: 8300000, guid: 718212693e9a8ee459852700f12bbe52, type: 3}
+    Volume: 1
+    Pitch: 1
+    SpacialBlend: 0
+    AudioSource: {fileID: 0}
+  - Name: Gunshot
+    Clip: {fileID: 8300000, guid: 75c240ba4a5c2a64491e83c5f029fbab, type: 3}
+    Volume: 1
+    Pitch: 1
+    SpacialBlend: 0
+    AudioSource: {fileID: 0}
+  SoundVisual: {fileID: 9089947530959922902, guid: 706f20cbfe960de42b162eec560f3ad3, type: 3}
