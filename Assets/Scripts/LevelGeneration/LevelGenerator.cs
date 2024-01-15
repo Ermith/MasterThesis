@@ -105,7 +105,7 @@ public class LevelGenerator : MonoBehaviour
                 }
 
         Debug.Log("Spawning Enemies");
-        float scale = 3;
+        float scale = 2;
         geometry.transform.localScale *= scale;
         foreach (EnemyParams enemy in enemies)
         {

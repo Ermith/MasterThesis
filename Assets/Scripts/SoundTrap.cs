@@ -21,6 +21,7 @@ public class SoundTrap : SmartCollider, ILockObject
             Debug.Log("Sound Trap Triggered");
             GameController.AudioManager.AudibleEffect(gameObject, player.transform.position, SoundRange);
             GameController.AudioManager.Play("GlassShatter", position: transform.position);
+            Destroy(gameObject);
         };
     }
 
