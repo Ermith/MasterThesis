@@ -24,11 +24,15 @@ public class FilledRoom : ASuperTile
                     dir);
 
         foreach ((int ex, int ey) in EdgeLocations(Width, Height))
+        {
             tileGrid[x + ex, y + ey] ??= new EdgeTile(EdgeDirectinons(ex, ey, Width, Height));
+            description.FreeTiles.Add((ex, ey));
+        }
 
         if (_subRoom)
             BuildSubRoom(
                 x + 1, y + 1,
+                1, 1,
                 Width - 2, Height - 2,
                 description,
                 DirectionsExtensions.GetRandom(),

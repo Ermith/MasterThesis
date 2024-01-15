@@ -13,8 +13,8 @@ public struct GraphDrawing<T>
     public Dictionary<T, (int, int)> VertexPositions;
     public int MaximumX;
     public int MaximumY;
-    public BaseVertex StartPosition;
-    public BaseVertex EndPosition;
+    public T StartPosition;
+    public T EndPosition;
 }
 
 class GraphDrawer<T>
@@ -334,15 +334,18 @@ class GraphDrawer<T>
     }
 
 
-    public GraphDrawing<T> Draw(BaseVertex startVertex, BaseVertex endVertex)
+    public GraphDrawing<T> Draw(T startVertex, T endVertex)
     {
         var (faces, embedding) = PlanarEmbedding(_graph);
 
         // These vertices are on the outer face
         List<T> outerFace = faces.Faces[0];
         int mid = outerFace.Count / 2;
-        T start = outerFace[0];
-        T end = outerFace[mid];
+        //T start = outerFace[0];
+        //T end = outerFace[mid];
+
+        T start = startVertex;
+        T end = endVertex;
 
         Dictionary<T, int> stNumbering = _graph.STNumbering(start, end);
         Dictionary<(T, T), int> edgePositionsX = EdgePositionsX(faces, embedding, stNumbering);
@@ -401,8 +404,8 @@ class GraphDrawer<T>
             VerticalLines = verticalLines,
             MaximumX = maximumX,
             MaximumY = maximumY,
-            StartPosition = start as BaseVertex,
-            EndPosition = endVertex as BaseVertex,
+            StartPosition = startVertex,
+            EndPosition = endVertex,
         };
     }
 }

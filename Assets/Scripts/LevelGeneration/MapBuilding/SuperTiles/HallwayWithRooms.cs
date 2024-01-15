@@ -75,24 +75,28 @@ public class HallwayWithRooms : Hallway
         if (!nwExits.None())
             BuildSubRoom(
                 x, y,
+                0, 0,
                 roomWidth, roomHeight,
                 description, nwExits);
 
         if (!neExits.None()) 
             BuildSubRoom(
                 x + midX + 1, y,
+                midX + 1, 0,
                 roomWidth, roomHeight,
                 description, neExits);
 
         if (!swExits.None())
             BuildSubRoom(
                 x, y + midY + 1,
+                0, midY + 1,
                 roomWidth, roomHeight,
                 description, swExits);
 
         if (!seExits.None())
             BuildSubRoom(
                 x + midX + 1, y + midY + 1,
+                midX + 1, midY + 1,
                 roomWidth, roomHeight,
                 description, seExits);
 

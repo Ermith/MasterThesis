@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using URandom = UnityEngine.Random;
+
 public interface IRule<T>
 {
     public bool IsPossible();
@@ -49,8 +51,8 @@ public class ExtensionRule : BaseRule
 
         if (l == null) return;
         IKey k = l.GetNewKey();
-        RegisterLock(l, edge.From);
-        RegisterKey(k, newVertex);
+        RegisterKey(k, edge.From);
+        RegisterLock(l, newVertex);
     }
 
     public override bool IsPossible()
@@ -81,8 +83,12 @@ public class CycleRule : BaseRule
 
         if (l == null) return;
         IKey k = l.GetNewKey();
-        RegisterKey(k, edge.To);
-        RegisterLock(l, a);
+        RegisterKey(k, edge.From);
+
+        if (URandom.value > 0.5f)
+            RegisterLock(l, a);
+        else
+            RegisterLock(l, b);
     }
 
     public override bool IsPossible()

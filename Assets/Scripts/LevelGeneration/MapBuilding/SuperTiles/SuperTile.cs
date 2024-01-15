@@ -126,6 +126,7 @@ public abstract class ASuperTile
 
     internal void BuildSubRoom(
         int x, int y,
+        int ox, int oy,
         int width, int height,
         SuperTileDescription description,
         Directions roomExits, bool internalRoom = true)
@@ -151,10 +152,11 @@ public abstract class ASuperTile
                 if (!edgeFlags.None())
                 {
                     tile = new EdgeTile(edgeFlags);
+                    description.FreeTiles.Add((i + ox, j + oy));
                 } else
                 {
                     tile = new EmptyTile();
-                    description.FreeTiles.Add((i, j));
+                    description.FreeTiles.Add((i + ox, j + oy));
                 }
 
                 tileGrid[x + i, y + j] = tile;

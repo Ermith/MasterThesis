@@ -15,7 +15,7 @@ public class Room : ASuperTile
     public override List<EnemyParams> BuildTiles(int x, int y, ATile[,] tileGrid)
     {
         SuperTileDescription description = CreateDescription(x, y, tileGrid);
-        BuildSubRoom(x, y, Width, Height, description, Exits, internalRoom: false);
+        BuildSubRoom(x, y, 0, 0, Width, Height, description, Exits, internalRoom: false);
         int midX = Width / 2;
         int midY = Height / 2;
 
