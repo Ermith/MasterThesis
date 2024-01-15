@@ -172,7 +172,7 @@ MonoBehaviour:
   DoorBlueprint: {fileID: 2635403507403632615, guid: 16ee88e120243694d888caa51f294c8e, type: 3}
   KeyBlueprint: {fileID: 3527088339798993706, guid: 9b19d2c50283bdf439dd82105d99df54, type: 3}
   SecurityCameraBlueprint: {fileID: 5452511249017854686, guid: bc89579a0bacc0d428944dc5a800e863, type: 3}
-  SecurityCameraSourceBlueprint: {fileID: 8614125414331960436, guid: 376b0c47b4172984bb688512d8ada202, type: 3}
+  PowerSourceBlueprint: {fileID: 8614125414331960436, guid: 376b0c47b4172984bb688512d8ada202, type: 3}
   TrapBlueprint: {fileID: 5882171629686246166, guid: 0b1491e76facedd4dbd599a7e8c4e23e, type: 3}
   SoundTrapBlueprint: {fileID: 4244482063706028480, guid: 9467a07ddf7aada4cbeb1d87a58a9f0e, type: 3}
   HalfRefugeBlueprint: {fileID: 9204218792952268314, guid: 32ccb22a8717b564eb51e6591a1e941d, type: 3}

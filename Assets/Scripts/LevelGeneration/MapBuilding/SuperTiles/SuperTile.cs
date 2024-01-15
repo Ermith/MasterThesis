@@ -27,8 +27,8 @@ public abstract class ASuperTile
     public int Width { get; set; }
     public int Height { get; set; }
 
-    public List<Lock> Locks { get; set; }
-    public List<Key> Keys { get; set;  }
+    public List<ILock> Locks { get; set; }
+    public List<IKey> Keys { get; set;  }
 
     public Directions Exits { get; set; }
     public Dictionary<Directions, (int, int)> ExitTiles;

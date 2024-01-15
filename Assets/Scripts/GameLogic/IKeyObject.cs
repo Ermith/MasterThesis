@@ -4,8 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-interface UsableObject
+public interface IKeyObject
 {
-    void Use(PlayerController player);
-    string UsePrompt();
+    IKey MyKey { get; set; }
 }

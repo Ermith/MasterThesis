@@ -9,4 +9,5 @@ public class EnemyParams
     public int Spawn;
     public IEnumerable<(int, int)> Patrol;
     public bool Retrace;
+    public ILock Lock;
 }

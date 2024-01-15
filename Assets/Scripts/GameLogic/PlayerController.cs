@@ -50,6 +50,8 @@ public class PlayerController : MonoBehaviour
     private Vector3 _viewPointOffsetTarget;
     private float _peekTime;
 
+    private List<IKey> _ownedKeys = new();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -214,7 +216,7 @@ public class PlayerController : MonoBehaviour
             stepSoundRadius: WalkingRadius,
             stepPeriod: WalkStepFrequency,
             bobScale: WalkingBob,
-            canPeek: false,
+            canPeek: true,
             bobEnabled: true);
 
         Camera.BobStart();
@@ -263,10 +265,10 @@ public class PlayerController : MonoBehaviour
         _movementState = MovementState.Sliding;
         _slideTimer = 0;
 
-        if (Camera.CameraMode == CameraModeType.FirstPerson || Camera.CameraMode == CameraModeType.ThirdPerson)
+        if (Camera.Mode == CameraModeType.FirstPerson || Camera.Mode == CameraModeType.ThirdPerson)
             Camera.CustomOffsetStart(0.2f, Vector3.down, false);
 
-        if (Camera.CameraMode == CameraModeType.FirstPerson)
+        if (Camera.Mode == CameraModeType.FirstPerson)
             Camera.CustomRotationStart(0.2f, new Vector3(10, 0, 10));
 
         GameController.AudioManager.Play("Slide");
@@ -363,13 +365,13 @@ public class PlayerController : MonoBehaviour
         _slideRequest = Input.GetKey(KeyCode.Space);
 
         // Peeking
-        if (!_canPeek)
-            return;
-
-        if (Input.GetKeyDown(KeyCode.E)) { _peekRequest = PeekRequest.Right; }
-        if (Input.GetKeyDown(KeyCode.Q)) { _peekRequest = PeekRequest.Left; }
-        if (Input.GetKeyUp(KeyCode.E)) { _peekRequest = PeekRequest.Return; }
-        if (Input.GetKeyUp(KeyCode.Q)) { _peekRequest = PeekRequest.Return; }
+        if (_canPeek)
+        {
+            if (Input.GetKeyDown(KeyCode.E)) { _peekRequest = PeekRequest.Right; }
+            if (Input.GetKeyDown(KeyCode.Q)) { _peekRequest = PeekRequest.Left; }
+            if (Input.GetKeyUp(KeyCode.E)) { _peekRequest = PeekRequest.Return; }
+            if (Input.GetKeyUp(KeyCode.Q)) { _peekRequest = PeekRequest.Return; }
+        }
 
         // Aiming and Shooting
         if (Input.GetMouseButton(1) || Input.GetKey(KeyCode.T)) _aimRequest = true;
@@ -424,8 +426,8 @@ public class PlayerController : MonoBehaviour
             Camera.SwitchMode(_cameraModeRequest.Value);
 
         Camera.Rotate(_turnX, _turnY);
-        SwitchVisual(Camera.CameraMode != CameraModeType.FirstPerson);
-        Camera.BobEnabled = Camera.CameraMode == CameraModeType.FirstPerson && _bobEnabled;
+        SwitchVisual(Camera.Mode != CameraModeType.FirstPerson);
+        Camera.BobEnabled = Camera.Mode == CameraModeType.FirstPerson && _bobEnabled;
         Camera.BobDuration = _stepPeriod / 2f;
         Camera.BobScale = _bobScale;
     }
@@ -475,12 +477,16 @@ public class PlayerController : MonoBehaviour
 
     private void Use()
     {
-        bool hit = Physics.Raycast(_viewPoint.position, Camera.GetGroundDirection(), out RaycastHit hitInfo, 2f);
+        Vector3 dir = Camera.Mode == CameraModeType.TopDown
+            ? Camera.GetGroundDirection()
+            : Camera.transform.forward;
+
+        bool hit = Physics.Raycast(_viewPoint.position, dir, out RaycastHit hitInfo, 2f);
         if (!hit) { GameController.HideInteraction(); return; }
 
-        var usableObject = hitInfo.collider.gameObject.transform.GetComponentInParent<UsableObject>();
+        var usableObject = hitInfo.collider.gameObject.transform.GetComponentInParent<IUsableObject>();
 
-        if (usableObject == null) return;
+        if (usableObject == null || !usableObject.IsUsable) { GameController.HideInteraction(); return; };
 
         GameController.ShowInteraction(usableObject.UsePrompt());
         if (_useRequest) usableObject.Use(this);
@@ -501,17 +507,17 @@ public class PlayerController : MonoBehaviour
 
     private void StartPeek(bool left)
     {
-        if (Camera.CameraMode == CameraModeType.TopDown)
+        if (Camera.Mode == CameraModeType.TopDown)
             return;
 
         float peekAngle = left ? PeekAngle : -PeekAngle;
         Vector3 offset = PeekOffset;
         if (left) offset.x *= -1;
 
-        if (Camera.CameraMode == CameraModeType.FirstPerson)
+        if (Camera.Mode == CameraModeType.FirstPerson)
             Camera.CustomRotationStart(PeekDuration, new Vector3(0, 0, peekAngle));
 
-        if (Camera.CameraMode == CameraModeType.ThirdPerson)
+        if (Camera.Mode == CameraModeType.ThirdPerson)
         {
             offset.x *= 1.5f;
             offset.z = 2;
@@ -547,4 +553,15 @@ public class PlayerController : MonoBehaviour
         else
             GetComponentInChildren<MeshRenderer>().material.color = Color.white;
     }
+
+    public bool HasKey(ILock @lock)
+    {
+        foreach (var key in _ownedKeys)
+            if (key.Locks.Contains(@lock))
+                return true;
+
+        return false;
+    }
+
+    public void PickupKey(IKey key) => _ownedKeys.Add(key);
 }

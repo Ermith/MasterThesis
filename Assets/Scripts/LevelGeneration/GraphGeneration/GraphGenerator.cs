@@ -8,28 +8,28 @@ public class BaseVertex
     static char c = 'A';
     char _c;
 
-    private List<Lock> _locks = new();
-    private List<Key> _keys = new();
+    private List<ILock> _locks = new();
+    private List<IKey> _keys = new();
 
-    public void AddLock(Lock l)
+    public void AddLock(ILock l)
     {
         _locks.Add(l);
     }
 
-    public void AddKey(Key k)
+    public void AddKey(IKey k)
     {
         _keys.Add(k);
     }
 
-    public IEnumerable<Lock> GetLocks()
+    public IEnumerable<ILock> GetLocks()
     {
-        foreach(Lock l in _locks)
+        foreach(ILock l in _locks)
             yield return l;
     }
 
-    public IEnumerable<Key> GetKeys()
+    public IEnumerable<IKey> GetKeys()
     {
-        foreach(Key k in _keys)
+        foreach(IKey k in _keys)
             yield return k;
     }
 
@@ -47,8 +47,8 @@ public class BaseVertex
 public class GraphGenerator
 {
     public IGraph<BaseVertex> Graph { get; private set; }
-    public Dictionary<Lock, BaseVertex> LockMapping = new();
-    public Dictionary<Key, BaseVertex> KeyMapping = new();
+    public Dictionary<ILock, BaseVertex> LockMapping = new();
+    public Dictionary<IKey, BaseVertex> KeyMapping = new();
     private BaseVertex _start;
 
     public GraphGenerator(IGraph<BaseVertex> graph)
@@ -56,11 +56,11 @@ public class GraphGenerator
         Graph = graph;
     }
 
-    public void RegisterLock(Lock l, BaseVertex vertex) => LockMapping[l] = vertex;
-    public void RegisterKey(Key k, BaseVertex vertex) => KeyMapping[k] = vertex;
+    public void RegisterLock(ILock l, BaseVertex vertex) => LockMapping[l] = vertex;
+    public void RegisterKey(IKey k, BaseVertex vertex) => KeyMapping[k] = vertex;
 
-    public BaseVertex GetLockVertex(Lock l) => LockMapping[l];
-    public BaseVertex GetKeyVertex(Key k) => KeyMapping[k];
+    public BaseVertex GetLockVertex(ILock l) => LockMapping[l];
+    public BaseVertex GetKeyVertex(IKey k) => KeyMapping[k];
 
     public BaseVertex GetStartVertex() => _start;
 
@@ -85,7 +85,7 @@ public class GraphGenerator
         CycleRule cycleRule = new(this);
         ExtensionRule extensionRule = new(this);
 
-        int count = 2;
+        int count = 1;
         for (int i = 0; i < count; i++)
         {
             

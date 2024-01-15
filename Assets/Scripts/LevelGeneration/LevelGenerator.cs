@@ -15,7 +15,7 @@ public class LevelGenerator : MonoBehaviour
     public GameObject DoorBlueprint;
     public GameObject KeyBlueprint;
     public GameObject SecurityCameraBlueprint;
-    public GameObject SecurityCameraSourceBlueprint;
+    public GameObject PowerSourceBlueprint;
     public GameObject TrapBlueprint;
     public GameObject SoundTrapBlueprint;
     public GameObject HalfRefugeBlueprint;
@@ -29,17 +29,17 @@ public class LevelGenerator : MonoBehaviour
     // Intermediate Results
     public IGraph<BaseVertex> Graph { get; private set; }
     public GraphDrawing<BaseVertex> GraphDrawing { get; private set; }
-    public Dictionary<Key, BaseVertex> KeyVertexMapping;
-    public Dictionary<Lock, BaseVertex> LockVertexMapping;
+    public Dictionary<IKey, BaseVertex> KeyVertexMapping;
+    public Dictionary<ILock, BaseVertex> LockVertexMapping;
     public ASuperTile[,] SuperTileGrid;
     public ATile[,] TileGrid;
     public ASubTile[,] SubTileGrid;
-    private void Awake()
+    private void Start()
     {
         //*/
         DoorKey.Blueprint = KeyBlueprint;
         SecurityCameraLock.Blueprint = SecurityCameraBlueprint;
-        SecurityCameraKey.Blueprint = SecurityCameraSourceBlueprint;
+        SecurityCameraKey.Blueprint = PowerSourceBlueprint;
         TrapLock.Blueprint = TrapBlueprint;
         SoundTrapLock.Blueprint = SoundTrapBlueprint;
 
@@ -73,7 +73,8 @@ public class LevelGenerator : MonoBehaviour
             var door = st as DoorSubTile;
             GameObject doorTileObject = Instantiate(DoorBlueprint);
             var doorObject = doorTileObject.GetComponentInChildren<Door>();
-            doorObject.DoorLock = door.DoorLock;
+            doorObject.Lock = door.DoorLock;
+            doorObject.Lock?.Instances.Add(doorObject);
             doorObject.transform.forward = door.Orientation.ToVector3();
             return doorTileObject;
         });
@@ -136,10 +137,5 @@ public class LevelGenerator : MonoBehaviour
         //*/
 
         FindObjectOfType<LevelCamera>().SetPosition(SubTileGrid.GetLength(0), SubTileGrid.GetLength(1), scale, offset);
-    }
-
-    private void Start()
-    {
-
     }
 }

@@ -94,4 +94,10 @@ public class Sight : MonoBehaviour
 
         return relative.magnitude <= Range && Mathf.Abs(angle) <= Angle / 2;
     }
+
+    public void OnDisable()
+    {
+        VisionConeVisible = false;
+        _meshRenderer.enabled = false;
+    }
 }

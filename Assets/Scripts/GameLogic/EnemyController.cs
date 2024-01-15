@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Sight), typeof(Audition), typeof(CharacterController))]
-public class EnemyController : MonoBehaviour
+public class EnemyController : MonoBehaviour, ILockObject
 {
     Sight _sight;
     Audition _audition;
@@ -23,6 +23,8 @@ public class EnemyController : MonoBehaviour
     Vector3 _lookFrom;
     Vector3 _lookTo;
     float _rotationTime;
+
+    public ILock Lock { get; set; }
 
     // Start is called before the first frame update
     void Start()
@@ -144,4 +146,13 @@ public class EnemyController : MonoBehaviour
         _characterController.SimpleMove(dir * 3);
     }
 
+    public void Unlock()
+    {
+        Die();
+    }
+
+    public void Die()
+    {
+        gameObject.SetActive(false);
+    }
 }

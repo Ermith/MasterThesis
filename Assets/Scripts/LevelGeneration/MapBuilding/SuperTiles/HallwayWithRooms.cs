@@ -96,8 +96,8 @@ public class HallwayWithRooms : Hallway
                 roomWidth, roomHeight,
                 description, seExits);
 
-        foreach (Lock l in Locks) l.Implement(description);
-        foreach (Key k in Keys) k.Implement(description);
+        foreach (ILock l in Locks) l.Implement(description);
+        foreach (IKey k in Keys) k.Implement(description);
 
         return description.Enemies;
     }

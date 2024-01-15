@@ -15,7 +15,7 @@ public class CameraController : MonoBehaviour
     public float ThirdPersonDistance = 5f;
     public float ThirdPersonDampTime = 0.1f;
 
-    public CameraModeType CameraMode { get; private set; }
+    public CameraModeType Mode { get; private set; }
 
     // Camera Mode Params
     private float _distance = 20;
@@ -113,7 +113,7 @@ public class CameraController : MonoBehaviour
                 break;
         }
 
-        CameraMode = cameraMode;
+        Mode = cameraMode;
     }
 
     public void BobStart()

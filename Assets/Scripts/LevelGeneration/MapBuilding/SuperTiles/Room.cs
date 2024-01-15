@@ -31,10 +31,10 @@ public class Room : ASuperTile
         description.PatrolPath = patrol;
         description.PatrolLooped = false;
 
-        foreach (Key k in Keys)
+        foreach (IKey k in Keys)
             k.Implement(description);
 
-        foreach (Lock l in Locks)
+        foreach (ILock l in Locks)
             l.Implement(description);
 
         return description.Enemies;

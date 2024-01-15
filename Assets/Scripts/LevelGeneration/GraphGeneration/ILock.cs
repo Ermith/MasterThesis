@@ -13,21 +13,29 @@ public interface IRoomFeature
     public void Implement(SuperTileDescription superTile);
 }
 
-public interface Lock
+public interface ILock
 {
-    public Key GetNewKey();
+    public IKey GetNewKey();
+    public void Implement(SuperTileDescription superTile);
+    public IList<ILockObject> Instances { get; }
+}
+
+public interface IKey
+{
+    IList<ILock> Locks { get; }
     public void Implement(SuperTileDescription superTile);
 }
 
-public interface Key
+public class DoorLock : ILock
 {
-    Lock Lock { get; }
-    public void Implement(SuperTileDescription superTile);
-}
+    public IList<ILockObject> Instances { get; } = new List<ILockObject>();
 
-public class DoorLock : Lock
-{
-    public Key GetNewKey() => new DoorKey(this);
+    public IKey GetNewKey()
+    {
+        var doorKey = new DoorKey();
+        doorKey.Locks.Add(this);
+        return doorKey;
+    }
 
     public void Implement(SuperTileDescription superTile)
     {
@@ -38,16 +46,11 @@ public class DoorLock : Lock
     }
 }
 
-public class DoorKey : Key
+public class DoorKey : IKey
 {
     public static GameObject Blueprint;
-    public DoorKey(Lock l)
-    {
-        _lock = l;
-    }
 
-    private readonly Lock _lock;
-    public Lock Lock => _lock;
+    public IList<ILock> Locks { get; } = new List<ILock>();
 
     public void Implement(SuperTileDescription superTile)
     {
@@ -58,13 +61,20 @@ public class DoorKey : Key
         (int x, int y) = superTile.FreeTiles.ToArray()[tileIndex];
         var tile = superTile.Get(x, y);
         superTile.FreeTiles.Remove((x, y));
-        tile.Objects.Add(() => GameObject.Instantiate(Blueprint));
+        tile.Objects.Add(() =>
+        {
+            var obj = GameObject.Instantiate(Blueprint);
+            obj.GetComponent<IKeyObject>().MyKey = this;
+            return obj;
+        });
     }
 }
 
-public class EnemyLock : Lock
+public class EnemyLock : ILock
 {
-    public Key GetNewKey()
+    public IList<ILockObject> Instances { get; } = new List<ILockObject>();
+
+    public IKey GetNewKey()
     {
         return null;
     }
@@ -79,17 +89,23 @@ public class EnemyLock : Lock
         superTile.Enemies.Add(new EnemyParams
         {
             Patrol = patrol,
-            Spawn = 0
+            Spawn = spawnIndex,
+            Lock = this,
         });
     }
 }
 
-public class SecurityCameraLock : Lock
+public class SecurityCameraLock : ILock
 {
     public static GameObject Blueprint;
-    public Key GetNewKey()
+
+    public IList<ILockObject> Instances { get; } = new List<ILockObject>();
+
+    public IKey GetNewKey()
     {
-        return new SecurityCameraKey(this);
+        SecurityCameraKey key = new();
+        key.Locks.Add(this);
+        return key;
     }
 
     public void Implement(SuperTileDescription superTile)
@@ -100,23 +116,21 @@ public class SecurityCameraLock : Lock
             exit.Objects.Add(() =>
             {
                 var obj = GameObject.Instantiate(Blueprint);
-                obj.GetComponent<SecurityCameraController>().SetOrientation(dir.Opposite());
+                var sc = obj.GetComponent<SecurityCameraController>();
+                sc.SetOrientation(dir.Opposite());
+                sc.Lock = this;
+                Instances.Add(sc);
                 return obj;
             });
         }
     }
 }
 
-public class SecurityCameraKey : Key
+public class SecurityCameraKey : IKey
 {
     public static GameObject Blueprint;
-    public SecurityCameraKey(Lock l)
-    {
-        _lock = l;
-    }
 
-    private readonly Lock _lock;
-    public Lock Lock => _lock;
+    public IList<ILock> Locks { get; } = new List<ILock>();
 
     public void Implement(SuperTileDescription superTile)
     {
@@ -124,14 +138,23 @@ public class SecurityCameraKey : Key
         (int x, int y) = superTile.FreeTiles.ToArray()[tileIndex];
         var tile = superTile.Get(x, y);
         superTile.FreeTiles.Remove((x, y));
-        tile.Objects.Add(() => GameObject.Instantiate(Blueprint));
+
+        tile.Objects.Add(() =>
+        {
+            var gameObject = GameObject.Instantiate(Blueprint);
+            gameObject.GetComponent<IKeyObject>().MyKey = this;
+            return gameObject;
+        });
     }
 }
 
-public class TrapLock : Lock
+public class TrapLock : ILock
 {
     public static GameObject Blueprint;
-    public Key GetNewKey()
+
+    public IList<ILockObject> Instances { get; } = new List<ILockObject>();
+
+    public IKey GetNewKey()
     {
         return null;
     }
@@ -147,15 +170,25 @@ public class TrapLock : Lock
             (int x, int y) = freeTiles[tileIndex];
             var tile = superTile.Get(x, y);
             superTile.FreeTiles.Remove((x, y));
-            tile.Objects.Add(() => GameObject.Instantiate(Blueprint));
+            tile.Objects.Add(() =>
+            {
+                var obj = GameObject.Instantiate(Blueprint);
+                var lo = obj.GetComponent<ILockObject>();
+                lo.Lock = this;
+                Instances.Add(lo);
+                return obj;
+            });
         }
     }
 }
 
-public class SoundTrapLock : Lock
+public class SoundTrapLock : ILock
 {
     public static GameObject Blueprint;
-    public Key GetNewKey()
+
+    public IList<ILockObject> Instances { get; } = new List<ILockObject>();
+
+    public IKey GetNewKey()
     {
         return null;
     }
@@ -165,14 +198,20 @@ public class SoundTrapLock : Lock
         var freeTiles = superTile.FreeTiles.ToArray();
         if (freeTiles.Length <= 0) return;
 
-
         for (int i = 0; i < freeTiles.Length / 1; i++)
         {
             int tileIndex = URandom.Range(0, superTile.FreeTiles.Count - 1);
             (int x, int y) = freeTiles[tileIndex];
             var tile = superTile.Get(x, y);
             superTile.FreeTiles.Remove((x, y));
-            tile.Objects.Add(() => GameObject.Instantiate(Blueprint));
+            tile.Objects.Add(() =>
+            {
+                var obj = GameObject.Instantiate(Blueprint);
+                var lo = obj.GetComponent<ILockObject>();
+                lo.Lock = this;
+                Instances.Add(lo);
+                return obj;
+            });
         }
     }
 }

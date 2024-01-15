@@ -118,7 +118,7 @@ public class GraphDrawingWindow : EditorWindow
 
         foreach ((BaseVertex vertex, (int x, int y)) in drawParams.VertexPositions)
         {
-            Lock[] locks = vertex.GetLocks().ToArray();
+            ILock[] locks = vertex.GetLocks().ToArray();
             int count = locks.Length;
             Color color = count > 0 ? Color.blue : Color.white;
             string name = count > 0 ? $"{count}" : string.Empty;
@@ -128,17 +128,18 @@ public class GraphDrawingWindow : EditorWindow
         }
 
         foreach ((BaseVertex vertex, (int x, int y)) in drawParams.VertexPositions)
-            foreach (Key key in vertex.GetKeys())
-            {
-                (int xTo, int yTo) = drawParams.VertexPositions[_levelGenerator.LockVertexMapping[key.Lock]];
+            foreach (IKey key in vertex.GetKeys())
+                foreach (ILock @lock in key.Locks)
+                {
+                    (int xTo, int yTo) = drawParams.VertexPositions[_levelGenerator.LockVertexMapping[@lock]];
 
-                Vector3 from = new(x, y);
-                Vector3 to = new(xTo, yTo);
+                    Vector3 from = new(x, y);
+                    Vector3 to = new(xTo, yTo);
 
-                DrawArrow(Color.red,
-                    from * scale * spacing + offset,
-                    to * scale * spacing + offset);
-            }
+                    DrawArrow(Color.red,
+                        from * scale * spacing + offset,
+                        to * scale * spacing + offset);
+                }
     }
 
     private void DrawSuperTiles(ASuperTile[,] grid) { DrawGenericTileGrid(grid); }

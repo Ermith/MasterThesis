@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SecurityCameraController : MonoBehaviour
+public class SecurityCameraController : MonoBehaviour, ILockObject
 {
     private Directions lookDirection = Directions.None;
     Sight _sight;
@@ -11,10 +11,19 @@ public class SecurityCameraController : MonoBehaviour
     float _timer = 0;
     float _duration = 2;
 
+    public ILock Lock { get; set; }
 
     public void SetOrientation(Directions dirs)
     {
         transform.localRotation = Quaternion.LookRotation(dirs.ToVector3(), Vector3.up);
+    }
+
+    public void Unlock()
+    {
+        Debug.Log("Security Camera Disabled");
+        GetComponentInChildren<MeshRenderer>().material.color = Color.black;
+        _sight.enabled = false;
+        enabled = false;
     }
 
     private void Awake()

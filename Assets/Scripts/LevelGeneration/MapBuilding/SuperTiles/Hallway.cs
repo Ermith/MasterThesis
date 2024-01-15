@@ -42,8 +42,8 @@ public class Hallway : ASuperTile
         tileGrid[x + midX, y + midY] = new EdgeTile(midWalls);
         description.FreeTiles.Add((midX, midY));
 
-        foreach (Lock l in Locks) l.Implement(description);
-        foreach (Key k in Keys) k.Implement(description);
+        foreach (ILock l in Locks) l.Implement(description);
+        foreach (IKey k in Keys) k.Implement(description);
 
         return description.Enemies;
     }

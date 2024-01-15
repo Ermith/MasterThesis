@@ -5,7 +5,7 @@ using UnityEngine;
 public interface IRule<T>
 {
     public bool IsPossible();
-    public void Apply(IEdge<T> edge, IGraph<T> graph, Lock l = null);
+    public void Apply(IEdge<T> edge, IGraph<T> graph, ILock l = null);
 }
 
 public abstract class BaseRule : IRule<BaseVertex>
@@ -16,17 +16,17 @@ public abstract class BaseRule : IRule<BaseVertex>
         _generator = generator;
     }
 
-    public abstract void Apply(IEdge<BaseVertex> edge, IGraph<BaseVertex> graph, Lock l = null);
+    public abstract void Apply(IEdge<BaseVertex> edge, IGraph<BaseVertex> graph, ILock l = null);
 
     public abstract bool IsPossible();
 
-    internal void RegisterLock(Lock l, BaseVertex vertex)
+    internal void RegisterLock(ILock l, BaseVertex vertex)
     {
         vertex.AddLock(l);
         _generator.RegisterLock(l, vertex);
     }
 
-    internal void RegisterKey(Key k, BaseVertex vertex)
+    internal void RegisterKey(IKey k, BaseVertex vertex)
     {
         vertex.AddKey(k);
         _generator.RegisterKey(k, vertex);
@@ -39,7 +39,7 @@ public class ExtensionRule : BaseRule
     {
     }
 
-    public override void Apply(IEdge<BaseVertex> edge, IGraph<BaseVertex> graph, Lock l = null)
+    public override void Apply(IEdge<BaseVertex> edge, IGraph<BaseVertex> graph, ILock l = null)
     {
         BaseVertex newVertex = new();
         graph.RemoveEdge(edge.From, edge.To);
@@ -48,7 +48,7 @@ public class ExtensionRule : BaseRule
         graph.AddEdge(newVertex, edge.To);
 
         if (l == null) return;
-        Key k = l.GetNewKey();
+        IKey k = l.GetNewKey();
         RegisterLock(l, edge.To);
         RegisterKey(k, newVertex);
     }
@@ -65,7 +65,7 @@ public class CycleRule : BaseRule
     {
     }
 
-    public override void Apply(IEdge<BaseVertex> edge, IGraph<BaseVertex> graph, Lock l = null)
+    public override void Apply(IEdge<BaseVertex> edge, IGraph<BaseVertex> graph, ILock l = null)
     {
         BaseVertex a = new();
         BaseVertex b = new();
@@ -80,7 +80,7 @@ public class CycleRule : BaseRule
         graph.AddEdge(b, edge.To);
 
         if (l == null) return;
-        Key k = l.GetNewKey();
+        IKey k = l.GetNewKey();
         RegisterKey(k, edge.To);
         RegisterLock(l, a);
     }
