@@ -157,4 +157,10 @@ MonoBehaviour:
     Pitch: 1
     SpacialBlend: 1
     AudioSource: {fileID: 0}
+  - Name: Victory
+    Clip: {fileID: 8300000, guid: dd813a43f11228049ad462a75ed7113b, type: 3}
+    Volume: 1
+    Pitch: 1
+    SpacialBlend: 1
+    AudioSource: {fileID: 0}
   SoundVisual: {fileID: 9089947530959922902, guid: 706f20cbfe960de42b162eec560f3ad3, type: 3}

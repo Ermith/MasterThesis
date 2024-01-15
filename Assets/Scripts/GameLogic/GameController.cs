@@ -22,8 +22,8 @@ public class GameController : MonoBehaviour
 
     public static void Restart()
     {
-        Instance.StartCoroutine(RestartLoad());
-        //SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        //Instance.StartCoroutine(RestartLoad());
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     private static IEnumerator RestartLoad()

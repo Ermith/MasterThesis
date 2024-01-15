@@ -14,6 +14,7 @@ public struct GraphDrawing<T>
     public int MaximumX;
     public int MaximumY;
     public BaseVertex StartPosition;
+    public BaseVertex EndPosition;
 }
 
 class GraphDrawer<T>
@@ -333,7 +334,7 @@ class GraphDrawer<T>
     }
 
 
-    public GraphDrawing<T> Draw(BaseVertex startVertex)
+    public GraphDrawing<T> Draw(BaseVertex startVertex, BaseVertex endVertex)
     {
         var (faces, embedding) = PlanarEmbedding(_graph);
 
@@ -400,7 +401,8 @@ class GraphDrawer<T>
             VerticalLines = verticalLines,
             MaximumX = maximumX,
             MaximumY = maximumY,
-            StartPosition = startVertex
+            StartPosition = startVertex,
+            EndPosition = stNumbering.Keys.ToArray()[stNumbering.Count - 1] as BaseVertex,
         };
     }
 }

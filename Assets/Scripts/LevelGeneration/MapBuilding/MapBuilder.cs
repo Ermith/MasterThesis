@@ -13,6 +13,7 @@ class MapBuilder
     private int _superWidth, _superHeight;
     private int _width, _height;
     private Vector3 _spawnPosition;
+    private Vector3 _endPosition;
 
     public MapBuilder(GraphDrawing<BaseVertex> graphDrawing, int superWidth, int superHeight)
     {
@@ -75,7 +76,7 @@ class MapBuilder
                 superTileGrid[x, y] = tile;
 
                 //if (tile is Hallway)
-                    tile.Locks.Add(new EnemyLock());
+                tile.Locks.Add(new EnemyLock());
 
 
                 t = URandom.value;
@@ -115,7 +116,7 @@ class MapBuilder
                 superTileGrid[x, y] = tile;
                 tile.Locks.Add(new EnemyLock());
 
-                
+
                 t = URandom.value;
                 if (t > 0.75f && tile is not Hallway)
                     tile.Locks.Add(new TrapLock());
@@ -123,7 +124,7 @@ class MapBuilder
                     tile.Locks.Add(new SoundTrapLock());
             }
         }
-        
+
         foreach ((var vertex, (int x, int y)) in _graphDrawing.VertexPositions)
         {
             var north = TryGetTile(x, y - 1, superTileGrid);
@@ -158,7 +159,7 @@ class MapBuilder
                 tile.Locks.Add(new TrapLock());
             else if (t > 0.5f)
                 tile.Locks.Add(new SoundTrapLock());
-            
+
         }
 
         return superTileGrid;
@@ -192,6 +193,16 @@ class MapBuilder
             (x + 0.5f) * _superWidth * ATile.WIDTH,
             0,
             (y + 0.5f) * _superHeight * ATile.HEIGHT
-            );
+        );
+    }
+
+    public Vector3 GetEndPosition()
+    {
+        (int x, int y) = _graphDrawing.VertexPositions[_graphDrawing.EndPosition];
+        return new Vector3(
+            (x + 0.5f) * _superWidth * ATile.WIDTH,
+            0,
+            (y + 0.5f) * _superHeight * ATile.HEIGHT
+        );
     }
 }

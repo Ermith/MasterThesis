@@ -50,6 +50,7 @@ public class GraphGenerator
     public Dictionary<ILock, BaseVertex> LockMapping = new();
     public Dictionary<IKey, BaseVertex> KeyMapping = new();
     private BaseVertex _start;
+    private BaseVertex _end;
 
     public GraphGenerator(IGraph<BaseVertex> graph)
     {
@@ -63,6 +64,7 @@ public class GraphGenerator
     public BaseVertex GetKeyVertex(IKey k) => KeyMapping[k];
 
     public BaseVertex GetStartVertex() => _start;
+    public BaseVertex GetEndVertex() => _end;
 
     public void Generate()
     {
@@ -72,6 +74,7 @@ public class GraphGenerator
         BaseVertex C = new();
         BaseVertex D = new();
         _start = A;
+        _end = D;
 
         Graph.AddVertex(A);
         Graph.AddVertex(B);
@@ -88,7 +91,6 @@ public class GraphGenerator
         int count = 1;
         for (int i = 0; i < count; i++)
         {
-            
             cycleRule.Apply(Graph.GetRandomEdge(), Graph, new DoorLock());
             extensionRule.Apply(Graph.GetRandomEdge(), Graph, new SecurityCameraLock());
         }

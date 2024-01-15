@@ -19,6 +19,7 @@ public class LevelGenerator : MonoBehaviour
     public GameObject TrapBlueprint;
     public GameObject SoundTrapBlueprint;
     public GameObject HalfRefugeBlueprint;
+    public GameObject VictoryTrigger;
     public EnemyController EnemyBlueprint;
 
     IGraph<BaseVertex> _graph;
@@ -54,7 +55,7 @@ public class LevelGenerator : MonoBehaviour
 
         _graphDrawer = new GraphDrawer<BaseVertex>(_graph);
         Debug.Log("DRAWING THE GRAPH");
-        GraphDrawing = _graphDrawer.Draw(_graphGenerator.GetStartVertex());
+        GraphDrawing = _graphDrawer.Draw(_graphGenerator.GetStartVertex(), _graphGenerator.GetEndVertex());
 
         _mapBuilder = new MapBuilder(GraphDrawing, SuperWidth, SuperHeight);
         Debug.Log("CREATING SUPERTILES");
@@ -134,6 +135,7 @@ public class LevelGenerator : MonoBehaviour
         Debug.Log($"REPOSITIONING THE PLAYER {playerSpawn}");
         // Spawn player at the correct position
         GameObject.Find("Player").transform.position = playerSpawn;
+        GameObject.Instantiate(VictoryTrigger).transform.position = _mapBuilder.GetEndPosition() * scale + offset;
         //*/
 
         FindObjectOfType<LevelCamera>().SetPosition(SubTileGrid.GetLength(0), SubTileGrid.GetLength(1), scale, offset);
