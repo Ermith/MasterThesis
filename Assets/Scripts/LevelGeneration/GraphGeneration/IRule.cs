@@ -49,7 +49,7 @@ public class ExtensionRule : BaseRule
 
         if (l == null) return;
         IKey k = l.GetNewKey();
-        RegisterLock(l, edge.To);
+        RegisterLock(l, edge.From);
         RegisterKey(k, newVertex);
     }
 

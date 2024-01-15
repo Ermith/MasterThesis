@@ -401,8 +401,8 @@ class GraphDrawer<T>
             VerticalLines = verticalLines,
             MaximumX = maximumX,
             MaximumY = maximumY,
-            StartPosition = startVertex,
-            EndPosition = stNumbering.Keys.ToArray()[stNumbering.Count - 1] as BaseVertex,
+            StartPosition = start as BaseVertex,
+            EndPosition = endVertex as BaseVertex,
         };
     }
 }

@@ -68,7 +68,27 @@ public class GraphGenerator
 
     public void Generate()
     {
-        //*/
+        _start = new BaseVertex();
+        _end = new BaseVertex();
+        Graph.AddVertex(_start);
+        Graph.AddVertex(_end);
+        Graph.AddEdge(_start, _end);
+
+        CycleRule cycleRule = new(this);
+        ExtensionRule extensionRule = new(this);
+
+        cycleRule.Apply(Graph.GetRandomEdge(), Graph, new DoorLock());
+
+        for (int i = 0; i < 2; i++)
+        {
+            ILock @lock = URandom.value > 0.5f ? new DoorLock() : new SecurityCameraLock();
+            if (URandom.value > 0.5f)
+                cycleRule.Apply(Graph.GetRandomEdge(), Graph, @lock);
+            else
+                extensionRule.Apply(Graph.GetRandomEdge(), Graph, @lock);
+        }
+
+        /*/
         BaseVertex A = new();
         BaseVertex B = new();
         BaseVertex C = new();
@@ -95,7 +115,7 @@ public class GraphGenerator
             extensionRule.Apply(Graph.GetRandomEdge(), Graph, new SecurityCameraLock());
         }
 
-
+        //*/
         //foreach (var vertex in Graph.GetVertices())
         //    if (URandom.value > 0.5f)
         //        vertex.AddLock(new EnemyLock());
