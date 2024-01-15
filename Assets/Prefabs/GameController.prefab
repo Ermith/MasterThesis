@@ -71,78 +71,90 @@ MonoBehaviour:
     Clip: {fileID: 8300000, guid: f831c5aa030d53c4a835727200a07891, type: 3}
     Volume: 0.5
     Pitch: 1
-    SpacialBlend: 0
+    SpacialBlend: 1
     AudioSource: {fileID: 0}
   - Name: BigStep
     Clip: {fileID: 8300000, guid: 263e22655a7feac498828cfc812ec563, type: 3}
     Volume: 1
     Pitch: 1
-    SpacialBlend: 0
+    SpacialBlend: 1
     AudioSource: {fileID: 0}
   - Name: Slide
     Clip: {fileID: 8300000, guid: cf373f637253ace4eaf31048b2391133, type: 3}
     Volume: 1
     Pitch: 0.7
-    SpacialBlend: 0
+    SpacialBlend: 1
     AudioSource: {fileID: 0}
   - Name: GlassShatter
     Clip: {fileID: 8300000, guid: 589cb6facf147ea43acad7eab04de724, type: 3}
     Volume: 1
     Pitch: 1
-    SpacialBlend: 0
+    SpacialBlend: 1
     AudioSource: {fileID: 0}
   - Name: DeathGrunt
     Clip: {fileID: 8300000, guid: b1b1313dd16675b4b96c1daee63331a7, type: 3}
     Volume: 1
     Pitch: 1
-    SpacialBlend: 0
+    SpacialBlend: 1
     AudioSource: {fileID: 0}
   - Name: AlarmSiren
     Clip: {fileID: 8300000, guid: 718212693e9a8ee459852700f12bbe52, type: 3}
     Volume: 1
     Pitch: 1
-    SpacialBlend: 0
+    SpacialBlend: 0.712
     AudioSource: {fileID: 0}
   - Name: Gunshot
     Clip: {fileID: 8300000, guid: 75c240ba4a5c2a64491e83c5f029fbab, type: 3}
     Volume: 1
     Pitch: 1
-    SpacialBlend: 0
+    SpacialBlend: 1
     AudioSource: {fileID: 0}
   - Name: Cut
     Clip: {fileID: 8300000, guid: 827f3b497eaa73f419bab07f9712b143, type: 3}
     Volume: 1
     Pitch: 1
-    SpacialBlend: 0
+    SpacialBlend: 1
     AudioSource: {fileID: 0}
   - Name: ElectricDischarge
     Clip: {fileID: 8300000, guid: 1f441d6090482bd44947380477e5ea28, type: 3}
     Volume: 1
     Pitch: 1
-    SpacialBlend: 0
+    SpacialBlend: 1
     AudioSource: {fileID: 0}
   - Name: DoorCreak
     Clip: {fileID: 8300000, guid: 6af79a9473500394884b9543e121f927, type: 3}
     Volume: 1
     Pitch: 1
-    SpacialBlend: 0
+    SpacialBlend: 1
     AudioSource: {fileID: 0}
   - Name: DoorShut
     Clip: {fileID: 8300000, guid: 40cbd43474fc72c489e3c4304e81fcc8, type: 3}
     Volume: 1
     Pitch: 1
-    SpacialBlend: 0
+    SpacialBlend: 1
     AudioSource: {fileID: 0}
   - Name: DoorOpen
     Clip: {fileID: 8300000, guid: 9c93e5db34880c843bac57c5bed15b64, type: 3}
     Volume: 1
     Pitch: 1
-    SpacialBlend: 0
+    SpacialBlend: 1
     AudioSource: {fileID: 0}
   - Name: DoorLocked
     Clip: {fileID: 8300000, guid: a179a99ec59e1e448aabdd834a8d66d0, type: 3}
     Volume: 1
     Pitch: 1
-    SpacialBlend: 0
+    SpacialBlend: 1
+    AudioSource: {fileID: 0}
+  - Name: Beep
+    Clip: {fileID: 8300000, guid: ee8aadb299e7bb94f9c644f636bbeba9, type: 3}
+    Volume: 1
+    Pitch: 1
+    SpacialBlend: 1
+    AudioSource: {fileID: 0}
+  - Name: Jingle
+    Clip: {fileID: 8300000, guid: 7cd9609263fda8743bc2e8d60ee400dc, type: 3}
+    Volume: 1
+    Pitch: 1
+    SpacialBlend: 1
     AudioSource: {fileID: 0}
   SoundVisual: {fileID: 9089947530959922902, guid: 706f20cbfe960de42b162eec560f3ad3, type: 3}

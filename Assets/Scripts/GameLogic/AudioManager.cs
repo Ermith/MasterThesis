@@ -77,7 +77,7 @@ public class AudioManager : MonoBehaviour
             }
     }
 
-    public AudioSource Play(string name, bool loop = false, Vector3? position = null, float? pitch = null)
+    public AudioSource Play(string name, bool loop = false, Vector3? position = null, float? pitch = null, float? volume = null)
     {
         Sound sound = null;
         foreach (Sound s in Sounds)
@@ -94,7 +94,7 @@ public class AudioManager : MonoBehaviour
             var audio = go.gameObject.AddComponent<AudioSource>();
 
             audio.clip = sound.Clip;
-            audio.volume = sound.Volume;// * Settings.SFXVolume;
+            audio.volume = (volume == null) ? sound.Volume : volume.Value;// * Settings.SFXVolume;
             audio.pitch = (pitch == null) ? sound.Pitch : pitch.Value;
             audio.spatialBlend = sound.SpacialBlend;
             audio.loop = loop;

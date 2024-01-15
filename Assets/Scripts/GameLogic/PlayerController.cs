@@ -9,7 +9,7 @@ using UnityEngine.SocialPlatforms;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
-    private enum MovementState { Standing, Walking, Running, Sliding};
+    private enum MovementState { Standing, Walking, Running, Sliding };
     private MovementState _movementState;
 
     public float WalkingSpeed = 2f;
@@ -297,21 +297,19 @@ public class PlayerController : MonoBehaviour
         switch (_movementState)
         {
             case MovementState.Standing:
-                if (_inputDir != Vector3.zero && _runRequest) { SetRunningState();  }
-                if (_inputDir != Vector3.zero && !_runRequest) { SetWalkingState();  }
+                if (_inputDir != Vector3.zero && _runRequest) { SetRunningState(); }
+                if (_inputDir != Vector3.zero && !_runRequest) { SetWalkingState(); }
                 if (_movementState != MovementState.Standing) EndPeek();
                 break;
 
 
             case MovementState.Walking:
-                if (_inputDir == Vector3.zero) { SetStandingState(); _stepTimer = 0f; }
-                else if (_runRequest) SetRunningState();
+                if (_inputDir == Vector3.zero) { SetStandingState(); _stepTimer = 0f; } else if (_runRequest) SetRunningState();
                 break;
 
 
             case MovementState.Running:
-                if (_inputDir == Vector3.zero) { SetStandingState(); _stepTimer = 0f; }
-                else if (!_runRequest) SetWalkingState();
+                if (_inputDir == Vector3.zero) { SetStandingState(); _stepTimer = 0f; } else if (!_runRequest) SetWalkingState();
                 else if (_slideRequest) { SetSlidingState(); _stepTimer = 0f; }
                 break;
 
@@ -471,6 +469,7 @@ public class PlayerController : MonoBehaviour
             projectile.Shoot(_aimPoint.position, Camera.GetGroundDirection(), (Vector3 pos, GameObject target) =>
             {
                 GameController.AudioManager.AudibleEffect(projectile.gameObject, pos, 10f);
+                GameController.AudioManager.Play("GlassShatter", position: pos, volume: 0.5f);
             });
         }
     }
@@ -563,5 +562,9 @@ public class PlayerController : MonoBehaviour
         return false;
     }
 
-    public void PickupKey(IKey key) => _ownedKeys.Add(key);
+    public void PickupKey(IKey key)
+    {
+        _ownedKeys.Add(key);
+        GameController.AudioManager.Play("Jingle");
+    }
 }
