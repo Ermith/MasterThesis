@@ -143,8 +143,8 @@ MonoBehaviour:
   Projectile: {fileID: 8520847064218726488, guid: c09c916153dd54c4f8cd75a232a00f21, type: 3}
   WalkingBob: 0.05
   WalkStepFrequency: 0.8
-  RunBob: 0.15
-  RunStepFrequency: 0.3
+  RunBob: 0.08
+  RunStepFrequency: 0.35
   IsHidden: 0
   Refuge: 0
 --- !u!120 &8421662841618415801

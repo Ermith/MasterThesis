@@ -80,9 +80,13 @@ class MapBuilder
 
 
                 t = URandom.value;
-                if (t > 0.75f && tile is not Hallway)
-                    tile.Locks.Add(new TrapLock());
-                else if (t > 0.5f)
+                if (t > 0.0f && tile is not Hallway)
+                {
+                    var cameraLock = new SecurityCameraLock();
+                    var powerSource = cameraLock.GetNewKey();
+                    tile.Locks.Add(cameraLock);
+                    tile.Keys.Add(powerSource);
+                } else if (t > 0.5f)
                     tile.Locks.Add(new SoundTrapLock());
             }
 
@@ -118,9 +122,13 @@ class MapBuilder
 
 
                 t = URandom.value;
-                if (t > 0.75f && tile is not Hallway)
-                    tile.Locks.Add(new TrapLock());
-                else if (t > 0.5f)
+                if (t > 0.0f && tile is not Hallway)
+                {
+                    var cameraLock = new SecurityCameraLock();
+                    var powerSource = cameraLock.GetNewKey();
+                    tile.Locks.Add(cameraLock);
+                    tile.Keys.Add(powerSource);
+                } else if (t > 0.5f)
                     tile.Locks.Add(new SoundTrapLock());
             }
         }
@@ -155,9 +163,13 @@ class MapBuilder
 
 
             float t = URandom.value;
-            if (t > 0.75f)
-                tile.Locks.Add(new TrapLock());
-            else if (t > 0.5f)
+            if (t > 0.0f && (x, y) != _graphDrawing.VertexPositions[_graphDrawing.StartPosition])
+            {
+                var cameraLock = new SecurityCameraLock();
+                var powerSource = cameraLock.GetNewKey();
+                tile.Locks.Add(cameraLock);
+                tile.Keys.Add(powerSource);
+            } else if (t > 0.5f && (x, y) != _graphDrawing.VertexPositions[_graphDrawing.StartPosition])
                 tile.Locks.Add(new SoundTrapLock());
 
         }

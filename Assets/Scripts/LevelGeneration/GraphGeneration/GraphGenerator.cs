@@ -82,12 +82,12 @@ public class GraphGenerator
 
         for (int i = 0; i < 2; i++)
         {
-            ILock @lock = URandom.value > 0.5f ? new DoorLock() : new SecurityCameraLock();
+            ILock @lock = URandom.value > 0.5f ? new DoorLock() : new DoorLock();
             IEdge<BaseVertex> edge;
             do
             {
                 edge = Graph.GetRandomEdge();
-            } while (edge.From == _end || edge.To == _start);
+            } while (edge.From == _end || edge.To == _start || edge.From == _start);
         
             if (URandom.value > 0.5f)
                 cycleRule.Apply(edge, Graph, @lock);

@@ -6,7 +6,7 @@
 **hold Shift** - sprint  
 **Space while sprinting** - slide  
 **RightMouse/T** - aim  
-**LeftMouse/V while aiming**- projectile for distraction of   
+**LeftMouse/V while aiming**- projectile for distraction of enemies   
 **F1** - First Person camera  
 **F2** - Top Down camera  
 **F3** - Third Person camera  
