@@ -2,7 +2,7 @@
 using UnityEngine;
 
 
-interface IExperimentalState
+interface IMovementState
 {
     bool CanShoot { get; }
     bool CanPeek { get; }
@@ -15,7 +15,7 @@ interface IExperimentalState
     Vector3 GetMovement(Vector3 desiredMovement, Vector3 previousMovement);
 }
 
-class StandingState : IExperimentalState
+class StandingState : IMovementState
 {
     public StandingState()
     {
@@ -48,7 +48,7 @@ class StandingState : IExperimentalState
     }
 }
 
-class WalkingState : IExperimentalState
+class WalkingState : IMovementState
 {
     private float _movementSpeed;
     private float _bobScale;
@@ -111,7 +111,7 @@ class WalkingState : IExperimentalState
     }
 }
 
-class RunningState : IExperimentalState
+class RunningState : IMovementState
 {
     private float _movementSpeed;
     private float _bobScale;
@@ -174,7 +174,7 @@ class RunningState : IExperimentalState
     }
 }
 
-class SlidingState : IExperimentalState
+class SlidingState : IMovementState
 {
     private float _duration;
     private float _timer;
@@ -210,7 +210,7 @@ class SlidingState : IExperimentalState
         }
 
         GameController.AudioManager.Play("Slide");
-        player.Animation.Play();
+        player.Animation.Play("SlideAnimation");
     }
 
     public void Exit(PlayerController player)

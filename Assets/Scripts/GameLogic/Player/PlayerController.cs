@@ -62,7 +62,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (GameController.IsPaused)
+        if (GameController.IsPaused || _dead)
             return;
 
         _movementState.Update(this);
@@ -81,8 +81,16 @@ public class PlayerController : MonoBehaviour
         _meshRenderer.material.color = hidden ? Color.black : Color.white;
     }
 
+    private bool _dead = false;
     public void Die()
     {
+        if (_dead) return;
+
+        _dead = true;
+        GameController.AudioManager.Play("DeathGrunt");
+        var clip = Animation.GetClip("DeathAnimation");
+        Animation.Play("DeathAnimation");
+        GameController.ExecuteAfter(GameController.NewGame, clip.length);
     }
 
     #region Update Functions
@@ -181,7 +189,7 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region States And Movement
-    private IExperimentalState _movementState;
+    private IMovementState _movementState;
     private StandingState _standingState;
     private WalkingState _walkingState;
     private RunningState _runningState;
@@ -255,7 +263,7 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    private void EnterState(IExperimentalState state)
+    private void EnterState(IMovementState state)
     {
         _movementState.Exit(this);
         state.Enter(this);

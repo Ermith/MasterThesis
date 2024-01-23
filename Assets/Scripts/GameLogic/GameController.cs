@@ -64,10 +64,21 @@ public class GameController : MonoBehaviour
         Instance.StartCoroutine(WaitCoroutine(action, time));
     }
 
+    public static void ExecuteAfterUnscaled(Action action, float time)
+    {
+        Instance.StartCoroutine(WaitCoroutine(action, time));
+    }
+
     private static IEnumerator WaitCoroutine(Action action, float wait)
     {
         yield return new WaitForSeconds(wait);
 
+        action();
+    }
+
+    private static IEnumerator WaitCoroutineUnscaled(Action action, float wait)
+    {
+        yield return new WaitForSecondsRealtime(wait);
         action();
     }
 
@@ -114,62 +125,5 @@ public class GameController : MonoBehaviour
     {
         SceneManager.LoadScene("MainMenuScene");
         ShowCursor(true);
-    }
-
-    public static Coroutine Tween(Action<float> action, float duration, Func<float, float> easing)
-    {
-        return Instance.StartCoroutine(TweenCoroutine(action, duration, easing));
-    }
-
-    private static IEnumerator TweenCoroutine(Action<float> action, float duration, Func<float, float> easing)
-    {
-        float timer = 0f;
-
-        while (timer < duration)
-        {
-            float t = Mathf.Clamp01(timer / duration);
-            action(easing(t));
-            timer += Time.deltaTime;
-            yield return null;
-        }
-
-        action(1);
-    }
-}
-
-public class Tween
-{
-    Coroutine _coroutine;
-    private Action<float> _action;
-    private Func<float, float> _easing;
-    private float _duration;
-    private float _t;
-
-    public Tween(Action<float> action, float duration, Func<float, float> easing)
-    {
-        _action = action;
-        _easing = easing;
-        _duration = duration;
-    }
-
-    public void Start()
-    {
-        _coroutine = GameController.Tween((float t) =>
-        {
-            _t = t;
-            _action(t);
-        }, _duration, _easing);
-    }
-
-    public void Revert()
-    {
-        GameController.Instance.StopCoroutine(_coroutine);
-        _coroutine = GameController.Tween(
-            (float t) =>
-            {
-                _t = t;
-                _action(1 - t);
-            },
-            _duration * _t, _easing);
     }
 }
