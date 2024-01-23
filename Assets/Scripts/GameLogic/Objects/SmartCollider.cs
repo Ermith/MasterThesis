@@ -7,7 +7,7 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class SmartCollider : MonoBehaviour
 {
-    internal delegate void TriggerResponse(Player player);
+    internal delegate void TriggerResponse(PlayerController player);
     internal event TriggerResponse _triggerResponse;
     internal event TriggerResponse _triggerLeaveResponse;
 
@@ -17,7 +17,7 @@ public class SmartCollider : MonoBehaviour
         if (other.tag != "Player")
             return;
 
-        _triggerResponse?.Invoke(other.GetComponent<Player>());
+        _triggerResponse?.Invoke(other.GetComponent<PlayerController>());
     }
 
     private void OnTriggerExit(Collider other)
@@ -25,6 +25,6 @@ public class SmartCollider : MonoBehaviour
         if (other.tag != "Player")
             return;
 
-        _triggerLeaveResponse?.Invoke(other.GetComponent<Player>());
+        _triggerLeaveResponse?.Invoke(other.GetComponent<PlayerController>());
     }
 }

@@ -32,7 +32,7 @@ public class Door : MonoBehaviour, IInteractableObject, ILockObject
 
     }
 
-    public void Interact(Player player)
+    public void Interact(PlayerController player)
     {
         if (Lock != null)
         {

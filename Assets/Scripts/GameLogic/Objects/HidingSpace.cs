@@ -6,13 +6,13 @@ public class HidingSpace : SmartCollider
 {
     private void Start()
     {
-        _triggerResponse += (Player player) =>
+        _triggerResponse += (PlayerController player) =>
         {
             player.SetHidden(true);
             Debug.Log("Player in Hiding");
         };
 
-        _triggerLeaveResponse += (Player player) =>
+        _triggerLeaveResponse += (PlayerController player) =>
         {
             player.SetHidden(false);
             Debug.Log("NO PLAYER HIDE");

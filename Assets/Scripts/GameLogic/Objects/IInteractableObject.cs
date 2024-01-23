@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 interface IInteractableObject
 {
     bool CanInteract { get; }
-    void Interact(Player player);
+    void Interact(PlayerController player);
     string InteractionPrompt();
 }

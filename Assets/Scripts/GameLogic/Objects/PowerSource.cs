@@ -8,7 +8,7 @@ public class PowerSource : MonoBehaviour, IInteractableObject, IKeyObject
 
     public bool CanInteract => enabled;
 
-    public void Interact(Player player)
+    public void Interact(PlayerController player)
     {
         if (!CanInteract) return;
 

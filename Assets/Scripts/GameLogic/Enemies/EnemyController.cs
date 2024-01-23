@@ -49,7 +49,7 @@ public class EnemyController : MonoBehaviour, ILockObject
         ResolveRotation();
         ResolveMovement();
 
-        var player = FindObjectOfType<Player>();
+        var player = FindObjectOfType<PlayerController>();
         _sight.VisionConeHilighted = false;
         if (!player.IsHidden && _sight.CanSee(player.transform))
         {

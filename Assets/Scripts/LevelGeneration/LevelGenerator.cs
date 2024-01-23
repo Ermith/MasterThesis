@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,6 +22,7 @@ public class LevelGenerator : MonoBehaviour
     public GameObject HalfRefugeBlueprint;
     public GameObject VictoryTrigger;
     public EnemyController EnemyBlueprint;
+    public GameObject Player;
 
     IGraph<BaseVertex> _graph;
     GraphGenerator _graphGenerator;
@@ -131,13 +133,20 @@ public class LevelGenerator : MonoBehaviour
         // Just offset it for now
         level.transform.position = offset;
 
+        GameObject.Instantiate(VictoryTrigger).transform.position = _mapBuilder.GetEndPosition() * scale + offset;
+        FindObjectOfType<LevelCamera>().SetPosition(SubTileGrid.GetLength(0), SubTileGrid.GetLength(1), scale, offset);
+
+
         var playerSpawn = _mapBuilder.GetSpawnPosition() * scale + offset;
         Debug.Log($"REPOSITIONING THE PLAYER {playerSpawn}");
         // Spawn player at the correct position
-        GameObject.FindObjectOfType<Player>().transform.position = playerSpawn;
-        GameObject.Instantiate(VictoryTrigger).transform.position = _mapBuilder.GetEndPosition() * scale + offset;
-        //*/
+        // Needs to be 1 frame delayed because of bug, when setting position works only occasionally
+        StartCoroutine(DelayedSpawn(playerSpawn));
+    }
 
-        FindObjectOfType<LevelCamera>().SetPosition(SubTileGrid.GetLength(0), SubTileGrid.GetLength(1), scale, offset);
+    private IEnumerator DelayedSpawn(Vector3 spawnPosition)
+    {
+        yield return null;
+        Player.transform.position = spawnPosition;
     }
 }

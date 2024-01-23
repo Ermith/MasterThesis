@@ -6,238 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-interface IExperimentalState
-{
-    bool CanShoot { get; }
-    bool CanPeek { get; }
-    bool CanInteract { get; }
-    bool Locked { get; }
-    bool FreeLook { get; }
-    void Enter(Player player);
-    void Exit(Player player);
-    void Update(Player player);
-    Vector3 GetMovement(Vector3 desiredMovement, Vector3 previousMovement);
-}
-
-class StandingState : IExperimentalState
-{
-    public StandingState()
-    {
-    }
-
-    public bool Locked => false;
-    public bool FreeLook => false;
-
-    public bool CanShoot => true;
-
-    public bool CanPeek => true;
-
-    public bool CanInteract => true;
-
-    public void Enter(Player player)
-    {
-    }
-
-    public void Exit(Player player)
-    {
-    }
-
-    public Vector3 GetMovement(Vector3 desiredMovement, Vector3 previousMovement)
-    {
-        return Vector3.zero;
-    }
-
-    public void Update(Player player)
-    {
-    }
-}
-
-class WalkingState : IExperimentalState
-{
-    private float _movementSpeed;
-    private float _bobScale;
-    private float _stepPeriod;
-    private float _stepRadius;
-
-    private float _stepTimer;
-
-    public WalkingState(float movementSpeed, float bobScale, float stepPeriod, float stepRadius)
-    {
-        _movementSpeed = movementSpeed;
-        _bobScale = bobScale;
-        _stepPeriod = stepPeriod;
-        _stepRadius = stepRadius;
-    }
-
-    public bool Locked => false;
-    public bool FreeLook => false;
-
-    public bool CanShoot => true;
-
-    public bool CanPeek => true;
-
-    public bool CanInteract => true;
-
-    public void Enter(Player player)
-    {
-        player.Camera.BobDuration = _stepPeriod / 2;
-        player.Camera.BobScale = _bobScale;
-        _stepTimer = 0.5f * _stepPeriod;
-
-        if (player.Camera.Mode == CameraModeType.FirstPerson)
-            player.Camera.BobStart();
-    }
-    public void Update(Player player)
-    {
-        if (_stepTimer > _stepPeriod)
-        {
-            _stepTimer %= _stepPeriod;
-            StepSound(player);
-        }
-
-        _stepTimer += Time.deltaTime;
-    }
-
-    public void Exit(Player player)
-    {
-        player.Camera.BobEnd();
-    }
-
-    public Vector3 GetMovement(Vector3 desiredMovement, Vector3 previousMovement)
-    {
-        return desiredMovement * _movementSpeed;
-    }
-
-    public void StepSound(Player player)
-    {
-        GameController.AudioManager.Play("SmallStep");
-        GameController.AudioManager.AudibleEffect(player.gameObject, player.transform.position, _stepRadius);
-    }
-}
-
-class RunningState : IExperimentalState
-{
-    private float _movementSpeed;
-    private float _bobScale;
-    private float _stepPeriod;
-    private float _stepRadius;
-
-    private float _stepTimer;
-
-    public RunningState(float movementSpeed, float bobScale, float stepPeriod, float stepRadius)
-    {
-        _movementSpeed = movementSpeed;
-        _bobScale = bobScale;
-        _stepPeriod = stepPeriod;
-        _stepRadius = stepRadius;
-    }
-
-    public bool Locked => false;
-    public bool FreeLook => false;
-
-    public bool CanShoot => false;
-
-    public bool CanPeek => false;
-
-    public bool CanInteract => false;
-
-    public void Enter(Player player)
-    {
-        player.Camera.BobDuration = _stepPeriod / 2;
-        player.Camera.BobScale = _bobScale;
-        _stepTimer = 0.5f * _stepPeriod;
-
-        if (player.Camera.Mode == CameraModeType.FirstPerson)
-            player.Camera.BobStart();
-    }
-    public void Update(Player player)
-    {
-        if (_stepTimer > _stepPeriod)
-        {
-            _stepTimer %= _stepPeriod;
-            StepSound(player);
-        }
-
-        _stepTimer += Time.deltaTime;
-    }
-
-    public void Exit(Player player)
-    {
-        player.Camera.BobEnd();
-    }
-
-    public Vector3 GetMovement(Vector3 desiredMovement, Vector3 previousMovement)
-    {
-        return desiredMovement * _movementSpeed;
-    }
-
-    public void StepSound(Player player)
-    {
-        GameController.AudioManager.Play("BigStep");
-        GameController.AudioManager.AudibleEffect(player.gameObject, player.transform.position, _stepRadius);
-    }
-}
-
-class SlidingState : IExperimentalState
-{
-    private float _duration;
-    private float _timer;
-    private float _initialSpeed;
-
-    public SlidingState(float initialSpeed, float duration)
-    {
-        _initialSpeed = initialSpeed;
-        _duration = duration;
-        _timer = duration;
-    }
-
-    public bool Locked => _timer > 0;
-    public bool FreeLook => true;
-
-    public bool CanShoot => true;
-
-    public bool CanPeek => false;
-
-    public bool CanInteract => true;
-
-    public void Enter(Player player)
-    {
-        _timer = _duration;
-
-        if (player.Camera.Mode == CameraModeType.FirstPerson || player.Camera.Mode == CameraModeType.ThirdPerson)
-            player.Camera.CustomOffsetStart(0.2f, Vector3.down, false);
-
-        if (player.Camera.Mode == CameraModeType.FirstPerson)
-        {
-            float rotation = player.GetInputDir().x > 0 ? 10 : -10;
-            player.Camera.CustomRotationStart(0.2f, new Vector3(10, 0, rotation));
-        }
-
-        GameController.AudioManager.Play("Slide");
-        player.Animation.Play();
-    }
-
-    public void Exit(Player player)
-    {
-        Debug.Log("EXIT");
-        player.Camera.CustomRotationEnd();
-        player.Camera.CustomOffsetEnd();
-    }
-
-    public Vector3 GetMovement(Vector3 desiredMovement, Vector3 previousMovement)
-    {
-        float t = Mathf.Clamp01(_timer / _duration);
-        return previousMovement.normalized * _initialSpeed * t;
-    }
-
-    public void Update(Player player)
-    {
-        _timer -= Time.deltaTime;
-    }
-}
-
 [RequireComponent(typeof(CharacterController))]
-public class Player : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     #region Exposed Parameters
     public float MouseSensitivity = 0.7f;
@@ -292,6 +62,9 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        if (GameController.IsPaused)
+            return;
+
         _movementState.Update(this);
         UpdateCamera();
         UpdateMovement();
@@ -310,7 +83,6 @@ public class Player : MonoBehaviour
 
     public void Die()
     {
-
     }
 
     #region Update Functions
@@ -527,7 +299,11 @@ public class Player : MonoBehaviour
         return false;
     }
 
-    public void AddKey(IKey key) => _keys.Add(key);
+    public void AddKey(IKey key)
+    {
+        GameController.AudioManager.Play("Jingle");
+        _keys.Add(key);
+    }
 
     #endregion
 

@@ -16,7 +16,7 @@ public class SoundTrap : SmartCollider, ILockObject
 
     private void Start()
     {
-        _triggerResponse += (Player player) =>
+        _triggerResponse += (PlayerController player) =>
         {
             Debug.Log("Sound Trap Triggered");
             GameController.AudioManager.AudibleEffect(gameObject, player.transform.position, SoundRange);
