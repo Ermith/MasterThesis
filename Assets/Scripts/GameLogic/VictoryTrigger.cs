@@ -7,10 +7,10 @@ public class VictoryTrigger : SmartCollider
     // Start is called before the first frame update
     void Start()
     {
-        _triggerResponse += (PlayerController player) =>
+        _triggerResponse += (Player player) =>
         {
             var audio = GameController.AudioManager.Play("Victory");
-            GameController.Instance.ExecuteAfter(GameController.Restart, audio.clip.length);
+            GameController.ExecuteAfter(GameController.Restart, audio.clip.length);
         };
     }
 }

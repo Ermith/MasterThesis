@@ -7,7 +7,7 @@ public class MenuCotnroller : MonoBehaviour
 {
     public void Resume()
     {
-        GameController.Instance.Resume();
+        GameController.Resume();
     }
 
     public void NewGame()

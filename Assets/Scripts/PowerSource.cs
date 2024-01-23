@@ -2,15 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PowerSource : MonoBehaviour, IUsableObject, IKeyObject
+public class PowerSource : MonoBehaviour, IInteractableObject, IKeyObject
 {
     public IKey MyKey { get; set; }
 
-    public bool IsUsable => enabled;
+    public bool CanInteract => enabled;
 
-    public void Use(PlayerController player)
+    public void Interact(Player player)
     {
-        if (!IsUsable) return;
+        if (!CanInteract) return;
 
         foreach (var @lock in MyKey.Locks)
             foreach (var lockObject in @lock.Instances)
@@ -20,11 +20,11 @@ public class PowerSource : MonoBehaviour, IUsableObject, IKeyObject
             }
 
         var audio = GameController.AudioManager.Play("Cut");
-        GameController.Instance.ExecuteAfter(() => GameController.AudioManager.Play("ElectricDischarge"), audio.clip.length);
+        GameController.ExecuteAfter(() => GameController.AudioManager.Play("ElectricDischarge"), audio.clip.length);
 
         GetComponentInChildren<MeshRenderer>().material.color = Color.black;
         enabled = false;
     }
 
-    public string UsePrompt() => "Cut Power";
+    public string InteractionPrompt() => "Cut Power";
 }

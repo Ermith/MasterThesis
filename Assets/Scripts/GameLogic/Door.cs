@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Door : MonoBehaviour, IUsableObject, ILockObject
+public class Door : MonoBehaviour, IInteractableObject, ILockObject
 {
     public float Duration = 0.5f;
 
@@ -16,7 +16,7 @@ public class Door : MonoBehaviour, IUsableObject, ILockObject
 
     public ILock Lock { get; set; }
 
-    public bool IsUsable => true;
+    public bool CanInteract => true;
 
     void Start()
     {
@@ -32,13 +32,13 @@ public class Door : MonoBehaviour, IUsableObject, ILockObject
 
     }
 
-    public void Use(PlayerController player)
+    public void Interact(Player player)
     {
         if (Lock != null)
         {
             Debug.Log("");
 
-            if (player.HasKey(Lock))
+            if (player.HasKeyForLock(Lock))
                 Unlock();
             else
             {
@@ -73,7 +73,7 @@ public class Door : MonoBehaviour, IUsableObject, ILockObject
         Debug.Log("Closing the door");
         _clopenCoroutine = StartCoroutine(ClopenCoroutine(Duration, 0, Easing.SmoothStep));
         GameController.AudioManager.Play("DoorCreak", position: transform.position);
-        GameController.Instance.ExecuteAfter(() => GameController.AudioManager.Play("DoorShut", position: transform.position), Duration - 0.05f);
+        GameController.ExecuteAfter(() => GameController.AudioManager.Play("DoorShut", position: transform.position), Duration - 0.05f);
         _open = false;
     }
 
@@ -95,7 +95,7 @@ public class Door : MonoBehaviour, IUsableObject, ILockObject
         _clopenCoroutine = null;
     }
 
-    public string UsePrompt()
+    public string InteractionPrompt()
     {
         return _open ? "Close Door" : "Open Door";
     }

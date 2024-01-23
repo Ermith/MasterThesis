@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements.Experimental;
 
 [RequireComponent(
     typeof(AudioManager)
@@ -17,6 +18,29 @@ public class GameController : MonoBehaviour
     public Canvas HUDCanvas;
 
     private Transform _interactText;
+
+
+    // Awake is called before the Start method
+    private void Awake()
+    {
+        Debug.Log("Game Instance");
+        Instance = this;
+        Time.timeScale = 1f;
+        //UnityEngine.Random.InitState(-488536290);
+        Debug.Log(UnityEngine.Random.seed);
+        _interactText = HUDCanvas.transform.Find("Interact Text");
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (_paused) Resume();
+            else Pause();
+        }
+
+    }
 
     public static void Restart()
     {
@@ -35,38 +59,20 @@ public class GameController : MonoBehaviour
         //yield return null;
     }
 
-    public void ExecuteAfter(Action action, float time)
+    public static void ExecuteAfter(Action action, float time)
     {
-        StartCoroutine(WaitCoroutine(action, time));
+        Instance.StartCoroutine(WaitCoroutine(action, time));
     }
 
-    private IEnumerator WaitCoroutine(Action action, float wait)
+    private static IEnumerator WaitCoroutine(Action action, float wait)
     {
         yield return new WaitForSeconds(wait);
 
         action();
     }
 
-    // Awake is called before the Start method
-    private void Awake()
-    {
-        Debug.Log("Game Instance");
-        Instance = this;
-        Time.timeScale = 1f;
-        //UnityEngine.Random.InitState(-488536290);
-        Debug.Log(UnityEngine.Random.seed);
-        _interactText = HUDCanvas.transform.Find("Interact Text");
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
-
     public static void ShowInteraction(string text)
     {
-
-
         Instance._interactText.gameObject.SetActive(true);
         Instance._interactText.GetComponentInChildren<TMPro.TMP_Text>().text = $"Press F to : {text}";
     }
@@ -76,30 +82,19 @@ public class GameController : MonoBehaviour
         Instance._interactText.gameObject.SetActive(false);
     }
 
-    // Update is called once per frame
-    void Update()
+    public static void Pause()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (_paused) Resume();
-            else Pause();
-        }
-
-    }
-
-    public void Pause()
-    {
-        _paused = true;
+        Instance._paused = true;
         Time.timeScale = 0f;
-        PauseCanvas.gameObject.SetActive(true);
+        Instance.PauseCanvas.gameObject.SetActive(true);
         ShowCursor(true);
     }
 
-    public void Resume()
+    public static void Resume()
     {
-        _paused = false;
+        Instance._paused = false;
         Time.timeScale = 1f;
-        PauseCanvas.gameObject.SetActive(false);
+        Instance.PauseCanvas.gameObject.SetActive(false);
         ShowCursor(false);
     }
 
@@ -119,5 +114,62 @@ public class GameController : MonoBehaviour
     {
         SceneManager.LoadScene("MainMenuScene");
         ShowCursor(true);
+    }
+
+    public static Coroutine Tween(Action<float> action, float duration, Func<float, float> easing)
+    {
+        return Instance.StartCoroutine(TweenCoroutine(action, duration, easing));
+    }
+
+    private static IEnumerator TweenCoroutine(Action<float> action, float duration, Func<float, float> easing)
+    {
+        float timer = 0f;
+
+        while (timer < duration)
+        {
+            float t = Mathf.Clamp01(timer / duration);
+            action(easing(t));
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        action(1);
+    }
+}
+
+public class Tween
+{
+    Coroutine _coroutine;
+    private Action<float> _action;
+    private Func<float, float> _easing;
+    private float _duration;
+    private float _t;
+
+    public Tween(Action<float> action, float duration, Func<float, float> easing)
+    {
+        _action = action;
+        _easing = easing;
+        _duration = duration;
+    }
+
+    public void Start()
+    {
+        _coroutine = GameController.Tween((float t) =>
+        {
+            _t = t;
+            _action(t);
+        }, _duration, _easing);
+    }
+
+    public void Revert()
+    {
+        GameController.Instance.StopCoroutine(_coroutine);
+        _coroutine = GameController.Tween(
+            (float t) =>
+            {
+                _t = t;
+                _action(1 - t);
+            },
+            _duration * _t, _easing);
     }
 }

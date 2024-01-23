@@ -39,7 +39,7 @@ public class SecurityCameraController : MonoBehaviour, ILockObject
     void Start()
     {
         _sight = GetComponentInChildren<Sight>();
-        _player = FindObjectOfType<PlayerController>().transform;
+        _player = FindObjectOfType<Player>().transform;
     }
 
     // Update is called once per frame
@@ -66,7 +66,7 @@ public class SecurityCameraController : MonoBehaviour, ILockObject
             if (_timer > _duration)
             {
                 GameController.AudioManager.PlayOnTarget("Gunshot", gameObject);
-                _player.GetComponent<PlayerController>().Die();
+                _player.GetComponent<Player>().Die();
                 _timer %= _duration;
             }
         }

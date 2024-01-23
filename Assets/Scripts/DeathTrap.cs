@@ -13,7 +13,7 @@ public class DeathTrap : SmartCollider, ILockObject
 
     private void Start()
     {
-        _triggerResponse += (PlayerController player) =>
+        _triggerResponse += (Player player) =>
         {
             Debug.Log("Death Trap Triggered");
             player.Die();

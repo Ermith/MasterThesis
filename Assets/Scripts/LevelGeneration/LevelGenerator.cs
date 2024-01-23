@@ -134,7 +134,7 @@ public class LevelGenerator : MonoBehaviour
         var playerSpawn = _mapBuilder.GetSpawnPosition() * scale + offset;
         Debug.Log($"REPOSITIONING THE PLAYER {playerSpawn}");
         // Spawn player at the correct position
-        GameObject.Find("Player").transform.position = playerSpawn;
+        GameObject.FindObjectOfType<Player>().transform.position = playerSpawn;
         GameObject.Instantiate(VictoryTrigger).transform.position = _mapBuilder.GetEndPosition() * scale + offset;
         //*/
 

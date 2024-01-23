@@ -1,19 +1,21 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.SocialPlatforms;
 
+/*/
 [RequireComponent(typeof(CharacterController))]
-public class PlayerController : MonoBehaviour
+public class KPlayerController : MonoBehaviour
 {
     private enum MovementState { Standing, Walking, Running, Sliding };
     private MovementState _movementState;
 
     public float WalkingSpeed = 2f;
-    public float RunningSpeed = 5f;
+    public float SprintingSpeed = 5f;
     public float SlidingSpeed = 7f;
     public float WalkingRadius = 1.5f;
     public float RunningRadius = 5f;
@@ -23,6 +25,7 @@ public class PlayerController : MonoBehaviour
     public CameraController Camera;
     public float StepFrequency = 5f;
     public Projectile Projectile;
+    public float MouseSensitivity = 0.7f;
 
     public float WalkingBob = 0.065f;
     public float WalkStepFrequency = 0.7f;
@@ -52,6 +55,8 @@ public class PlayerController : MonoBehaviour
 
     private List<IKey> _ownedKeys = new();
 
+    private IMovementState _state;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -68,113 +73,108 @@ public class PlayerController : MonoBehaviour
         _lineRenderer.endWidth = 0.1f;
 
         SetStandingState();
+        _standingState = new Standing();
+        _walkingState = new Walking(WalkingSpeed, WalkStepFrequency, WalkingRadius, WalkingBob);
+        _sprintingState = new Sprinting(SprintingSpeed, RunStepFrequency, RunningRadius, RunBob);
+        _slidingState = new Sliding(transform.forward, SlidingSpeed, _slideDuration);
+        _state = _walkingState;
+    }
+
+    private Standing _standingState;
+    private Walking _walkingState;
+    private Sprinting _sprintingState;
+    private Sliding _slidingState;
+
+    private void DetermineState()
+    {
+        if (!_state.CanSwitch) return;
+
+        if (_state is Standing)
+        {
+            if (_inputDir != Vector3.zero)
+            {
+                if (_sprintRequest)
+                    EnterState(_sprintingState);
+                else
+                    EnterState(_walkingState);
+
+                return;
+            }
+        }
+
+        if (_state is Walking)
+        {
+            if (_inputDir == Vector3.zero)
+            {
+                EnterState(_standingState);
+                return;
+            }
+
+            if (_sprintRequest)
+            {
+                EnterState(_sprintingState);
+                return;
+            }
+        }
+
+        if (_state is Sprinting)
+        {
+            if (_slideRequest)
+            {
+                EnterState(_slidingState);
+                return;
+            }
+
+            if (_inputDir == Vector3.zero)
+            {
+                EnterState(_standingState);
+                return;
+            }
+
+            if (!_sprintRequest)
+            {
+                EnterState(_walkingState);
+                return;
+            }
+        }
+
+        if (_state is Sliding)
+        {
+            if (_inputDir == Vector3.zero)
+            {
+                EnterState(_standingState);
+                return;
+            }
+
+            if (_sprintRequest)
+            {
+                EnterState(_sprintingState);
+                return;
+            }
+
+            EnterState(_walkingState);
+            return;
+        }
+    }
+
+    private void EnterState(IMovementState state)
+    {
+        //_state.Exit(this);
+        //state.Reset(this);
+        _state = state;
     }
 
     // Update is called once per frame
     void Update()
     {
         GatherInput();
-        ResolveState();
-        SwitchState();
-
-        /*/
-        // Camera
-        if (Input.GetKeyDown(KeyCode.F1)) Camera.SwitchMode(CameraModeType.FirstPerson);
-        if (Input.GetKeyDown(KeyCode.F2)) Camera.SwitchMode(CameraModeType.TopDown);
-        if (Input.GetKeyDown(KeyCode.F3)) Camera.SwitchMode(CameraModeType.ThirdPerson);
-
-        SwitchVisual(Camera.CameraMode != CameraModeType.FirstPerson);
-        Camera.BobEnabled = Camera.CameraMode == CameraModeType.FirstPerson;
-
-        // peeking
-        Vector3 peekLeft = new(-PeekOffset.x, PeekOffset.y, PeekOffset.z);
-        if (Input.GetKeyDown(KeyCode.E)) { StartPeek(false); }
-        if (Input.GetKeyDown(KeyCode.Q)) { StartPeek(true); }
-        if (Input.GetKeyUp(KeyCode.E)) { EndPeek(); }
-        if (Input.GetKeyUp(KeyCode.Q)) { EndPeek(); }
-        ResolvePeek();
-
-
-        // Movement
-        Vector3 inputDir = Vector3.zero;
-        if (Input.GetKey(KeyCode.W)) inputDir += Vector3.forward;
-        if (Input.GetKey(KeyCode.A)) inputDir += Vector3.left;
-        if (Input.GetKey(KeyCode.S)) inputDir += Vector3.back;
-        if (Input.GetKey(KeyCode.D)) inputDir += Vector3.right;
-        inputDir.Normalize();
-
-        float speed = WalkingSpeed;
-        float radius = WalkingRadius;
-        StepFrequency = 0.7f;
-        Camera.BobDuration = 0.35f;
-        Camera.BobScale = 0.075f;
-        if (Input.GetKey(KeyCode.LeftShift))
-        {
-            speed = RunningSpeed;
-            radius = RunningRadius;
-            StepFrequency = 0.4f;
-            Camera.BobDuration = 0.2f;
-            Camera.BobScale = 0.15f;
-        }
-
-        bool isMoving = inputDir != Vector3.zero;
-
-        if (isMoving) Camera.BobStart(); else Camera.BobEnd();
-        if (isMoving && !_wasMoving) walkTime = 0;
-        if (isMoving) walkTime += Time.deltaTime;
-        if (isMoving && walkTime > StepFrequency)
-        {
-            CreateSound(radius);
-            walkTime %= StepFrequency;
-        }
-
-        if (!isMoving && _wasMoving)
-            CreateSound(radius);
-
-        _wasMoving = isMoving;
-
-
-        float x = Input.GetAxis("Mouse X");
-        float y = Input.GetAxis("Mouse Y");
-        Camera.Rotate(-x, y);
-        Vector3 cameraDir = Camera.GetGroundDirection();
-        Vector3 camearaRight = -Vector3.Cross(cameraDir, Vector3.up);
-
-        Vector3 direction = cameraDir * inputDir.z + camearaRight * inputDir.x;
-        _characterContrroller.SimpleMove(direction * speed);
-        transform.forward = cameraDir;
-
-        if (Input.GetKeyDown(KeyCode.V))
-        {
-            Projectile projectile = Instantiate(Projectile);
-            projectile.Shoot(transform.position, cameraDir, (Vector3 pos, GameObject target) =>
-            {
-                GameController.AudioManager.AudibleEffect(projectile.gameObject, pos, 10f);
-            });
-        }
-
-        _lineRenderer.enabled = false;
-        if (Input.GetKey(KeyCode.T))
-        {
-            float maxDistance = 1000;
-            bool hit = Physics.Raycast(transform.position, Camera.GetGroundDirection(), out RaycastHit hitInfo, maxDistance);
-            if (!hit) return;
-
-            _lineRenderer.enabled = true;
-            _lineRenderer.SetPositions(
-                new Vector3[] { transform.position, hitInfo.point }
-            );
-        }
-
-        IsHidden = Refuge;
-        Refuge = false;
-        //*/
-        //GetComponent<MeshRenderer>().material.color = IsHidden ? Color.black : Color.white;
+        DetermineState();
+        UpdateState();
     }
 
     // State Computation
-    private Vector3 _inputDir = Vector3.zero;
-    private bool _runRequest = false;
+    public Vector3 _inputDir = Vector3.zero;
+    private bool _sprintRequest = false;
     private bool _slideRequest = false;
     private bool _aimRequest = false;
     private bool _shootRequest = false;
@@ -183,9 +183,9 @@ public class PlayerController : MonoBehaviour
     private float _turnX, _turnY;
     private CameraModeType? _cameraModeRequest = null;
     private PeekRequest? _peekRequest = null;
-    private float _slideDuration = 1.8f;
+    private float _slideDuration = 1.4f;
 
-    private enum PeekRequest { Left, Right, Return }
+    public enum PeekRequest { Left, Right, Return }
     private bool _isPeeking;
 
     // Steate Parameters
@@ -206,7 +206,7 @@ public class PlayerController : MonoBehaviour
         _dying = true;
         float duration = GameController.AudioManager.Play("DeathGrunt").clip.length;
 
-        GameController.Instance.ExecuteAfter(GameController.MainMenu, duration);
+        GameController.ExecuteAfter(GameController.MainMenu, duration);
     }
 
     private void SetWalkingState()
@@ -227,7 +227,7 @@ public class PlayerController : MonoBehaviour
     private void SetRunningState()
     {
         SetState(
-            movementSpeed: RunningSpeed,
+            movementSpeed: SprintingSpeed,
             stepSoundRadius: RunningRadius,
             stepPeriod: RunStepFrequency,
             bobScale: RunBob,
@@ -297,19 +297,19 @@ public class PlayerController : MonoBehaviour
         switch (_movementState)
         {
             case MovementState.Standing:
-                if (_inputDir != Vector3.zero && _runRequest) { SetRunningState(); }
-                if (_inputDir != Vector3.zero && !_runRequest) { SetWalkingState(); }
+                if (_inputDir != Vector3.zero && _sprintRequest) { SetRunningState(); }
+                if (_inputDir != Vector3.zero && !_sprintRequest) { SetWalkingState(); }
                 if (_movementState != MovementState.Standing) EndPeek();
                 break;
 
 
             case MovementState.Walking:
-                if (_inputDir == Vector3.zero) { SetStandingState(); _stepTimer = 0f; } else if (_runRequest) SetRunningState();
+                if (_inputDir == Vector3.zero) { SetStandingState(); _stepTimer = 0f; } else if (_sprintRequest) SetRunningState();
                 break;
 
 
             case MovementState.Running:
-                if (_inputDir == Vector3.zero) { SetStandingState(); _stepTimer = 0f; } else if (!_runRequest) SetWalkingState();
+                if (_inputDir == Vector3.zero) { SetStandingState(); _stepTimer = 0f; } else if (!_sprintRequest) SetWalkingState();
                 else if (_slideRequest) { SetSlidingState(); _stepTimer = 0f; }
                 break;
 
@@ -327,61 +327,49 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void GatherInput()
+    private void UpdateMovement()
     {
-        // reset input
-        _turnX = 0f;
-        _turnY = 0f;
-        _runRequest = false;
-        _slideRequest = false;
-        _inputDir = Vector3.zero;
-        _peekRequest = null;
-        _aimRequest = false;
-        _shootRequest = false;
-        _useRequest = false;
+        Vector3 movement = _state.GetMovement(
+            _inputDir,
+            _characterContrroller.velocity,
+            Camera);
 
-        if (GameController.IsPaused)
-            return;
 
-        // Camera
-        if (Input.GetKeyDown(KeyCode.F1)) _cameraModeRequest = CameraModeType.FirstPerson;
-        if (Input.GetKeyDown(KeyCode.F2)) _cameraModeRequest = CameraModeType.TopDown;
-        if (Input.GetKeyDown(KeyCode.F3)) _cameraModeRequest = CameraModeType.ThirdPerson;
-        _turnX = -Input.GetAxis("Mouse X");
-        _turnY = Input.GetAxis("Mouse Y");
+        _characterContrroller.SimpleMove(movement * _state.MovementSpeed);
+        transform.forward = _state.GetRotation(movement, transform.forward, Camera);
 
-        if (Input.GetKeyDown(KeyCode.F1) || Input.GetKeyDown(KeyCode.F2) || Input.GetKeyDown(KeyCode.F3)) FindObjectOfType<LevelCamera>().GetComponent<Camera>().enabled = false;
-        if (Input.GetKeyDown(KeyCode.F4)) FindObjectOfType<LevelCamera>().GetComponent<Camera>().enabled = true;
-
-        //Movement
-        if (Input.GetKey(KeyCode.W)) _inputDir += Vector3.forward;
-        if (Input.GetKey(KeyCode.A)) _inputDir += Vector3.left;
-        if (Input.GetKey(KeyCode.S)) _inputDir += Vector3.back;
-        if (Input.GetKey(KeyCode.D)) _inputDir += Vector3.right;
-        _inputDir.Normalize();
-        _runRequest = Input.GetKey(KeyCode.LeftShift);
-        _slideRequest = Input.GetKey(KeyCode.Space);
-
-        // Peeking
-        if (_canPeek)
+        if (!_state.BobEnabled)
         {
-            if (Input.GetKeyDown(KeyCode.E)) { _peekRequest = PeekRequest.Right; }
-            if (Input.GetKeyDown(KeyCode.Q)) { _peekRequest = PeekRequest.Left; }
-            if (Input.GetKeyUp(KeyCode.E)) { _peekRequest = PeekRequest.Return; }
-            if (Input.GetKeyUp(KeyCode.Q)) { _peekRequest = PeekRequest.Return; }
+            Camera.BobEnd();
+            return;
         }
 
-        // Aiming and Shooting
-        if (Input.GetMouseButton(1) || Input.GetKey(KeyCode.T)) _aimRequest = true;
-        if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.V)) && _aimRequest) _shootRequest = true;
 
-        // Use
-        if (Input.GetKeyDown(KeyCode.F)) _useRequest = true;
+        //Camera.BobScale = _state.BobScale;
+        //Camera.BobDuration = _state.StepPeriod;
+        //
+        //if (!Camera.Bobbing())
+        //{
+        //    Camera.BobStart();
+        //    Debug.Log("REALLY BOBBING");
+        //}
+        //
+        //if (Camera.BobStep)
+        //    GameController.AudioManager.AudibleEffect(
+        //        gameObject,
+        //        transform.position,
+        //        _state.StepRange);
     }
 
-    private void ResolveState()
+
+    private void UpdateState()
     {
-        ResolveCamera();
+        _state.Update();
+        UpdateCamera();
+        UpdateMovement();
+        UpdateShooting();
+        UpdateInteraction();
+        UpdatePeeking();
 
         string stepSound = "SmallStep";
         if (_movementState == MovementState.Running) stepSound = "BigStep";
@@ -418,16 +406,27 @@ public class PlayerController : MonoBehaviour
         Use();
     }
 
-    private void ResolveCamera()
+    private void UpdateCamera()
     {
         if (_cameraModeRequest != null)
             Camera.SwitchMode(_cameraModeRequest.Value);
 
-        Camera.Rotate(_turnX, _turnY);
+        Camera.Rotate(_turnX * MouseSensitivity, _turnY * MouseSensitivity);
         SwitchVisual(Camera.Mode != CameraModeType.FirstPerson);
-        Camera.BobEnabled = Camera.Mode == CameraModeType.FirstPerson && _bobEnabled;
-        Camera.BobDuration = _stepPeriod / 2f;
-        Camera.BobScale = _bobScale;
+
+        Camera.BobEnabled = Camera.Mode == CameraModeType.FirstPerson;
+
+        if (!_state.BobEnabled)
+        {
+            Camera.BobEnd();
+            return;
+        }
+
+        Camera.BobDuration = _state.StepPeriod / 2f;
+        Camera.BobScale = _state.BobScale;
+        if (!Camera.Bobbing())
+            Camera.BobStart();
+
     }
 
     private void ResolveMovement()
@@ -448,10 +447,10 @@ public class PlayerController : MonoBehaviour
         _slideTimer += Time.deltaTime;
     }
 
-    private void Shooting()
+    private void UpdateShooting()
     {
         _lineRenderer.enabled = false;
-        if (_aimRequest)
+        if (_aimRequest && _state.CanShoot)
         {
             float maxDistance = 1000;
             bool hit = Physics.Raycast(_aimPoint.position, Camera.GetGroundDirection(), out RaycastHit hitInfo, maxDistance);
@@ -474,21 +473,42 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void Use()
+    private void UpdateInteraction()
     {
-        Vector3 dir = Camera.Mode == CameraModeType.TopDown
+        if (!_state.CanInteract)
+        {
+            GameController.HideInteraction();
+            return;
+        }
+
+        Vector3 direction = Camera.Mode == CameraModeType.TopDown
             ? Camera.GetGroundDirection()
             : Camera.transform.forward;
 
-        bool hit = Physics.Raycast(_viewPoint.position, dir, out RaycastHit hitInfo, 2f);
-        if (!hit) { GameController.HideInteraction(); return; }
+        bool hit = Physics.Raycast(
+            _viewPoint.position,
+            direction,
+            out RaycastHit hitInfo,
+            maxDistance: 2f);
 
-        var usableObject = hitInfo.collider.gameObject.transform.GetComponentInParent<IUsableObject>();
+        if (!hit)
+        {
+            GameController.HideInteraction();
+            return;
+        }
 
-        if (usableObject == null || !usableObject.IsUsable) { GameController.HideInteraction(); return; };
+        var interactable =
+            hitInfo.collider.gameObject.transform
+            .GetComponentInParent<IInteractableObject>();
 
-        GameController.ShowInteraction(usableObject.UsePrompt());
-        if (_useRequest) usableObject.Use(this);
+        if (interactable == null || !interactable.CanInteract)
+        {
+            GameController.HideInteraction();
+            return;
+        };
+
+        GameController.ShowInteraction(interactable.InteractionPrompt());
+        //if (_useRequest) interactable.Interact(this);
     }
 
     private void StepSound(string sound, float range)
@@ -504,6 +524,35 @@ public class PlayerController : MonoBehaviour
             : UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
     }
 
+    private void UpdatePeeking()
+    {
+        if (!_state.CanPeek)
+        {
+            EndPeek();
+            return;
+        }
+
+        if (_peekRequest == null)
+            return;
+
+        Debug.Log(_peekRequest.Value);
+
+        switch (_peekRequest.Value)
+        {
+            case PeekRequest.Left:
+                StartPeek(true);
+                break;
+
+            case PeekRequest.Right:
+                StartPeek(false);
+                break;
+
+            case PeekRequest.Return:
+                EndPeek();
+                break;
+        }
+
+    }
     private void StartPeek(bool left)
     {
         if (Camera.Mode == CameraModeType.TopDown)
@@ -567,4 +616,84 @@ public class PlayerController : MonoBehaviour
         _ownedKeys.Add(key);
         GameController.AudioManager.Play("Jingle");
     }
-}
+
+
+    private void GatherInput()
+    {
+        // reset input
+        _turnX = 0f;
+        _turnY = 0f;
+        _sprintRequest = false;
+        _slideRequest = false;
+        _inputDir = Vector3.zero;
+        _peekRequest = null;
+        _aimRequest = false;
+        _shootRequest = false;
+        _useRequest = false;
+        _cameraModeRequest = null;
+
+        if (GameController.IsPaused)
+            return;
+
+        // Camera
+        if (Input.GetKeyDown(KeyCode.F1)) _cameraModeRequest = CameraModeType.FirstPerson;
+        if (Input.GetKeyDown(KeyCode.F2)) _cameraModeRequest = CameraModeType.TopDown;
+        if (Input.GetKeyDown(KeyCode.F3)) _cameraModeRequest = CameraModeType.ThirdPerson;
+        _turnX = -Input.GetAxis("Mouse X");
+        _turnY = Input.GetAxis("Mouse Y");
+
+        //if (Input.GetKeyDown(KeyCode.F1) || Input.GetKeyDown(KeyCode.F2) || Input.GetKeyDown(KeyCode.F3)) FindObjectOfType<LevelCamera>().GetComponent<Camera>().enabled = false;
+        if (Input.GetKeyDown(KeyCode.F4)) FindObjectOfType<LevelCamera>().GetComponent<Camera>().enabled = true;
+
+        //Movement
+        if (Input.GetKey(KeyCode.W)) _inputDir += Vector3.forward;
+        if (Input.GetKey(KeyCode.A)) _inputDir += Vector3.left;
+        if (Input.GetKey(KeyCode.S)) _inputDir += Vector3.back;
+        if (Input.GetKey(KeyCode.D)) _inputDir += Vector3.right;
+        _inputDir.Normalize();
+        _sprintRequest = Input.GetKey(KeyCode.LeftShift);
+        _slideRequest = Input.GetKey(KeyCode.Space);
+
+        // Peeking
+        if (_canPeek)
+        {
+            if (Input.GetKeyDown(KeyCode.E)) { _peekRequest = PeekRequest.Right; }
+            if (Input.GetKeyDown(KeyCode.Q)) { _peekRequest = PeekRequest.Left; }
+            if (Input.GetKeyUp(KeyCode.E)) { _peekRequest = PeekRequest.Return; }
+            if (Input.GetKeyUp(KeyCode.Q)) { _peekRequest = PeekRequest.Return; }
+        }
+
+        // Aiming and Shooting
+        if (Input.GetMouseButton(1) || Input.GetKey(KeyCode.T)) _aimRequest = true;
+        if ((Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.V)) && _aimRequest) _shootRequest = true;
+
+        // Use
+        if (Input.GetKeyDown(KeyCode.F)) _useRequest = true;
+    }
+
+    public void SetCameraMode(CameraModeType cameraMode)
+    {
+        Camera.SwitchMode(cameraMode);
+        SwitchVisual(cameraMode != CameraModeType.FirstPerson);
+        Camera.BobEnabled = cameraMode == CameraModeType.FirstPerson && _bobEnabled;
+        Camera.BobDuration = _stepPeriod / 2f;
+        Camera.BobScale = _bobScale;
+    }
+
+    public void RotateCamera(float yaw, float pitch)
+    {
+        Camera.Rotate(yaw * MouseSensitivity, pitch * MouseSensitivity);
+    }
+
+    public void SetMovementDirection(Vector3 inputDir, bool sprint = false, bool slide = false)
+    {
+        _inputDir = inputDir;
+        _sprintRequest = sprint;
+        _slideRequest = slide;
+    }
+
+    public void Peek(PeekRequest request)
+    {
+        _peekRequest = request;
+    }
+}//*/

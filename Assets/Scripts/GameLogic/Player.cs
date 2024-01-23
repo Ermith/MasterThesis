@@ -1,0 +1,606 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
+
+interface IExperimentalState
+{
+    bool CanShoot { get; }
+    bool CanPeek { get; }
+    bool CanInteract { get; }
+    bool Locked { get; }
+    bool FreeLook { get; }
+    void Enter(Player player);
+    void Exit(Player player);
+    void Update(Player player);
+    Vector3 GetMovement(Vector3 desiredMovement, Vector3 previousMovement);
+}
+
+class StandingState : IExperimentalState
+{
+    public StandingState()
+    {
+    }
+
+    public bool Locked => false;
+    public bool FreeLook => false;
+
+    public bool CanShoot => true;
+
+    public bool CanPeek => true;
+
+    public bool CanInteract => true;
+
+    public void Enter(Player player)
+    {
+    }
+
+    public void Exit(Player player)
+    {
+    }
+
+    public Vector3 GetMovement(Vector3 desiredMovement, Vector3 previousMovement)
+    {
+        return Vector3.zero;
+    }
+
+    public void Update(Player player)
+    {
+    }
+}
+
+class WalkingState : IExperimentalState
+{
+    private float _movementSpeed;
+    private float _bobScale;
+    private float _stepPeriod;
+    private float _stepRadius;
+
+    private float _stepTimer;
+
+    public WalkingState(float movementSpeed, float bobScale, float stepPeriod, float stepRadius)
+    {
+        _movementSpeed = movementSpeed;
+        _bobScale = bobScale;
+        _stepPeriod = stepPeriod;
+        _stepRadius = stepRadius;
+    }
+
+    public bool Locked => false;
+    public bool FreeLook => false;
+
+    public bool CanShoot => true;
+
+    public bool CanPeek => true;
+
+    public bool CanInteract => true;
+
+    public void Enter(Player player)
+    {
+        player.Camera.BobDuration = _stepPeriod / 2;
+        player.Camera.BobScale = _bobScale;
+        _stepTimer = 0.5f * _stepPeriod;
+
+        if (player.Camera.Mode == CameraModeType.FirstPerson)
+            player.Camera.BobStart();
+    }
+    public void Update(Player player)
+    {
+        if (_stepTimer > _stepPeriod)
+        {
+            _stepTimer %= _stepPeriod;
+            StepSound(player);
+        }
+
+        _stepTimer += Time.deltaTime;
+    }
+
+    public void Exit(Player player)
+    {
+        player.Camera.BobEnd();
+    }
+
+    public Vector3 GetMovement(Vector3 desiredMovement, Vector3 previousMovement)
+    {
+        return desiredMovement * _movementSpeed;
+    }
+
+    public void StepSound(Player player)
+    {
+        GameController.AudioManager.Play("SmallStep");
+        GameController.AudioManager.AudibleEffect(player.gameObject, player.transform.position, _stepRadius);
+    }
+}
+
+class RunningState : IExperimentalState
+{
+    private float _movementSpeed;
+    private float _bobScale;
+    private float _stepPeriod;
+    private float _stepRadius;
+
+    private float _stepTimer;
+
+    public RunningState(float movementSpeed, float bobScale, float stepPeriod, float stepRadius)
+    {
+        _movementSpeed = movementSpeed;
+        _bobScale = bobScale;
+        _stepPeriod = stepPeriod;
+        _stepRadius = stepRadius;
+    }
+
+    public bool Locked => false;
+    public bool FreeLook => false;
+
+    public bool CanShoot => false;
+
+    public bool CanPeek => false;
+
+    public bool CanInteract => false;
+
+    public void Enter(Player player)
+    {
+        player.Camera.BobDuration = _stepPeriod / 2;
+        player.Camera.BobScale = _bobScale;
+        _stepTimer = 0.5f * _stepPeriod;
+
+        if (player.Camera.Mode == CameraModeType.FirstPerson)
+            player.Camera.BobStart();
+    }
+    public void Update(Player player)
+    {
+        if (_stepTimer > _stepPeriod)
+        {
+            _stepTimer %= _stepPeriod;
+            StepSound(player);
+        }
+
+        _stepTimer += Time.deltaTime;
+    }
+
+    public void Exit(Player player)
+    {
+        player.Camera.BobEnd();
+    }
+
+    public Vector3 GetMovement(Vector3 desiredMovement, Vector3 previousMovement)
+    {
+        return desiredMovement * _movementSpeed;
+    }
+
+    public void StepSound(Player player)
+    {
+        GameController.AudioManager.Play("BigStep");
+        GameController.AudioManager.AudibleEffect(player.gameObject, player.transform.position, _stepRadius);
+    }
+}
+
+class SlidingState : IExperimentalState
+{
+    private float _duration;
+    private float _timer;
+    private float _initialSpeed;
+
+    public SlidingState(float initialSpeed, float duration)
+    {
+        _initialSpeed = initialSpeed;
+        _duration = duration;
+        _timer = duration;
+    }
+
+    public bool Locked => _timer > 0;
+    public bool FreeLook => true;
+
+    public bool CanShoot => true;
+
+    public bool CanPeek => false;
+
+    public bool CanInteract => true;
+
+    public void Enter(Player player)
+    {
+        _timer = _duration;
+
+        if (player.Camera.Mode == CameraModeType.FirstPerson || player.Camera.Mode == CameraModeType.ThirdPerson)
+            player.Camera.CustomOffsetStart(0.2f, Vector3.down, false);
+
+        if (player.Camera.Mode == CameraModeType.FirstPerson)
+        {
+            float rotation = player.GetInputDir().x > 0 ? 10 : -10;
+            player.Camera.CustomRotationStart(0.2f, new Vector3(10, 0, rotation));
+        }
+
+        GameController.AudioManager.Play("Slide");
+        player.Animation.Play();
+    }
+
+    public void Exit(Player player)
+    {
+        Debug.Log("EXIT");
+        player.Camera.CustomRotationEnd();
+        player.Camera.CustomOffsetEnd();
+    }
+
+    public Vector3 GetMovement(Vector3 desiredMovement, Vector3 previousMovement)
+    {
+        float t = Mathf.Clamp01(_timer / _duration);
+        return previousMovement.normalized * _initialSpeed * t;
+    }
+
+    public void Update(Player player)
+    {
+        _timer -= Time.deltaTime;
+    }
+}
+
+[RequireComponent(typeof(CharacterController))]
+public class Player : MonoBehaviour
+{
+    #region Exposed Parameters
+    public float MouseSensitivity = 0.7f;
+
+    public float WalkingSpeed = 3f;
+    public float RunningSpeed = 10f;
+    public float SlidingSpeed = 15f;
+    public float SlidingDuration = 1.3f;
+
+    public float RunningStepRadius = 10f;
+    public float WalkingStepRadius = 1.5f;
+
+    public float WalkingStepPeriod = 0.35f;
+    public float RunningStepPeriod = 0.15f;
+
+    public float WalkingBobScale = 0.03f;
+    public float RunningBobScale = 0.07f;
+
+    public float PeekAngle = 20f;
+    public float PeekTime = 0.15f;
+    public Vector3 PeekOffset = new Vector3(1, -0.5f, 0);
+
+    public CameraController Camera;
+    #endregion
+
+    // Components and children
+    private CharacterController _characterController;
+    private Transform _viewPoint;
+    private Gun _gun;
+    private GameObject _visual;
+    private Animation _animation;
+    private MeshRenderer _meshRenderer;
+    public Animation Animation => _animation;
+
+    private void Start()
+    {
+        _characterController = GetComponent<CharacterController>();
+        _animation = GetComponent<Animation>();
+        _meshRenderer = GetComponentInChildren<MeshRenderer>();
+        _viewPoint = transform.Find("ViewPoint");
+        _visual = transform.Find("Visual").gameObject;
+        _peekingBase = _viewPoint.localPosition;
+        _peekDuration = PeekTime;
+        _gun = transform.Find("Gun").GetComponent<Gun>();
+
+        _standingState = new StandingState();
+        _walkingState = new WalkingState(WalkingSpeed, WalkingBobScale, WalkingStepPeriod, WalkingStepRadius);
+        _runningState = new RunningState(RunningSpeed, RunningBobScale, RunningStepPeriod, RunningStepRadius);
+        _slidingState = new SlidingState(SlidingSpeed, SlidingDuration);
+        _movementState = _standingState;
+    }
+
+    private void Update()
+    {
+        _movementState.Update(this);
+        UpdateCamera();
+        UpdateMovement();
+        UpdatePeeking();
+        UpdateInteraction();
+        UpdateShooting();
+        SwitchState();
+    }
+
+    public bool IsHidden { get; private set; }
+    public void SetHidden(bool hidden)
+    {
+        IsHidden = hidden;
+        _meshRenderer.material.color = hidden ? Color.black : Color.white;
+    }
+
+    public void Die()
+    {
+
+    }
+
+    #region Update Functions
+    private void UpdateCamera()
+    {
+        if (Input.GetKeyDown(KeyCode.F1)) Camera.SwitchMode(CameraModeType.FirstPerson);
+        if (Input.GetKeyDown(KeyCode.F2)) Camera.SwitchMode(CameraModeType.TopDown);
+        if (Input.GetKeyDown(KeyCode.F3)) Camera.SwitchMode(CameraModeType.ThirdPerson);
+
+        _visual.SetActive(Camera.Mode != CameraModeType.FirstPerson);
+
+        // rotation
+        float yaw = -Input.GetAxis("Mouse X");
+        float pitch = Input.GetAxis("Mouse Y");
+        Camera.Rotate(yaw, pitch, MouseSensitivity);
+    }
+
+    private void UpdateInteraction()
+    {
+        if (!_movementState.CanInteract)
+        {
+            GameController.HideInteraction();
+            return;
+        }
+
+        Vector3 direction = Camera.Mode == CameraModeType.TopDown
+            ? Camera.GetGroundDirection()
+            : Camera.transform.forward;
+
+        bool hit = Physics.Raycast(
+            _viewPoint.position,
+            direction,
+            out RaycastHit hitInfo,
+            maxDistance: 2f);
+
+        if (!hit)
+        {
+            GameController.HideInteraction();
+            return;
+        }
+
+        var usableObject =
+            hitInfo.collider.gameObject.transform
+            .GetComponentInParent<IInteractableObject>();
+
+        if (usableObject == null || !usableObject.CanInteract)
+        {
+            GameController.HideInteraction();
+            return;
+        };
+
+        GameController.ShowInteraction(usableObject.InteractionPrompt());
+        if (Input.GetKeyDown(KeyCode.F)) usableObject.Interact(this);
+    }
+
+    private void UpdateShooting()
+    {
+
+        if (!_movementState.CanShoot || !Input.GetMouseButton(1))
+        {
+            _gun.StopAim();
+            return;
+        }
+
+        Vector3 direction =
+            Camera.Mode == CameraModeType.FirstPerson
+            ? Camera.transform.forward
+            : Camera.GetGroundDirection();
+
+        transform.forward = direction;
+        _gun.Aim(direction);
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            _gun.Shoot();
+        }
+    }
+
+    private void UpdateMovement()
+    {
+        Vector2 inputDir = GetInputDir();
+        Vector3 cameraForward = Camera.GetGroundDirection();
+        Vector3 cameraRight = -Vector3.Cross(cameraForward, Vector3.up);
+        Vector3 desiredDir = inputDir.x * cameraRight + inputDir.y * cameraForward;
+        Vector3 movement = _movementState.GetMovement(desiredDir, _previousMovement);
+
+        _characterController.SimpleMove(movement);
+        _previousMovement = movement;
+
+        // Rotation
+        if (!_movementState.FreeLook && Camera.Mode == CameraModeType.FirstPerson)
+            transform.forward = cameraForward;
+        else if (movement.magnitude != 0)
+            transform.forward = movement.normalized;
+    }
+    #endregion
+
+    #region States And Movement
+    private IExperimentalState _movementState;
+    private StandingState _standingState;
+    private WalkingState _walkingState;
+    private RunningState _runningState;
+    private SlidingState _slidingState;
+    private Vector3 _previousMovement;
+
+    private void SwitchState()
+    {
+        if (_movementState.Locked)
+            return;
+
+        if (_movementState == _standingState)
+            if (IsMovementRequest())
+            {
+                EnterState(_walkingState);
+                return;
+            }
+
+        if (_movementState == _walkingState)
+        {
+            if (!IsMovementRequest())
+            {
+                EnterState(_standingState);
+                _walkingState.StepSound(this);
+                return;
+            }
+
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                Debug.Log("RUNNING");
+                EnterState(_runningState);
+                return;
+            }
+        }
+
+        if (_movementState == _runningState)
+        {
+            if (!IsMovementRequest())
+            {
+                EnterState(_standingState);
+                _runningState.StepSound(this);
+                return;
+            }
+
+            if (!Input.GetKey(KeyCode.LeftShift))
+            {
+                EnterState(_walkingState);
+                return;
+            }
+
+            if (Input.GetKey(KeyCode.Space))
+            {
+                EnterState(_slidingState);
+                return;
+            }
+        }
+
+        if (_movementState == _slidingState)
+        {
+            if (IsMovementRequest())
+            {
+                if (Input.GetKey(KeyCode.LeftShift))
+                    EnterState(_runningState);
+                else
+                    EnterState(_walkingState);
+            } else
+                EnterState(_standingState);
+
+            return;
+        }
+
+    }
+
+    private void EnterState(IExperimentalState state)
+    {
+        _movementState.Exit(this);
+        state.Enter(this);
+        _movementState = state;
+    }
+
+    public Vector2 GetInputDir()
+    {
+        // Movement
+        Vector2 inputDir = Vector2.zero;
+        if (Input.GetKey(KeyCode.W)) inputDir.y += 1;
+        if (Input.GetKey(KeyCode.A)) inputDir.x -= 1;
+        if (Input.GetKey(KeyCode.S)) inputDir.y -= 1;
+        if (Input.GetKey(KeyCode.D)) inputDir.x += 1;
+        return inputDir.normalized;
+    }
+
+    public bool IsMovementRequest()
+    {
+        int horizontal = 0;
+        int vertical = 0;
+
+        if (Input.GetKey(KeyCode.W)) vertical += 1;
+        if (Input.GetKey(KeyCode.S)) vertical -= 1;
+        if (Input.GetKey(KeyCode.A)) horizontal -= 1;
+        if (Input.GetKey(KeyCode.D)) horizontal += 1;
+
+        return horizontal != 0 || vertical != 0;
+    }
+
+    #endregion
+
+    #region Keys
+    private List<IKey> _keys = new List<IKey>();
+    public bool HasKeyForLock(ILock @lock)
+    {
+        foreach (IKey key in _keys)
+            if (key.Locks.Contains(@lock))
+                return true;
+
+        return false;
+    }
+
+    public void AddKey(IKey key) => _keys.Add(key);
+
+    #endregion
+
+    #region Peeking
+
+    private Vector3 _peekingOffset;
+    private Vector3 _peekingBase;
+    private Vector3 _peekingFrom;
+    private Vector3 _peekingTo;
+    private float _peekDuration;
+    private float _peekTimer;
+
+    private void PeekStart(Vector3 offset)
+    {
+        float angle = offset.x < 0 ? PeekAngle : -PeekAngle;
+        Camera.CustomRotationStart(_peekDuration, new Vector3(0, 0, angle));
+
+        _peekingFrom = _peekingOffset;
+        _peekingTo = offset;
+        _peekTimer = 0;
+        _peekDuration = PeekTime;
+    }
+
+    private void PeekEnd()
+    {
+        if (_peekingTo == Vector3.zero) return;
+
+        Camera.CustomRotationEnd();
+        _peekingFrom = _peekingOffset;
+        _peekingTo = Vector3.zero;
+        _peekTimer = 0;
+        _peekDuration = _peekDuration - _peekTimer;
+    }
+
+    private void UpdatePeeking()
+    {
+        if (!_movementState.CanPeek || PeekEndRequest() || Camera.Mode == CameraModeType.TopDown)
+        {
+            PeekEnd();
+        }
+
+        Vector3? offset = PeekStartRequest();
+        if (_movementState.CanPeek && offset != null)
+        {
+            PeekStart(offset.Value);
+        }
+
+        float t = Mathf.Clamp01(_peekTimer / _peekDuration);
+        _peekingOffset = Vector3.Lerp(_peekingFrom, _peekingTo, t);
+        _peekTimer += Time.deltaTime;
+
+        Vector3 cameraForawd = Camera.GetGroundDirection();
+        Vector3 cameraRight = -Vector3.Cross(cameraForawd, Vector3.up);
+        _viewPoint.localPosition = _peekingBase.AddY(_peekingOffset.y);
+        _viewPoint.position += cameraForawd * _peekingOffset.z + cameraRight * _peekingOffset.x;
+    }
+
+    private Vector3? PeekStartRequest()
+    {
+        Vector3 offset = Vector3.zero;
+        if (Camera.Mode == CameraModeType.ThirdPerson)
+            offset = offset.AddZ(2);
+
+        if (Input.GetKeyDown(KeyCode.E))
+            return PeekOffset + offset;
+
+        if (Input.GetKeyDown(KeyCode.Q))
+            return PeekOffset.MultiplyX(-1) + offset;
+
+        return null;
+    }
+
+    private bool PeekEndRequest() =>
+        Input.GetKeyUp(KeyCode.E) || Input.GetKeyUp(KeyCode.Q);
+    #endregion
+}

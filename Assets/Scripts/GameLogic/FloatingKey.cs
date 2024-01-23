@@ -8,9 +8,9 @@ public class FloatingKey : SmartCollider, IKeyObject
 
     private void Start()
     {
-        _triggerResponse += (PlayerController player) =>
+        _triggerResponse += (Player player) =>
         {
-            player.PickupKey(MyKey);
+            player.AddKey(MyKey);
             GameController.AudioManager.Play("Beep", position: transform.position);
             Destroy(gameObject);
         };

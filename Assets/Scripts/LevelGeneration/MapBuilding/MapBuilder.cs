@@ -76,18 +76,18 @@ class MapBuilder
                 superTileGrid[x, y] = tile;
 
                 //if (tile is Hallway)
-                tile.Locks.Add(new EnemyLock());
+                
 
 
                 t = URandom.value;
-                if (t > 0.0f && tile is not Hallway)
+                if (t > 0.5f && tile is not Hallway)
                 {
                     var cameraLock = new SecurityCameraLock();
                     var powerSource = cameraLock.GetNewKey();
                     tile.Locks.Add(cameraLock);
                     tile.Keys.Add(powerSource);
-                } else if (t > 0.5f)
-                    tile.Locks.Add(new SoundTrapLock());
+                } else
+                    tile.Locks.Add(new EnemyLock());
             }
 
         foreach ((int x, int yFrom, int yTo) in _graphDrawing.VerticalLines)
@@ -118,18 +118,16 @@ class MapBuilder
                     tile = new Hallway(_superWidth, _superHeight, exits);
 
                 superTileGrid[x, y] = tile;
-                tile.Locks.Add(new EnemyLock());
-
 
                 t = URandom.value;
-                if (t > 0.0f && tile is not Hallway)
+                if (t > 0.5f && tile is not Hallway)
                 {
                     var cameraLock = new SecurityCameraLock();
                     var powerSource = cameraLock.GetNewKey();
                     tile.Locks.Add(cameraLock);
                     tile.Keys.Add(powerSource);
-                } else if (t > 0.5f)
-                    tile.Locks.Add(new SoundTrapLock());
+                } else
+                    tile.Locks.Add(new EnemyLock());
             }
         }
 
@@ -158,19 +156,18 @@ class MapBuilder
 
             //if (tile is FilledRoom room)
 
-            if (vertex != _graphDrawing.StartPosition)
-                tile.Locks.Add(new EnemyLock());
+            if (vertex == _graphDrawing.StartPosition) continue;
 
 
             float t = URandom.value;
-            if (t > 0.0f && (x, y) != _graphDrawing.VertexPositions[_graphDrawing.StartPosition])
+            if (t > 0.5f)
             {
                 var cameraLock = new SecurityCameraLock();
                 var powerSource = cameraLock.GetNewKey();
                 tile.Locks.Add(cameraLock);
                 tile.Keys.Add(powerSource);
-            } else if (t > 0.5f && (x, y) != _graphDrawing.VertexPositions[_graphDrawing.StartPosition])
-                tile.Locks.Add(new SoundTrapLock());
+            } else
+                tile.Locks.Add(new EnemyLock());
 
         }
 
