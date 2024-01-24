@@ -393,12 +393,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55a4a72a1e5157d4a8e1cea03d141943, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MouseSensitivity: 0.7
+  MouseSensitivity: 0.55
   WalkingSpeed: 3
-  RunningSpeed: 10
-  SlidingSpeed: 15
+  RunningSpeed: 7.5
+  SlidingSpeed: 18
   SlidingDuration: 1.3
-  RunningStepRadius: 10
+  RunningStepRadius: 9
   WalkingStepRadius: 1.5
   WalkingStepPeriod: 0.7
   RunningStepPeriod: 0.33
