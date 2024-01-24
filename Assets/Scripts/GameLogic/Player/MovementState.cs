@@ -106,7 +106,7 @@ class WalkingState : IMovementState
 
     public void StepSound(PlayerController player)
     {
-        GameController.AudioManager.Play("SmallStep");
+        GameController.AudioManager.PlayStep("Default", player.gameObject, volume: 0.3f);
         GameController.AudioManager.AudibleEffect(player.gameObject, player.transform.position, _stepRadius);
     }
 }
@@ -169,7 +169,7 @@ class RunningState : IMovementState
 
     public void StepSound(PlayerController player)
     {
-        GameController.AudioManager.Play("BigStep");
+        GameController.AudioManager.PlayStep("Default", player.gameObject, volume: 1f);
         GameController.AudioManager.AudibleEffect(player.gameObject, player.transform.position, _stepRadius);
     }
 }

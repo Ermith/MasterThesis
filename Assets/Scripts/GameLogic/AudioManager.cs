@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using URandom = UnityEngine.Random;
+
 public class AudioManager : MonoBehaviour
 {
     #region SERIALIZED_FIELDS
@@ -11,11 +13,15 @@ public class AudioManager : MonoBehaviour
     [SerializeField, Tooltip("Sounds can be called by their name in scripts.")]
     public Sound[] Sounds;
 
+    [SerializeField, Tooltip("Footsteps for different occasions")]
+    public Sound[] StepSounds;
+
     [SerializeField, Tooltip("Debug visual for audible effects that enemies can hear.")]
     public SoundVisual SoundVisual;
     #endregion
 
-    private List<Audition> _auditions = new List<Audition>();
+    private List<Audition> _auditions = new();
+    private Dictionary<string, List<Sound>> _stepDictionary = new();
 
     #region AUDIBLE EFFECTS
     public void RegisterAudition(Audition audition) => _auditions.Add(audition);
@@ -114,6 +120,26 @@ public class AudioManager : MonoBehaviour
         return sound.AudioSource;
     }
 
+    public AudioSource PlayStep(string name, GameObject target, float? volume = null, float? pitch = null)
+    {
+        List<Sound> stepVariations = _stepDictionary[name];
+        int index = URandom.Range(0, stepVariations.Count);
+        var source = stepVariations[index].AudioSource;
+
+        GameObject obj = new GameObject(name);
+        var audio = obj.AddComponent<AudioSource>();
+        obj.transform.parent = target.transform;
+        obj.transform.localPosition = Vector3.zero;
+
+        audio.clip = source.clip;
+        audio.volume = volume == null ? source.volume : volume.Value;
+        audio.pitch = pitch == null ? source.pitch : pitch.Value;
+        audio.spatialBlend = source.spatialBlend;
+
+        StartCoroutine(PlayOnTargetCoroutine(audio));
+        return audio;
+    }
+
     private IEnumerator PlaySpacialSoundCoroutine(AudioSource audio)
     {
         audio.Play();
@@ -159,5 +185,22 @@ public class AudioManager : MonoBehaviour
 
         Music.AudioSource.loop = true;
         Music.AudioSource.Play();
+
+        foreach (Sound s in StepSounds)
+        {
+            s.AudioSource = gameObject.AddComponent<AudioSource>();
+            s.AudioSource.clip = s.Clip;
+
+            s.AudioSource.volume = s.Volume;
+            s.AudioSource.pitch = s.Pitch;
+            s.AudioSource.spatialBlend = s.SpacialBlend;
+            s.AudioSource.dopplerLevel = 0;
+
+            string key = s.Name.Split('_')[0];
+            if (!_stepDictionary.ContainsKey(key))
+                _stepDictionary[key] = new List<Sound>();
+
+            _stepDictionary[key].Add(s);
+        }
     }
 }
