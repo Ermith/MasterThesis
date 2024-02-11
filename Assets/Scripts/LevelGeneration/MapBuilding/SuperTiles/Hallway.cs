@@ -28,10 +28,10 @@ public class Hallway : ASuperTile
 
                 description.FreeTiles.Add((px, py));
 
-                if ((px + py) % 2 == 0)
-                    tileGrid[x + px, y + py] = new EdgeTile(dir.Perpendicular());
-                else
-                    tileGrid[x + px, y + py] = new RefugeEdgeTile(dir.Perpendicular(), dir.Perpendicular());
+                // if ((px + py) % 2 == 0)
+                //     tileGrid[x + px, y + py] = new EdgeTile(dir.Perpendicular(), thickness: 2);
+                // else
+                    tileGrid[x + px, y + py] = new RefugeEdgeTile(dir.Perpendicular(), dir.Perpendicular(), thickness: 2);
             }
 
         description.PatrolPath = patrol;
@@ -39,7 +39,7 @@ public class Hallway : ASuperTile
         
 
         Directions midWalls = ~Exits;
-        tileGrid[x + midX, y + midY] = new EdgeTile(midWalls);
+        tileGrid[x + midX, y + midY] = new RefugeEdgeTile(midWalls, midWalls, thickness: 2);
         description.FreeTiles.Add((midX, midY));
 
         foreach (ILock l in Locks) l.Implement(description);

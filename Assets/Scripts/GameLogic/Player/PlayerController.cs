@@ -365,7 +365,7 @@ public class PlayerController : MonoBehaviour
 
         Vector3 cameraForawd = Camera.GetGroundDirection();
         Vector3 cameraRight = -Vector3.Cross(cameraForawd, Vector3.up);
-        _viewPoint.localPosition = _peekingBase.AddY(_peekingOffset.y);
+        _viewPoint.localPosition = _peekingBase.Added(y: _peekingOffset.y);
         _viewPoint.position += cameraForawd * _peekingOffset.z + cameraRight * _peekingOffset.x;
     }
 
@@ -373,13 +373,13 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 offset = Vector3.zero;
         if (Camera.Mode == CameraModeType.ThirdPerson)
-            offset = offset.AddZ(2);
+            offset = offset.Added(z: 2);
 
         if (Input.GetKeyDown(KeyCode.E))
             return PeekOffset + offset;
 
         if (Input.GetKeyDown(KeyCode.Q))
-            return PeekOffset.MultiplyX(-1) + offset;
+            return PeekOffset.Multiplied(x: -1) + offset;
 
         return null;
     }

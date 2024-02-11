@@ -15,6 +15,6 @@ public class EmptyTile : ATile
                 subTileGrid[x + i, y + j] = floor;
             }
 
-        subTileGrid[x + 1, y + 1].Objects = Objects;
+        subTileGrid[x + HalfWidth, y + HalfHeight].Objects = Objects;
     }
 }

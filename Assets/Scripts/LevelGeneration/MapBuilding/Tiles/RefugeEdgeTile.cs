@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 public class RefugeEdgeTile : EdgeTile
 {
     Directions Refuges;
-    public RefugeEdgeTile(Directions refuges, Directions edges, Directions exits = Directions.None) : base(edges, exits)
+    public RefugeEdgeTile(Directions refuges, Directions edges, Directions exits = Directions.None, int thickness = 2) : base(edges, thickness, exits)
     {
         Refuges = refuges;
     }
@@ -16,9 +16,44 @@ public class RefugeEdgeTile : EdgeTile
     {
         base.BuildSubTiles(x, y, subTileGrid);
 
-        if (Refuges.North()) subTileGrid[x + 1, y] = new HalfRefugeSubTile(Directions.North);
-        if (Refuges.South()) subTileGrid[x + 1, y + 2] = new HalfRefugeSubTile(Directions.South);
-        if (Refuges.West()) subTileGrid[x, y + 1] = new HalfRefugeSubTile(Directions.West);
-        if (Refuges.East()) subTileGrid[x + 2, y + 1] = new HalfRefugeSubTile(Directions.East);
+        if (Refuges.North())
+        {
+            int rx = x + HalfWidth;
+            int ry = y + Thickness - 1;
+
+            subTileGrid[rx, ry] = new RefugeSubTile();
+            subTileGrid[rx - 1, ry] = new RefugeSubTile();
+            //subTileGrid[rx + 1, ry] = new RefugeSubTile();
+        }
+
+        if (Refuges.South())
+        {
+            int rx = x + HalfWidth;
+            int ry = y + HEIGHT - 1 - Thickness + 1;
+
+            subTileGrid[rx, ry] = new RefugeSubTile();
+            subTileGrid[rx - 1, ry] = new RefugeSubTile();
+            //subTileGrid[rx + 1, ry] = new RefugeSubTile();
+        }
+
+        if (Refuges.West())
+        {
+            int rx = x + Thickness - 1;
+            int ry = y + HalfHeight;
+
+            subTileGrid[rx, ry] = new RefugeSubTile();
+            subTileGrid[rx, ry - 1] = new RefugeSubTile();
+            //subTileGrid[rx, ry + 1] = new RefugeSubTile();
+        }
+
+        if (Refuges.East())
+        {
+            int rx = x + WIDTH - 1 - Thickness + 1;
+            int ry = y + HalfHeight;
+
+            subTileGrid[rx, ry] = new RefugeSubTile();
+            subTileGrid[rx, ry - 1] = new RefugeSubTile();
+            //subTileGrid[rx, ry + 1] = new RefugeSubTile();
+        }
     }
 }

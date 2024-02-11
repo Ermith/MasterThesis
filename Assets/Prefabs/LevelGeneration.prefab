@@ -175,6 +175,7 @@ MonoBehaviour:
   PowerSourceBlueprint: {fileID: 8614125414331960436, guid: 376b0c47b4172984bb688512d8ada202, type: 3}
   TrapBlueprint: {fileID: 5882171629686246166, guid: 0b1491e76facedd4dbd599a7e8c4e23e, type: 3}
   SoundTrapBlueprint: {fileID: 4244482063706028480, guid: 9467a07ddf7aada4cbeb1d87a58a9f0e, type: 3}
-  HalfRefugeBlueprint: {fileID: 9204218792952268314, guid: 32ccb22a8717b564eb51e6591a1e941d, type: 3}
+  RefugeBlueprint: {fileID: 6398615319085239364, guid: 73d18f8c39726974cac62fe48f483f6c, type: 3}
   VictoryTrigger: {fileID: 9216524343229251750, guid: 29ca8bb401bbb2342bcbd1c842f1d6c4, type: 3}
   EnemyBlueprint: {fileID: 7240094474568271842, guid: fa0c4d815c803c042876b3b83aa0ccb4, type: 3}
+  Player: {fileID: 0}

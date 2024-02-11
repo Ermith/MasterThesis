@@ -10,7 +10,7 @@ public class DoorTile : EdgeTile
     public DoorLock Lock = null;
     public Directions DoorExits;
 
-    public DoorTile(Directions edges, Directions freeExits, Directions doorExits) : base(edges, freeExits)
+    public DoorTile(Directions edges, Directions freeExits, Directions doorExits, int thickness = 1) : base(edges, thickness, freeExits)
     {
         DoorExits = doorExits;
     }
@@ -19,10 +19,11 @@ public class DoorTile : EdgeTile
     {
         base.BuildSubTiles(x, y, subTileGrid);
         List<(int, int, Directions dir)> doors = new();
-        if (DoorExits.North()) doors.Add((x + 1, y, Directions.North));
-        if (DoorExits.South()) doors.Add((x + 1, y + 2, Directions.South));
-        if (DoorExits.West()) doors.Add((x, y + 1, Directions.West));
-        if (DoorExits.East()) doors.Add((x + 2, y + 1, Directions.East));
+
+        if (DoorExits.North()) doors.Add((x + HalfWidth, y, Directions.North));
+        if (DoorExits.South()) doors.Add((x + HalfWidth, y + HEIGHT - 1, Directions.South));
+        if (DoorExits.West()) doors.Add((x, y + HalfHeight, Directions.West));
+        if (DoorExits.East()) doors.Add((x + WIDTH - 1, y + HalfHeight, Directions.East));
 
         foreach ((int dx, int dy, Directions dir)  in doors)
         {

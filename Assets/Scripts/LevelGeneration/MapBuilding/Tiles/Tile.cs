@@ -6,7 +6,10 @@ using System;
 
 public abstract class ATile
 {
-    public const int WIDTH = 3, HEIGHT = 3;
+    public const int WIDTH = 6, HEIGHT = 6;
+    public int HalfWidth => (WIDTH) / 2;
+    public int HalfHeight => (HEIGHT) / 2;
+
     public List<Func<GameObject>> Objects = new();
     public abstract void BuildSubTiles(int x, int y, ASubTile[,] subTileGrid);
 

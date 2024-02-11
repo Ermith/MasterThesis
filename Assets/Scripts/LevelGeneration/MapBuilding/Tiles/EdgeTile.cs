@@ -8,25 +8,28 @@ public class EdgeTile : ATile
 {
     public Directions Edges { get; set; }
     public Directions Exits { get; set; }
-    public EdgeTile(Directions edges, Directions exits = Directions.None)
+    public int Thickness { get; private set; }
+
+    public EdgeTile(Directions edges, int thickness = 1,  Directions exits = Directions.None)
     {
         Edges = edges;
         Exits = exits;
+        Thickness = thickness;
     }
 
     private bool IsWall(int x, int y)
     {
         return (
-            (x == 0 && Edges.West())
-            || (x == WIDTH - 1 && Edges.East())
-            || (y == 0 && Edges.North())
-            || (y == HEIGHT - 1 && Edges.South())
+            (x < Thickness && Edges.West())
+            || (x > WIDTH - 1 - Thickness && Edges.East())
+            || (y < Thickness && Edges.North())
+            || (y > HEIGHT - 1 - Thickness && Edges.South())
             )
             && !(
-            (x == WIDTH / 2 && y == 0 && Exits.North())
-            || (x == WIDTH / 2 && y == HEIGHT - 1 && Exits.South())
-            || (x == 0 && y == HEIGHT / 2 && Exits.West())
-            || (x == WIDTH - 1 && y == HEIGHT / 2 && Exits.East())
+            (x == WIDTH / 2 && y < Thickness && Exits.North())
+            || (x == WIDTH / 2 && y > HEIGHT - 1 - Thickness && Exits.South())
+            || (x < Thickness && y == HEIGHT / 2 && Exits.West())
+            || (x > WIDTH - 1 - Thickness && y == HEIGHT / 2 && Exits.East())
             );
     }
 
@@ -41,6 +44,6 @@ public class EdgeTile : ATile
                     : new FloorSubTile();
             }
 
-        subTileGrid[x + 1, y + 1].Objects = Objects;
+        subTileGrid[x + HalfWidth, y + HalfHeight].Objects = Objects;
     }
 }

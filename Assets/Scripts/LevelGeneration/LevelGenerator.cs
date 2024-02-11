@@ -19,7 +19,7 @@ public class LevelGenerator : MonoBehaviour
     public GameObject PowerSourceBlueprint;
     public GameObject TrapBlueprint;
     public GameObject SoundTrapBlueprint;
-    public GameObject HalfRefugeBlueprint;
+    public GameObject RefugeBlueprint;
     public GameObject VictoryTrigger;
     public EnemyController EnemyBlueprint;
     public GameObject Player;
@@ -82,10 +82,10 @@ public class LevelGenerator : MonoBehaviour
             return doorTileObject;
         });
 
-        ASubTile.Register<HalfRefugeSubTile>((ASubTile st) =>
+        ASubTile.Register<RefugeSubTile>((ASubTile st) =>
         {
-            var halfRefuge = st as HalfRefugeSubTile;
-            GameObject obj = Instantiate(HalfRefugeBlueprint);
+            var halfRefuge = st as RefugeSubTile;
+            GameObject obj = Instantiate(RefugeBlueprint);
             obj.transform.forward = halfRefuge.Orientation.ToVector3();
             return obj;
         });
@@ -107,8 +107,10 @@ public class LevelGenerator : MonoBehaviour
                 }
 
         Debug.Log("Spawning Enemies");
-        float scale = 2;
-        geometry.transform.localScale *= scale;
+        float scale = 1f;
+        var localScale = geometry.transform.localScale;
+        //geometry.transform.localScale *= scale;
+        geometry.transform.localScale = localScale.Multiplied(x: scale, y: 1.5f, z: scale);
         foreach (EnemyParams enemy in enemies)
         {
             (int spawnX, int spawnZ) = enemy.Patrol.ToList()[enemy.Spawn];
