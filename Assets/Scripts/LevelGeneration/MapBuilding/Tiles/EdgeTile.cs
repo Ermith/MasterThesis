@@ -10,7 +10,7 @@ public class EdgeTile : ATile
     public Directions Exits { get; set; }
     public int Thickness { get; private set; }
 
-    public EdgeTile(Directions edges, int thickness = 1,  Directions exits = Directions.None)
+    public EdgeTile(Directions edges, int thickness = 1, Directions exits = Directions.None)
     {
         Edges = edges;
         Exits = exits;
@@ -19,18 +19,45 @@ public class EdgeTile : ATile
 
     private bool IsWall(int x, int y)
     {
-        return (
+        int midX = WIDTH / 2;
+        int midY = HEIGHT / 2;
+        int maxX = WIDTH - 1;
+        int maxY = HEIGHT - 1;
+
+        bool isEdge = (
             (x < Thickness && Edges.West())
-            || (x > WIDTH - 1 - Thickness && Edges.East())
+            || (x > maxX - Thickness && Edges.East())
             || (y < Thickness && Edges.North())
-            || (y > HEIGHT - 1 - Thickness && Edges.South())
-            )
-            && !(
-            (x == WIDTH / 2 && y < Thickness && Exits.North())
-            || (x == WIDTH / 2 && y > HEIGHT - 1 - Thickness && Exits.South())
-            || (x < Thickness && y == HEIGHT / 2 && Exits.West())
-            || (x > WIDTH - 1 - Thickness && y == HEIGHT / 2 && Exits.East())
+            || (y > maxY - Thickness && Edges.South())
             );
+
+        bool exitNorth = (
+                    Exits.North()
+                    && y < Thickness
+                    && (x == midX || x == midX - 1)
+                );
+
+        bool exitSouth = (
+                    Exits.South()
+                    && y > maxY - Thickness
+                    && (x == midX || x == midX - 1)
+                );
+
+        bool exitWest = (
+                    Exits.West()
+                    && x < Thickness
+                    && (y == midY || y == midY - 1)
+                );
+
+        bool exitEast = (
+                    Exits.East()
+                    && x > maxX - Thickness
+                    && (y == midY || y == midY - 1)
+                );
+
+        bool isExit = exitNorth || exitSouth || exitWest || exitEast;
+
+        return isEdge && !isExit;
     }
 
     public override void BuildSubTiles(int x, int y, ASubTile[,] subTileGrid)
@@ -39,7 +66,7 @@ public class EdgeTile : ATile
             for (int j = 0; j < HEIGHT; j++)
             {
                 subTileGrid[x + i, y + j] =
-                    IsWall(i, j) 
+                    IsWall(i, j)
                     ? new WallSubTile()
                     : new FloorSubTile();
             }
