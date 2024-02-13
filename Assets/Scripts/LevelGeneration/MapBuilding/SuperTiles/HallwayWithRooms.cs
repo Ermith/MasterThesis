@@ -21,10 +21,11 @@ public class HallwayWithRooms : Hallway
         foreach ((Directions dir, (int ex, int ey)) in description.ExitsTiles)
             foreach ((int px, int py) in GetShortPath(midX, midY, ex, ey))
             {
+                patrol.Add(ATile.FromSuperMid(x + px, y + py));
+
                 if ((px, py) == (midX, midY)) continue;
 
                 description.FreeTiles.Add((px, py));
-                patrol.Add(ATile.FromSuperMid(x + px, y + py));
                 tileGrid[x + px, y + py] = new EdgeTile(dir.Perpendicular()); ;
             }
 
