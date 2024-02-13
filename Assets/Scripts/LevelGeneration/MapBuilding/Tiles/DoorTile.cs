@@ -21,9 +21,16 @@ public class DoorTile : EdgeTile
         List<(int, int, Directions dir)> doors = new();
 
         if (DoorExits.North()) doors.Add((x + HalfWidth, y, Directions.North));
-        if (DoorExits.South()) doors.Add((x + HalfWidth, y + HEIGHT - 1, Directions.South));
-        if (DoorExits.West()) doors.Add((x, y + HalfHeight, Directions.West));
+        if (DoorExits.North()) doors.Add((x + HalfWidth - 1, y, Directions.South));
+
+        if (DoorExits.South()) doors.Add((x + HalfWidth, y + HEIGHT - 1, Directions.North));
+        if (DoorExits.South()) doors.Add((x + HalfWidth - 1, y + HEIGHT - 1, Directions.South));
+
+        if (DoorExits.West()) doors.Add((x, y + HalfHeight, Directions.East));
+        if (DoorExits.West()) doors.Add((x, y + HalfHeight - 1, Directions.West));
+
         if (DoorExits.East()) doors.Add((x + WIDTH - 1, y + HalfHeight, Directions.East));
+        if (DoorExits.East()) doors.Add((x + WIDTH - 1, y + HalfHeight - 1, Directions.West));
 
         foreach ((int dx, int dy, Directions dir)  in doors)
         {

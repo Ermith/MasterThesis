@@ -28,9 +28,9 @@ public class Hallway : ASuperTile
 
                 description.FreeTiles.Add((px, py));
 
-                // if ((px + py) % 2 == 0)
-                //     tileGrid[x + px, y + py] = new EdgeTile(dir.Perpendicular(), thickness: 2);
-                // else
+                if ((px + py) % 2 == 0)
+                    tileGrid[x + px, y + py] = new EdgeTile(dir.Perpendicular(), thickness: 2);
+                else
                     tileGrid[x + px, y + py] = new RefugeEdgeTile(dir.Perpendicular(), dir.Perpendicular(), thickness: 2);
             }
 
