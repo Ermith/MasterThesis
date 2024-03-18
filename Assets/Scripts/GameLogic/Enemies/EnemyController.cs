@@ -3,6 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Behaviour
+{
+    Patroling,
+    Sleeping,
+    Guarding,
+}
+
 [RequireComponent(typeof(Sight), typeof(Audition), typeof(CharacterController))]
 public class EnemyController : MonoBehaviour, ILockObject
 {
@@ -14,9 +21,11 @@ public class EnemyController : MonoBehaviour, ILockObject
     Vector3? _lookDirection = null;
     Vector3[] _patrolPositions = null;
     const float EPSILON_RADIUS = 0.15f;
+
+    // patrol
     int _patrolIndex = 0;
     int _patrolStep = 1;
-    bool _patrolEnabled = true;
+    bool _chasing = false;
     bool _patrolRetrace;
     Action _positionReached = null;
 
@@ -25,6 +34,11 @@ public class EnemyController : MonoBehaviour, ILockObject
     float _rotationTime;
 
     public ILock Lock { get; set; }
+    public Behaviour Behaviour { get; set; }
+    public Vector3 DefaultPosition = Vector3.zero;
+    public Vector3 DefaultDirection = Vector3.forward;
+    public float GuardViewDistance = 5f;
+    public float DefaultViewDistance = 20f;
 
     // Start is called before the first frame update
     void Start()
@@ -33,19 +47,23 @@ public class EnemyController : MonoBehaviour, ILockObject
         _sight = GetComponent<Sight>();
         _audition = GetComponent<Audition>();
         _audition.SoundResponse += SoundResponse;
+        _sight.Range = DefaultViewDistance;
+
+        // This fixes height when enemy spawns
+        _characterController.SimpleMove(Vector3.zero);
     }
 
     private void SoundResponse(GameObject sourceTarget, Vector3 sourcePosition)
     {
-        _patrolEnabled = false;
+        _chasing = false;
         LookAt(sourcePosition);
-        MoveTo(sourcePosition, () => _patrolEnabled = true);
+        MoveTo(sourcePosition, () => _chasing = true);
     }
 
     // Update is called once per frame
     void Update()
     {
-        ResolvePatrol();
+        ResolveBehaviour();
         ResolveRotation();
         ResolveMovement();
 
@@ -53,10 +71,11 @@ public class EnemyController : MonoBehaviour, ILockObject
         _sight.VisionConeHilighted = false;
         if (!player.IsHidden && _sight.CanSee(player.transform))
         {
-            _patrolEnabled = false;
+            _chasing = true;
             LookAt(player.transform.position);
-            MoveTo(player.transform.position, () => _patrolEnabled = true);
+            MoveTo(player.transform.position, () => _chasing = false);
             _sight.VisionConeHilighted = true;
+            _sight.Range = DefaultViewDistance;
 
             if ((player.transform.position - transform.position).magnitude < 2f)
                 player.Die();
@@ -85,11 +104,58 @@ public class EnemyController : MonoBehaviour, ILockObject
         _patrolPositions = positions;
         _patrolIndex = index;
         _patrolRetrace = retrace;
+        Behaviour = Behaviour.Patroling;
+    }
+
+    public void Sleep(Vector3 position)
+    {
+        DefaultPosition = position;
+        Behaviour = Behaviour.Sleeping;
+    }
+
+    public void Guard(Vector3 position, Vector3 direction)
+    {
+        DefaultPosition = position;
+        DefaultDirection = direction;
+        Behaviour = Behaviour.Guarding;
+    }
+
+    public void ResolveBehaviour()
+    {
+        if (_chasing)
+            return;
+
+        if (Behaviour == Behaviour.Patroling)
+            ResolvePatrol();
+
+        if (Behaviour == Behaviour.Guarding)
+            ResolveGuard();
+
+        if (Behaviour == Behaviour.Sleeping)
+            ResolveSleep();
+    }
+
+    private void ResolveGuard()
+    {
+        MoveTo(DefaultPosition, () => {
+            LookInDirection(DefaultDirection);
+            _sight.Range = GuardViewDistance;
+        });
+    }
+
+    private void ResolveSleep()
+    {
+        MoveTo(DefaultPosition,
+            () =>
+            {
+                _sight.Range = 0;
+            });
     }
 
     private void ResolvePatrol()
     {
-        if (_patrolPositions == null || _patrolPositions.Length < 1 || !_patrolEnabled) return;
+        if (_patrolPositions == null || _patrolPositions.Length < 1 || _chasing)
+            return;
 
         Vector3 position = _patrolPositions[_patrolIndex];
         LookAt(position);

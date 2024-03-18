@@ -26,7 +26,7 @@ public class GameController : MonoBehaviour
         Debug.Log("Game Instance");
         Instance = this;
         Time.timeScale = 1f;
-        //UnityEngine.Random.InitState(-488536290);
+        UnityEngine.Random.InitState(-488536290);
         Debug.Log(UnityEngine.Random.seed);
         _interactText = HUDCanvas.transform.Find("Interact Text");
     }

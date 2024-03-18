@@ -81,7 +81,7 @@ public class GraphDrawingWindow : EditorWindow
         }
     }
 
-    private void DrawGraph(GraphDrawing<BaseVertex> drawParams)
+    private void DrawGraph(GraphDrawing<GridVertex> drawParams)
     {
         int spacing = 50;
         int radius = (int)(20 * scale);
@@ -101,7 +101,7 @@ public class GraphDrawingWindow : EditorWindow
                 new Vector3(x, y) * spacing * scale + offset,
                 Vector3.back, radius);
     }
-    private void DrawGraphLocksAndKeys(GraphDrawing<BaseVertex> drawParams)
+    private void DrawGraphLocksAndKeys(GraphDrawing<GridVertex> drawParams)
     {
         int spacing = 50;
         int radius = (int)(20 * scale);
@@ -116,7 +116,7 @@ public class GraphDrawingWindow : EditorWindow
                 new Vector3(x, yFrom) * spacing * scale + offset,
                 new Vector3(x, yTo) * spacing * scale + offset);
 
-        foreach ((BaseVertex vertex, (int x, int y)) in drawParams.VertexPositions)
+        foreach ((GridVertex vertex, (int x, int y)) in drawParams.VertexPositions)
         {
             ILock[] locks = vertex.GetLocks().ToArray();
             int count = locks.Length;
@@ -127,7 +127,7 @@ public class GraphDrawingWindow : EditorWindow
             DrawVertex(location, color, radius, name);
         }
 
-        foreach ((BaseVertex vertex, (int x, int y)) in drawParams.VertexPositions)
+        foreach ((GridVertex vertex, (int x, int y)) in drawParams.VertexPositions)
             foreach (IKey key in vertex.GetKeys())
                 foreach (ILock @lock in key.Locks)
                 {

@@ -66,7 +66,7 @@ public interface IGraph<T>
     public DFSParams<T> DepthFirstSearch(T start);
 }
 
-abstract class AGraph<T> : IGraph<T>
+public abstract class AGraph<T> : IGraph<T>
 {
     public abstract int VertexCount { get; }
     public abstract void AddEdge(T from, T to, IEdge<T> edge = null);
@@ -154,7 +154,6 @@ abstract class AGraph<T> : IGraph<T>
             LinkedListNode<T> parentNode = llNodes[parent];
 
             if (positives[low])
-
             {
                 llNodes[vertex] = verticesLL.AddAfter(parentNode, vertex);
                 positives[parent] = false;
@@ -180,7 +179,7 @@ abstract class AGraph<T> : IGraph<T>
     }
 }
 
-class AdjecencyGraph<T> : AGraph<T>
+public class AdjecencyGraph<T> : AGraph<T>
 {
     private Dictionary<T, List<T>> _adjecencyList = new();
     private List<IEdge<T>> _edges = new();
@@ -269,7 +268,7 @@ class AdjecencyGraph<T> : AGraph<T>
     }
 }
 
-class UndirectedAdjecencyGraph<T> : AGraph<T>
+public class UndirectedAdjecencyGraph<T> : AGraph<T>
 {
     List<T> _vertices = new();
     List<IEdge<T>> _edges = new();
@@ -349,5 +348,109 @@ class UndirectedAdjecencyGraph<T> : AGraph<T>
     {
         int index = URandom.Range(0, _edges.Count - 1);
         return _edges[index];
+    }
+}
+
+public class GridGraph : AdjecencyGraph<GridVertex>
+{
+    public GridEdge AddGridEdge(GridVertex from, GridVertex to, Directions fromExit, Directions toExit)
+    {
+        if (from.Exits.Contains(fromExit) || to.Exits.Contains(toExit))
+            return null;
+
+        GridEdge edge = new();
+        edge.FromDirection = fromExit;
+        edge.ToDirection = toExit;
+        from.Exits |= fromExit;
+        to.Exits |= toExit;
+        AddEdge(from, to, edge);
+
+        return edge;
+    }
+    public GridVertex AddGridVertex(int x, int y)
+    {
+        GridVertex vertex = new GridVertex();
+        vertex.Position = (x, y);
+        AddVertex(vertex);
+
+        return vertex;
+    }
+
+    public int GetNewX(int oldX, int minY, int maxY, bool right)
+    {
+        if (right)
+        {
+            int minOffset = BaseRule.STEP * 2;
+            foreach (GridEdge e in GetEdges())
+            {
+                int? offset = e.GetHorizontalOffset(minY, maxY, oldX);
+                if (offset == null || offset <= 0) continue;
+                minOffset = Math.Min(minOffset, offset.Value);
+            }
+
+            return oldX + minOffset / 2;
+        }
+
+        int maxOffset = -BaseRule.STEP * 2;
+        foreach (GridEdge e in GetEdges())
+        {
+            int? offset = e.GetHorizontalOffset(minY, maxY, oldX);
+            if (offset == null || offset >= 0) continue;
+            maxOffset = Math.Max(maxOffset, offset.Value);
+        }
+
+        return oldX + maxOffset / 2;
+    }
+
+    public int GetNewY(int oldY, int minX, int maxX, bool up)
+    {
+        if (up)
+        {
+            int minOffset = BaseRule.STEP * 2;
+            foreach (GridEdge e in GetEdges())
+            {
+                int? offset = e.GetVerticalOffset(minX, maxX, oldY);
+                if (offset == null || offset <= 0) continue;
+                minOffset = Math.Min(minOffset, offset.Value);
+            }
+
+            return oldY + minOffset / 2;
+        }
+
+        int maxOffset = -BaseRule.STEP * 2;
+        foreach (GridEdge e in GetEdges())
+        {
+            int? offset = e.GetVerticalOffset(minX, maxX, oldY);
+            if (offset == null || offset >= 0) continue;
+            maxOffset = Math.Max(maxOffset, offset.Value);
+        }
+
+        return oldY + maxOffset / 2;
+    }
+
+    public void RemoveGridEdge(GridEdge e)
+    {
+        e.From.Exits = e.From.Exits.Without(e.FromDirection);
+        e.To.Exits = e.To.Exits.Without(e.ToDirection);
+        RemoveEdge(e.From, e.To);
+    }
+
+    public GridEdge LongestEdge()
+    {
+        GridEdge longest = null;
+        int length = 0;
+
+        foreach (GridEdge e in GetEdges().Cast<GridEdge>())
+        {
+            int l = e.maxX - e.minX + e.maxY - e.minY;
+            if (l > length)
+            {
+                length = l;
+                longest = e;
+            }
+        }
+
+
+        return longest;
     }
 }

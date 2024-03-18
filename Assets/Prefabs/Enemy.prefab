@@ -131,6 +131,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b253b57b89f055a4b8291caa146b1bf2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DefaultPosition: {x: 0, y: 0, z: 0}
+  DefaultDirection: {x: 0, y: 0, z: 1}
+  GuardViewDistance: 3
+  DefaultViewDistance: 15
 --- !u!114 &7240094474568271847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,7 +165,6 @@ MonoBehaviour:
   VisionConeMaterial: {fileID: 2100000, guid: 220ce8aac4dc5c5419af4b49c38ae3d0, type: 2}
   VisionConeVisible: 1
   VisionConeHilighted: 0
-  HeightCorrection: 0
 --- !u!143 &7240094474568271865
 CharacterController:
   m_ObjectHideFlags: 0

@@ -24,16 +24,16 @@ public class LevelGenerator : MonoBehaviour
     public EnemyController EnemyBlueprint;
     public GameObject Player;
 
-    IGraph<BaseVertex> _graph;
+    GridGraph _graph;
     GraphGenerator _graphGenerator;
-    GraphDrawer<BaseVertex> _graphDrawer;
+    GraphGridDrawer _graphDrawer;
     MapBuilder _mapBuilder;
 
     // Intermediate Results
-    public IGraph<BaseVertex> Graph { get; private set; }
-    public GraphDrawing<BaseVertex> GraphDrawing { get; private set; }
-    public Dictionary<IKey, BaseVertex> KeyVertexMapping;
-    public Dictionary<ILock, BaseVertex> LockVertexMapping;
+    public GridGraph Graph { get; private set; }
+    public GraphDrawing<GridVertex> GraphDrawing { get; private set; }
+    public Dictionary<IKey, GridVertex> KeyVertexMapping;
+    public Dictionary<ILock, GridVertex> LockVertexMapping;
     public ASuperTile[,] SuperTileGrid;
     public ATile[,] TileGrid;
     public ASubTile[,] SubTileGrid;
@@ -46,7 +46,7 @@ public class LevelGenerator : MonoBehaviour
         TrapLock.Blueprint = TrapBlueprint;
         SoundTrapLock.Blueprint = SoundTrapBlueprint;
 
-        _graph = new UndirectedAdjecencyGraph<BaseVertex>();
+        _graph = new GridGraph();
         _graphGenerator = new GraphGenerator(_graph);
 
         Debug.Log("GENERATING GRAPH");
@@ -55,7 +55,7 @@ public class LevelGenerator : MonoBehaviour
         KeyVertexMapping = _graphGenerator.KeyMapping;
         LockVertexMapping = _graphGenerator.LockMapping;
 
-        _graphDrawer = new GraphDrawer<BaseVertex>(_graph);
+        _graphDrawer = new GraphGridDrawer(_graph);
         Debug.Log("DRAWING THE GRAPH");
         GraphDrawing = _graphDrawer.Draw(_graphGenerator.GetStartVertex(), _graphGenerator.GetEndVertex());
 
@@ -113,15 +113,9 @@ public class LevelGenerator : MonoBehaviour
         geometry.transform.localScale = localScale.Multiplied(x: scale, y: 1.5f, z: scale);
         foreach (EnemyParams enemy in enemies)
         {
-            (int spawnX, int spawnZ) = enemy.Patrol.ToList()[enemy.Spawn];
+            (int spawnX, int spawnZ) = enemy.Spawn;
             Vector3 spawn = new(spawnX, 0, spawnZ);
             spawn = spawn * scale;
-
-            List<Vector3> patrol = new();
-            foreach ((int x, int z) in enemy.Patrol)
-            {
-                patrol.Add(new Vector3(x, 0, z) * scale + offset);
-            }
 
             var enemyInstance = Instantiate(
                 EnemyBlueprint,
@@ -129,7 +123,26 @@ public class LevelGenerator : MonoBehaviour
                 Quaternion.identity,
                 level.transform);
 
-            enemyInstance.Patrol(patrol.ToArray(), enemy.Spawn, enemy.Retrace);
+
+            if (enemy.Behaviour == Behaviour.Patroling)
+            {
+                List<Vector3> patrol = new();
+                foreach ((int x, int z) in enemy.Patrol)
+                {
+                    patrol.Add(new Vector3(x, 0, z) * scale + offset);
+                }
+
+                enemyInstance.Patrol(patrol.ToArray(), enemy.PatrolIndex, enemy.Retrace);
+            }
+
+            if (enemy.Behaviour == Behaviour.Guarding)
+            {
+                Debug.Log("SPAWNING GUARD ===========================================================");
+                enemyInstance.Guard(spawn, Vector3.right);
+            }
+
+            if (enemy.Behaviour == Behaviour.Sleeping)
+                enemyInstance.Sleep(spawn);
         }
 
         // Just offset it for now

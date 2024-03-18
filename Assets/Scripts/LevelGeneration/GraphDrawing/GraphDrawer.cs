@@ -5,6 +5,8 @@ using System.Text;
 using UnityEngine;
 using GraphPlanarityTesting.PlanarityTesting.BoyerMyrvold;
 using Planarity = GraphPlanarityTesting.Graphs.DataStructures;
+using Unity.VisualScripting;
+using TMPro;
 
 public struct GraphDrawing<T>
 {
@@ -398,6 +400,75 @@ class GraphDrawer<T>
         }
 
         return new GraphDrawing<T>
+        {
+            VertexPositions = vertexPositions,
+            HorizontalLines = horizontalLines,
+            VerticalLines = verticalLines,
+            MaximumX = maximumX,
+            MaximumY = maximumY,
+            StartPosition = startVertex,
+            EndPosition = endVertex,
+        };
+    }
+}
+
+public class GraphGridDrawer
+{
+    IGraph<GridVertex> _graph;
+    public GraphGridDrawer(IGraph<GridVertex> graph)
+    {
+        _graph = graph;
+    }
+
+    public GraphDrawing<GridVertex> Draw(GridVertex startVertex, GridVertex endVertex)
+    {
+        Dictionary<GridVertex, (int, int)> vertexPositions = new();
+        HashSet<(int x, int yFrom, int yTo)> verticalLines = new();
+        HashSet<(int xFrom, int xTo, int y)> horizontalLines = new();
+        List<int> xx = new();
+        List<int> yy = new();
+
+        foreach (GridVertex v in _graph.GetVertices())
+        {
+            if (!xx.Contains(v.Position.x)) xx.Add(v.Position.x);
+            if (!yy.Contains(v.Position.y)) yy.Add(v.Position.y);
+        }
+
+        xx.Sort();
+        yy.Sort();
+
+        int maximumX = xx.Count - 1;
+        int maximumY = yy.Count - 1;
+
+        foreach (GridVertex v in _graph.GetVertices())
+            vertexPositions.Add(v, (xx.IndexOf(v.Position.x), yy.IndexOf(v.Position.y)));
+
+        foreach (GridEdge e in _graph.GetEdges())
+        {
+            var horizontal = e.GetHorizontalLine();
+            var vertical = e.GetVerticalLine();
+
+
+            if (horizontal != null)
+            {
+                (int fromX, int toX, int y) = horizontal.Value;
+                fromX = xx.IndexOf(fromX);
+                toX = xx.IndexOf(toX);
+                y = yy.IndexOf(y);
+                horizontalLines.Add((fromX, toX, y));
+            }
+
+            if (vertical != null)
+            {
+                (int x, int fromY, int toY) = vertical.Value;
+                x = xx.IndexOf(x);
+                fromY = yy.IndexOf(fromY);
+                toY = yy.IndexOf(toY);
+                verticalLines.Add((x, fromY, toY));
+            }
+        }
+
+        return new GraphDrawing<GridVertex>
         {
             VertexPositions = vertexPositions,
             HorizontalLines = horizontalLines,

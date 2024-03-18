@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -24,6 +25,7 @@ public static class DirectionsExtensions
     public static bool South(this Directions directions) => (directions & Directions.South) != Directions.None;
     public static bool East(this Directions directions) => (directions & Directions.East) != Directions.None;
     public static bool West(this Directions directions) => (directions & Directions.West) != Directions.None;
+    public static bool Contains(this Directions directions, Directions dirs) => (directions & dirs) == dirs;
     public static bool Horizontal(this Directions directions) =>
         (directions.West() || directions.East())
         && !directions.North()
@@ -92,6 +94,14 @@ public static class DirectionsExtensions
             return Directions.North;
 
         return dirs;
+    }
+    public static Directions ChooseRandom(this Directions directions)
+    {
+        Directions[] dirs = directions.Enumerate().ToArray();
+        int count = dirs.Length;
+        if (count == 0) return Directions.None;
+
+        return dirs[URandom.Range(0, count)];
     }
 
     public static Directions GetAll() =>

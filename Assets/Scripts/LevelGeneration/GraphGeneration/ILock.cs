@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using UnityEngine;
-
+using UnityEngine.VFX;
 using URandom = UnityEngine.Random;
 
 public interface IRoomFeature
@@ -51,6 +51,7 @@ public class DoorKey : IKey
     public static GameObject Blueprint;
 
     public IList<ILock> Locks { get; } = new List<ILock>();
+    public bool Guarded = true;
 
     public void Implement(SuperTileDescription superTile)
     {
@@ -67,6 +68,18 @@ public class DoorKey : IKey
             obj.GetComponent<IKeyObject>().MyKey = this;
             return obj;
         });
+
+        if (Guarded)
+        {
+            (int spawnX, int spawnY) = ATile.FromSuperMid(superTile.X, superTile.Y);
+            tile.Guard = new EnemyParams
+            {
+                Behaviour = Behaviour.Guarding,
+                Spawn = (spawnX + x - 1, spawnY + y)
+            };
+
+            superTile.Enemies.Add(tile.Guard);
+        }
     }
 }
 
@@ -89,8 +102,10 @@ public class EnemyLock : ILock
         superTile.Enemies.Add(new EnemyParams
         {
             Patrol = patrol,
-            Spawn = spawnIndex,
+            Spawn = patrol[spawnIndex],
+            PatrolIndex = spawnIndex,
             Lock = this,
+            Behaviour = Behaviour.Patroling
         });
     }
 }

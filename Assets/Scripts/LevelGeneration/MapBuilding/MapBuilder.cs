@@ -9,13 +9,13 @@ using URandom = UnityEngine.Random;
 
 class MapBuilder
 {
-    private GraphDrawing<BaseVertex> _graphDrawing;
+    private GraphDrawing<GridVertex> _graphDrawing;
     private int _superWidth, _superHeight;
     private int _width, _height;
     private Vector3 _spawnPosition;
     private Vector3 _endPosition;
 
-    public MapBuilder(GraphDrawing<BaseVertex> graphDrawing, int superWidth, int superHeight)
+    public MapBuilder(GraphDrawing<GridVertex> graphDrawing, int superWidth, int superHeight)
     {
         _graphDrawing = graphDrawing;
         _superWidth = superWidth;
@@ -66,9 +66,9 @@ class MapBuilder
                 float t = URandom.Range(0f, 1f);
                 if (t > 0.75f)
                     tile = new HallwayWithRooms(_superWidth, _superHeight, exits);
-                else if (t > 0.50f)
+                else if (t > 0.5f)
                     tile = new WideHallway(_superWidth, _superHeight, exits);
-                else if (t > 0.25)
+                else if (t > 2)
                     tile = new FilledRoom(_superWidth, _superHeight, false, exits);
                 else
                     tile = new Hallway(_superWidth, _superHeight, exits);
@@ -108,11 +108,11 @@ class MapBuilder
                 }
 
                 float t = URandom.Range(0f, 1f);
-                if (t > 0.8f)
+                if (t > 0.75f)
                     tile = new HallwayWithRooms(_superWidth, _superHeight, exits);
-                else if (t > 0.50f)
+                else if (t > 0.5f)
                     tile = new WideHallway(_superWidth, _superHeight, exits);
-                else if (t > 0.25f)
+                else if (t > 2f)
                     tile = new FilledRoom(_superWidth, _superHeight, false, exits);
                 else
                     tile = new Hallway(_superWidth, _superHeight, exits);

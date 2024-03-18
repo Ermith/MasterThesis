@@ -1,15 +1,20 @@
 using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEngine;
 using URandom = UnityEngine.Random;
 
-public class BaseVertex
+public class GridVertex
 {
     static char c = 'A';
     char _c;
 
     private List<ILock> _locks = new();
     private List<IKey> _keys = new();
+
+    public Directions Exits;
+
+    public (int x, int y) Position;
 
     public void AddLock(ILock l)
     {
@@ -33,7 +38,7 @@ public class BaseVertex
             yield return k;
     }
 
-    public BaseVertex()
+    public GridVertex()
     {
         _c = c++;
     }
@@ -44,49 +49,220 @@ public class BaseVertex
     }
 }
 
+public class GridEdge : BaseEdge<GridVertex>
+{
+    public Directions FromDirection;
+    public Directions ToDirection;
+
+    public int fromX => From.Position.x;
+    public int fromY => From.Position.y;
+    public int toX => To.Position.x;
+    public int toY => To.Position.y;
+    
+    public int minX => Mathf.Min(fromX, toX);
+    public int minY => Mathf.Min(fromY, toY);
+    public int maxX => Mathf.Max(fromX, toX);
+    public int maxY => Mathf.Max(fromY, toY);
+
+    public (int x, int y) GetMid()
+    {
+        if (fromX == toX)
+            return (fromX, fromY + (toY - fromY) / 2);
+
+        if (fromY == toY)
+            return (fromX + (toX - fromX) / 2, fromY);
+
+        if (FromDirection.Horizontal())
+            return (toX, fromY);
+
+        if (FromDirection.Vertical())
+            return (fromX, toY);
+
+        // Should not happen
+        return (fromX, fromY);
+    }
+
+    public int? GetHorizontalOffset(int lowerBound, int upperBound, int x)
+    {
+        float verticalOverlap = Mathf.Min(maxY, upperBound) - Mathf.Max(minY, lowerBound);
+
+        // They are not even overlapping
+        if (verticalOverlap <= 0)
+            return null;
+
+        int offset = 0;
+
+        // Calculate horizontal offset of the vertical segment
+        //   | <---> | 
+
+        int vx = (FromDirection == Directions.West || ToDirection == Directions.West) ? minX : maxX;
+        offset += vx - x;
+
+
+        // Calculate horizontal offset of the horizontal segment
+        //   | <--->  --
+        int hy = (FromDirection == Directions.South || ToDirection == Directions.South) ? minY : maxY;
+        int hOffset = minX - x;
+        if (hy > lowerBound && hy < upperBound) // lower-upper are exclusive (not inclusive)
+            if (Math.Abs(offset) > Math.Abs(hOffset)) // The closer offset
+                offset = hOffset;
+
+        return offset;
+    }
+
+    public int? GetVerticalOffset(int leftBound, int rightBound, int y)
+    {
+        int horizontalOverlap = Math.Min(maxX, rightBound) - Math.Max(minX, leftBound);
+
+        // They are not even overlapping
+        if (horizontalOverlap <= 0)
+            return null;
+
+        int offset = 0;
+
+        // Calculate vertical offset of the horizontal segment
+        // -----
+        //   ^
+        //   |
+        //   v
+        // -----
+        int hy = (FromDirection == Directions.South || ToDirection == Directions.South) ? minY : maxY;
+        offset += hy - y;
+
+
+        // Calculate vertical offset of the vertical segment
+        // -----
+        //   ^
+        //   |
+        //   v
+        //   
+        //   |
+        int vx = (FromDirection == Directions.West || ToDirection == Directions.West) ? minX : maxX;
+        int vOffset = minY - y;
+        if (vx > leftBound && vx < rightBound) // left-right are exclusive (not inclusive)
+            if (Math.Abs(offset) > Math.Abs(vOffset)) // The closer offset
+                offset = vOffset;
+
+        return offset;
+    }
+
+    public (int, int, int)? GetVerticalLine()
+    {
+        if (fromX == toX)
+            return (fromX, minY, maxY);
+
+        (int midX, int midY) = GetMid();
+
+        if (fromX == midX)
+            return (
+                fromX,
+                Math.Min(fromY, midY),
+                Math.Max(fromY, midY));
+
+        if (midX == toX)
+            return (midX,
+                Math.Min(midY, toY),
+                Math.Max(midY, toY));
+
+        return null;
+    }
+
+    public (int, int, int)? GetHorizontalLine()
+    {
+        if (fromY == toY)
+            return (minX, maxX, toY);
+
+        (int midX, int midY) = GetMid();
+
+        if (fromY == midY)
+            return (
+                Math.Min(fromX, midX),
+                Math.Max(fromX, midX),
+                midY);
+
+        if (midY == toY)
+            return (
+                Math.Min(midX, toX),
+                Math.Max(midX, toX),
+                toY);
+
+        return null;
+    }
+}
+
 public class GraphGenerator
 {
-    public IGraph<BaseVertex> Graph { get; private set; }
-    public Dictionary<ILock, BaseVertex> LockMapping = new();
-    public Dictionary<IKey, BaseVertex> KeyMapping = new();
-    private BaseVertex _start;
-    private BaseVertex _end;
+    public GridGraph Graph { get; private set; }
+    public Dictionary<ILock, GridVertex> LockMapping = new();
+    public Dictionary<IKey, GridVertex> KeyMapping = new();
+    private GridVertex _start;
+    private GridVertex _end;
 
-    public GraphGenerator(IGraph<BaseVertex> graph)
+    public GraphGenerator(GridGraph graph)
     {
         Graph = graph;
     }
 
-    public void RegisterLock(ILock l, BaseVertex vertex) => LockMapping[l] = vertex;
-    public void RegisterKey(IKey k, BaseVertex vertex) => KeyMapping[k] = vertex;
+    public void RegisterLock(ILock l, GridVertex vertex) => LockMapping[l] = vertex;
+    public void RegisterKey(IKey k, GridVertex vertex) => KeyMapping[k] = vertex;
 
-    public BaseVertex GetLockVertex(ILock l) => LockMapping[l];
-    public BaseVertex GetKeyVertex(IKey k) => KeyMapping[k];
+    public GridVertex GetLockVertex(ILock l) => LockMapping[l];
+    public GridVertex GetKeyVertex(IKey k) => KeyMapping[k];
 
-    public BaseVertex GetStartVertex() => _start;
-    public BaseVertex GetEndVertex() => _end;
+    public GridVertex GetStartVertex() => _start;
+    public GridVertex GetEndVertex() => _end;
 
     public void Generate()
     {
-        _start = new BaseVertex();
-        _end = new BaseVertex();
+        _start = new GridVertex();
+        _end = new GridVertex();
+        GridEdge e = new();
         Graph.AddVertex(_start);
         Graph.AddVertex(_end);
-        Graph.AddEdge(_start, _end);
+        Graph.AddEdge(_start, _end, e);
+        _start.Position = (0, 0);
+        _start.Exits |= Directions.North;
+        _end.Position = (BaseRule.STEP, BaseRule.STEP);
+        _end.Exits |= Directions.West;
+        e.FromDirection = Directions.North;
+        e.ToDirection = Directions.West;
+
+
+        //GridVertex c = Graph.AddGridVertex(BaseRule.STEP, 0);
+        //GridVertex d = Graph.AddGridVertex(2*BaseRule.STEP, 0);
+        //Graph.AddGridEdge(c, d, Directions.East, Directions.West);
 
         CycleRule cycleRule = new(this);
         ExtensionRule extensionRule = new(this);
+        AdditionRule additionRule = new(this);
 
-        cycleRule.Apply(Graph.GetEdge(_start, _end), Graph, new DoorLock());
+        //extensionRule.Apply(Graph.GetEdge(_start, _end) as GridEdge, Graph, new DoorLock());
+        cycleRule.Apply(e, Graph);
 
+        for (int i = 0; i < 10; i++)
+        {
+            GridEdge edge = Graph.GetRandomEdge() as GridEdge;
+            edge = Graph.LongestEdge();
+            cycleRule.Apply(edge, Graph);
 
-        for (int i = 0; i < 2; i++)
+            edge = Graph.GetRandomEdge() as GridEdge;
+            edge = Graph.LongestEdge();
+            extensionRule.Apply(edge, Graph);
+        }
+
+        for (int i = 0; i < 20; i++)
+        {
+            GridEdge edge = Graph.GetRandomEdge() as GridEdge;
+            additionRule.Apply(edge, Graph);
+        }
+
+        for (int i = 0; i < 0; i++)
         {
             ILock @lock = URandom.value > 0.5f ? new DoorLock() : new DoorLock();
-            IEdge<BaseVertex> edge;
+            GridEdge edge;
             do
             {
-                edge = Graph.GetRandomEdge();
+                edge = Graph.GetRandomEdge() as GridEdge;
             } while (edge.From == _end || edge.To == _start || edge.From == _start);
         
             if (URandom.value > 0.5f)
@@ -135,10 +311,10 @@ public class GraphGenerator
     private void PredefinedGraph()
     {
         int count = 8;
-        var nodes = new BaseVertex[count];
+        var nodes = new GridVertex[count];
         for (int i = 0; i < count; i++)
         {
-            BaseVertex vertex = new();
+            GridVertex vertex = new();
             nodes[i] = vertex;
             Graph.AddVertex(vertex);
         }
