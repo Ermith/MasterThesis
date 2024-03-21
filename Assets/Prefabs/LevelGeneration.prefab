@@ -170,6 +170,7 @@ MonoBehaviour:
   WallBlueprint: {fileID: 5237557618514736743, guid: c01339a678e403c44bbaeb243bdd4296, type: 3}
   FloorBlueprint: {fileID: 7837130552153225658, guid: 8d6d044c788136d4e8c9bfae10432214, type: 3}
   DoorBlueprint: {fileID: 2635403507403632615, guid: 16ee88e120243694d888caa51f294c8e, type: 3}
+  WallOfLightBlueprint: {fileID: 7394506146460830983, guid: 89f309c559d25d04b9a2ef09c78af180, type: 3}
   KeyBlueprint: {fileID: 3527088339798993706, guid: 9b19d2c50283bdf439dd82105d99df54, type: 3}
   SecurityCameraBlueprint: {fileID: 5452511249017854686, guid: bc89579a0bacc0d428944dc5a800e863, type: 3}
   PowerSourceBlueprint: {fileID: 8614125414331960436, guid: 376b0c47b4172984bb688512d8ada202, type: 3}
@@ -178,4 +179,4 @@ MonoBehaviour:
   RefugeBlueprint: {fileID: 6398615319085239364, guid: 73d18f8c39726974cac62fe48f483f6c, type: 3}
   VictoryTrigger: {fileID: 9216524343229251750, guid: 29ca8bb401bbb2342bcbd1c842f1d6c4, type: 3}
   EnemyBlueprint: {fileID: 7240094474568271842, guid: fa0c4d815c803c042876b3b83aa0ccb4, type: 3}
-  Player: {fileID: 0}
+  Player: {fileID: 7394506146460830983, guid: 89f309c559d25d04b9a2ef09c78af180, type: 3}

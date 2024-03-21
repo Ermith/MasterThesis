@@ -214,19 +214,9 @@ public class GraphGenerator
 
     public void Generate()
     {
-        _start = new GridVertex();
-        _end = new GridVertex();
-        GridEdge e = new();
-        Graph.AddVertex(_start);
-        Graph.AddVertex(_end);
-        Graph.AddEdge(_start, _end, e);
-        _start.Position = (0, 0);
-        _start.Exits |= Directions.North;
-        _end.Position = (BaseRule.STEP, BaseRule.STEP);
-        _end.Exits |= Directions.West;
-        e.FromDirection = Directions.North;
-        e.ToDirection = Directions.West;
-
+        _start = Graph.AddGridVertex(0, 0);
+        _end = Graph.AddGridVertex(BaseRule.STEP, BaseRule.STEP);
+        GridEdge e = Graph.AddGridEdge(_start, _end, Directions.North, Directions.West);
 
         //GridVertex c = Graph.AddGridVertex(BaseRule.STEP, 0);
         //GridVertex d = Graph.AddGridVertex(2*BaseRule.STEP, 0);
@@ -235,11 +225,15 @@ public class GraphGenerator
         CycleRule cycleRule = new(this);
         ExtensionRule extensionRule = new(this);
         AdditionRule additionRule = new(this);
+        Pattern p = new TestPattern();
 
         //extensionRule.Apply(Graph.GetEdge(_start, _end) as GridEdge, Graph, new DoorLock());
-        cycleRule.Apply(e, Graph);
+        //cycleRule.Apply(e, Graph);
+        p.Apply(e, Graph);
+        //p.Apply(Graph.LongestEdge(), Graph);
+        
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 0; i++)
         {
             GridEdge edge = Graph.GetRandomEdge() as GridEdge;
             edge = Graph.LongestEdge();
@@ -250,12 +244,13 @@ public class GraphGenerator
             extensionRule.Apply(edge, Graph);
         }
 
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 0; i++)
         {
             GridEdge edge = Graph.GetRandomEdge() as GridEdge;
             additionRule.Apply(edge, Graph);
         }
 
+        /*/
         for (int i = 0; i < 0; i++)
         {
             ILock @lock = URandom.value > 0.5f ? new DoorLock() : new DoorLock();
@@ -270,6 +265,7 @@ public class GraphGenerator
             else
                 extensionRule.Apply(edge, Graph, @lock);
         }
+        //*/
         
         /*/
         BaseVertex A = new();

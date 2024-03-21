@@ -50,9 +50,9 @@ public abstract class ASuperTile
         Directions directions = Directions.None;
 
         if (x == 0) directions |= Directions.West;
-        if (y == 0) directions |= Directions.North;
+        if (y == 0) directions |= Directions.South;
         if (x == width - 1) directions |= Directions.East;
-        if (y == height - 1) directions |= Directions.South;
+        if (y == height - 1) directions |= Directions.North;
 
         return directions;
     }
@@ -92,8 +92,8 @@ public abstract class ASuperTile
         int midX = Width / 2;
         int midY = Height / 2;
         Dictionary<Directions, (int, int)> exits = new();
-        if (Exits.North()) exits[Directions.North] = (midX, 0);
-        if (Exits.South()) exits[Directions.South] = (midX, Height - 1);
+        if (Exits.North()) exits[Directions.North] = (midX, Height - 1);
+        if (Exits.South()) exits[Directions.South] = (midX, 0);
         if (Exits.East()) exits[Directions.East] = (Width - 1, midY);
         if (Exits.West()) exits[Directions.West] = (0, midY);
 
@@ -137,8 +137,8 @@ public abstract class ASuperTile
         int midY = height / 2;
 
         Dictionary<Directions, (int, int)> exits = new();
-        if (roomExits.North()) exits[Directions.North] = (midX, 0);
-        if (roomExits.South()) exits[Directions.South] = (midX, height - 1);
+        if (roomExits.North()) exits[Directions.South] = (midX, 0);
+        if (roomExits.South()) exits[Directions.North] = (midX, height - 1);
         if (roomExits.East()) exits[Directions.East] = (width - 1, midY);
         if (roomExits.West()) exits[Directions.West] = (0, midY);
 

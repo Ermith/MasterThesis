@@ -353,12 +353,12 @@ public class UndirectedAdjecencyGraph<T> : AGraph<T>
 
 public class GridGraph : AdjecencyGraph<GridVertex>
 {
-    public GridEdge AddGridEdge(GridVertex from, GridVertex to, Directions fromExit, Directions toExit)
+    public GridEdge AddGridEdge(GridVertex from, GridVertex to, Directions fromExit, Directions toExit, GridEdge edge = null)
     {
         if (from.Exits.Contains(fromExit) || to.Exits.Contains(toExit))
             return null;
 
-        GridEdge edge = new();
+        edge ??= new();
         edge.FromDirection = fromExit;
         edge.ToDirection = toExit;
         from.Exits |= fromExit;
@@ -449,7 +449,6 @@ public class GridGraph : AdjecencyGraph<GridVertex>
                 longest = e;
             }
         }
-
 
         return longest;
     }

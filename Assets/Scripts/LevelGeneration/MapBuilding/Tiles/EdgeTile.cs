@@ -27,18 +27,18 @@ public class EdgeTile : ATile
         bool isEdge = (
             (x < Thickness && Edges.West())
             || (x > maxX - Thickness && Edges.East())
-            || (y < Thickness && Edges.North())
-            || (y > maxY - Thickness && Edges.South())
+            || (y < Thickness && Edges.South())
+            || (y > maxY - Thickness && Edges.North())
             );
 
         bool exitNorth = (
-                    Exits.North()
+                    Exits.South()
                     && y < Thickness
                     && (x == midX || x == midX - 1)
                 );
 
         bool exitSouth = (
-                    Exits.South()
+                    Exits.North()
                     && y > maxY - Thickness
                     && (x == midX || x == midX - 1)
                 );

@@ -97,8 +97,8 @@ class MapBuilder
                 var tile = superTileGrid[x, y];
 
                 Directions exits;
-                if (y == yFrom) exits = Directions.South;
-                else if (y == yTo) exits = Directions.North;
+                if (y == yFrom) exits = Directions.North;
+                else if (y == yTo) exits = Directions.South;
                 else exits = Directions.North | Directions.South;
 
                 if (tile != null)
@@ -146,9 +146,9 @@ class MapBuilder
 
             ASuperTile tile;
             if (URandom.Range(0f, 1f) > 0.4f)
-                tile = new FilledRoom(_superWidth, _superHeight, true, exits);
+                tile = new FilledRoom(_superWidth, _superHeight, true, vertex.Exits);
             else
-                tile = new Room(_superWidth, _superHeight, exits);
+                tile = new Room(_superWidth, _superHeight, vertex.Exits);
 
             superTileGrid[x, y] = tile;
             superTileGrid[x, y].Locks = vertex.GetLocks().ToList();

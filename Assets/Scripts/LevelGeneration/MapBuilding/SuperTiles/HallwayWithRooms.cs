@@ -26,7 +26,7 @@ public class HallwayWithRooms : Hallway
                 if ((px, py) == (midX, midY)) continue;
 
                 description.FreeTiles.Add((px, py));
-                tileGrid[x + px, y + py] = new EdgeTile(dir.Perpendicular()); ;
+                tileGrid[x + px, y + py] = new EdgeTile(dir.Perpendicular());
             }
 
         description.PatrolPath = patrol;
@@ -45,7 +45,7 @@ public class HallwayWithRooms : Hallway
         {
             nwExits |= Directions.East;
             neExits |= Directions.West;
-            var tile = description.Get(midX, roomHeight / 2) as EdgeTile;
+            var tile = description.Get(midX, midY + 1 + roomHeight / 2) as EdgeTile;
             tile.Exits |= nwExits | neExits;
         }
 
@@ -53,7 +53,7 @@ public class HallwayWithRooms : Hallway
         {
             swExits |= Directions.East;
             seExits |= Directions.West;
-            var tile = description.Get(midX, midY + 1 + roomHeight / 2) as EdgeTile;
+            var tile = description.Get(midX, roomHeight / 2) as EdgeTile;
             tile.Exits |= swExits | seExits;
         }
 
@@ -73,28 +73,28 @@ public class HallwayWithRooms : Hallway
             tile.Exits |= neExits | seExits;
         }
 
-        if (!nwExits.None())
+        if (!swExits.None())
             BuildSubRoom(
                 x, y,
                 0, 0,
                 roomWidth, roomHeight,
                 description, nwExits);
 
-        if (!neExits.None()) 
+        if (!seExits.None()) 
             BuildSubRoom(
                 x + midX + 1, y,
                 midX + 1, 0,
                 roomWidth, roomHeight,
                 description, neExits);
 
-        if (!swExits.None())
+        if (!nwExits.None())
             BuildSubRoom(
                 x, y + midY + 1,
                 0, midY + 1,
                 roomWidth, roomHeight,
                 description, swExits);
 
-        if (!seExits.None())
+        if (!neExits.None())
             BuildSubRoom(
                 x + midX + 1, y + midY + 1,
                 midX + 1, midY + 1,

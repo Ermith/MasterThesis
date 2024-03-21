@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
 public class LevelGenerator : MonoBehaviour
 {
@@ -14,6 +13,7 @@ public class LevelGenerator : MonoBehaviour
     public GameObject WallBlueprint;
     public GameObject FloorBlueprint;
     public GameObject DoorBlueprint;
+    public GameObject WallOfLightBlueprint;
     public GameObject KeyBlueprint;
     public GameObject SecurityCameraBlueprint;
     public GameObject PowerSourceBlueprint;
@@ -42,7 +42,7 @@ public class LevelGenerator : MonoBehaviour
         //*/
         DoorKey.Blueprint = KeyBlueprint;
         SecurityCameraLock.Blueprint = SecurityCameraBlueprint;
-        SecurityCameraKey.Blueprint = PowerSourceBlueprint;
+        PowerSourceKey.Blueprint = PowerSourceBlueprint;
         TrapLock.Blueprint = TrapBlueprint;
         SoundTrapLock.Blueprint = SoundTrapBlueprint;
 
@@ -80,6 +80,17 @@ public class LevelGenerator : MonoBehaviour
             doorObject.Lock?.Instances.Add(doorObject);
             doorObject.transform.forward = door.Orientation.ToVector3();
             return doorTileObject;
+        });
+
+        ASubTile.Register<WallOfLightSubTile>((ASubTile st) =>
+        {
+            var wallOfLight = st as WallOfLightSubTile;
+            GameObject wallOfLightTileObject = Instantiate(WallOfLightBlueprint);
+            var wallOfLightObject = wallOfLightTileObject.GetComponentInChildren<WallOfLight>();
+            wallOfLightObject.Lock = wallOfLight.Lock;
+            wallOfLightObject.Lock?.Instances.Add(wallOfLightObject);
+            wallOfLightObject.transform.forward = wallOfLight.Orientation.ToVector3();
+            return wallOfLightTileObject;
         });
 
         ASubTile.Register<RefugeSubTile>((ASubTile st) =>

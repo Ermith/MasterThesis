@@ -28,6 +28,7 @@ public interface IKey
 
 public class DoorLock : ILock
 {
+    private Directions _exits;
     public IList<ILockObject> Instances { get; } = new List<ILockObject>();
 
     public IKey GetNewKey()
@@ -39,10 +40,44 @@ public class DoorLock : ILock
 
     public void Implement(SuperTileDescription superTile)
     {
-        foreach (Directions dir in superTile.Exits.Enumerate())
+        foreach (Directions dir in _exits.Enumerate())
             if (superTile.ExitsTiles.TryGetValue(dir, out (int x, int y) t))
                 if (superTile.Get(t.x, t.y) is DoorTile door)
                     door.Lock = this;
+    }
+
+    public DoorLock(Directions exits)
+    {
+        _exits = exits;
+    }
+}
+
+public class WallOfLightLock : ILock
+{
+    private Directions _exits;
+    public IList<ILockObject> Instances { get; } = new List<ILockObject>();
+
+    public IKey GetNewKey()
+    {
+        var doorKey = new PowerSourceKey();
+        doorKey.Locks.Add(this);
+        return doorKey;
+    }
+
+    public void Implement(SuperTileDescription superTile)
+    {
+        foreach (Directions dir in _exits.Enumerate())
+            if (superTile.ExitsTiles.TryGetValue(dir, out (int x, int y) t))
+                if (superTile.Get(t.x, t.y) is DoorTile door)
+                {
+                    door.Lock = this;
+                    door.Type = DoorType.WallOfLight;
+                }
+    }
+
+    public WallOfLightLock(Directions exits)
+    {
+        _exits = exits;
     }
 }
 
@@ -118,7 +153,7 @@ public class SecurityCameraLock : ILock
 
     public IKey GetNewKey()
     {
-        SecurityCameraKey key = new();
+        PowerSourceKey key = new();
         key.Locks.Add(this);
         return key;
     }
@@ -141,7 +176,7 @@ public class SecurityCameraLock : ILock
     }
 }
 
-public class SecurityCameraKey : IKey
+public class PowerSourceKey : IKey
 {
     public static GameObject Blueprint;
 
