@@ -14,6 +14,7 @@ public class LevelGenerator : MonoBehaviour
     public GameObject FloorBlueprint;
     public GameObject DoorBlueprint;
     public GameObject WallOfLightBlueprint;
+    public GameObject HiddenDoorBlueprint;
     public GameObject KeyBlueprint;
     public GameObject SecurityCameraBlueprint;
     public GameObject PowerSourceBlueprint;
@@ -79,6 +80,7 @@ public class LevelGenerator : MonoBehaviour
             doorObject.Lock = door.DoorLock;
             doorObject.Lock?.Instances.Add(doorObject);
             doorObject.transform.forward = door.Orientation.ToVector3();
+            doorObject.ChangeColor = true;
             return doorTileObject;
         });
 
@@ -91,6 +93,15 @@ public class LevelGenerator : MonoBehaviour
             wallOfLightObject.Lock?.Instances.Add(wallOfLightObject);
             wallOfLightObject.transform.forward = wallOfLight.Orientation.ToVector3();
             return wallOfLightTileObject;
+        });
+
+        ASubTile.Register<HiddenDoorSubTile>((ASubTile st) =>
+        {
+            var door = st as HiddenDoorSubTile;
+            GameObject doorTileObject = Instantiate(HiddenDoorBlueprint);
+            var doorObject = doorTileObject.GetComponentInChildren<Door>();
+            doorObject.transform.forward = door.Orientation.ToVector3();
+            return doorTileObject;
         });
 
         ASubTile.Register<RefugeSubTile>((ASubTile st) =>

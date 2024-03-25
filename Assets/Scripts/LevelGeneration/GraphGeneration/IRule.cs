@@ -428,8 +428,16 @@ public abstract class Pattern
         int newX = graph.GetNewX(midX, edge.minY, edge.maxY, right);
         int newY = graph.GetNewY(midY, edge.minX, edge.maxX, up);
 
+        GridEdge mockEdge = new();
+        mockEdge.From = a;
+        mockEdge.To = b;
+        mockEdge.FromDirection = acDir;
+        mockEdge.ToDirection = bcDir;
 
-        bool obstructed = newX != midX || newY != midY;
+        (int expectedX, int expectedY) = mockEdge.GetMid();
+        
+
+        bool obstructed = newX != expectedX || newY != expectedY;
         Directions caDir = obstructed ? bcDir : acDir.Opposite();
         Directions cbDir = obstructed ? acDir : bcDir.Opposite();
 
@@ -536,13 +544,35 @@ public class TestPattern : Pattern
         e2.From.AddLock(@lock);
 
         (GridEdge ce1, GridEdge ce2) = AddCycle(e1, graph);
+        graph.RemoveGridEdge(ce1);
+
+        (ce1, ce2) = AddExtension(ce1, graph);
         ce1.To.AddKey(key);
 
         WallOfLightLock @lock2 = new(ce1.FromDirection);
         IKey key2 = @lock2.GetNewKey();
 
         ce1.To.AddKey(key2);
-        ce2.To.AddLock(@lock2);
+        ce1.From.AddLock(@lock2);
+
+        //graph.RemoveGridEdge(e1);
+        //AddExtension(e1, graph);
+        //graph.RemoveGridEdge(e2);
+        //AddExtension(e2, graph);
+    }
+}
+
+public class HiddenPathPattern : Pattern
+{
+    public override void Apply(GridEdge edge, GridGraph graph)
+    {
+        (GridEdge ce1, GridEdge ce2) = AddCycle(edge, graph);
+
+        HiddenDoorLock @lock1 = new(ce1.FromDirection);
+        ce1.From.AddLock(@lock1);
+
+        HiddenDoorLock @lock2 = new(ce1.ToDirection);
+        ce1.To.AddLock(@lock2);
 
         //graph.RemoveGridEdge(e1);
         //AddExtension(e1, graph);

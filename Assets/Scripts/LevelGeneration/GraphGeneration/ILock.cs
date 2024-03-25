@@ -267,3 +267,30 @@ public class SoundTrapLock : ILock
         }
     }
 }
+
+public class HiddenDoorLock : ILock
+{
+    private Directions _exits;
+    public IList<ILockObject> Instances { get; } = new List<ILockObject>();
+
+    public IKey GetNewKey()
+    {
+        return null;
+    }
+
+    public void Implement(SuperTileDescription superTile)
+    {
+        foreach (Directions dir in _exits.Enumerate())
+            if (superTile.ExitsTiles.TryGetValue(dir, out (int x, int y) t))
+                if (superTile.Get(t.x, t.y) is DoorTile door)
+                {
+                    door.Lock = this;
+                    door.Type = DoorType.HiddenDoor;
+                }
+    }
+
+    public HiddenDoorLock(Directions exits)
+    {
+        _exits = exits;
+    }
+}

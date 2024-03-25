@@ -64,7 +64,8 @@ class MapBuilder
 
                 ASuperTile tile;
                 float t = URandom.Range(0f, 1f);
-                if (t > 0.75f)
+
+                if (t > 0.0f)
                     tile = new HallwayWithRooms(_superWidth, _superHeight, exits);
                 else if (t > 0.5f)
                     tile = new WideHallway(_superWidth, _superHeight, exits);
@@ -108,7 +109,7 @@ class MapBuilder
                 }
 
                 float t = URandom.Range(0f, 1f);
-                if (t > 0.75f)
+                if (t > 0.0f)
                     tile = new HallwayWithRooms(_superWidth, _superHeight, exits);
                 else if (t > 0.5f)
                     tile = new WideHallway(_superWidth, _superHeight, exits);

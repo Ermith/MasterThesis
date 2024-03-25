@@ -54,6 +54,8 @@ public class GridEdge : BaseEdge<GridVertex>
     public Directions FromDirection;
     public Directions ToDirection;
 
+    public List<IKey> Keys;
+
     public int fromX => From.Position.x;
     public int fromY => From.Position.y;
     public int toX => To.Position.x;
@@ -63,6 +65,8 @@ public class GridEdge : BaseEdge<GridVertex>
     public int minY => Mathf.Min(fromY, toY);
     public int maxX => Mathf.Max(fromX, toX);
     public int maxY => Mathf.Max(fromY, toY);
+
+    public bool Hidden;
 
     public (int x, int y) GetMid()
     {
@@ -226,10 +230,14 @@ public class GraphGenerator
         ExtensionRule extensionRule = new(this);
         AdditionRule additionRule = new(this);
         Pattern p = new TestPattern();
+        Pattern p2 = new HiddenPathPattern();
 
         //extensionRule.Apply(Graph.GetEdge(_start, _end) as GridEdge, Graph, new DoorLock());
         //cycleRule.Apply(e, Graph);
         p.Apply(e, Graph);
+
+        //e = Graph.GetRandomEdge() as GridEdge;
+        //p2.Apply(e, Graph);
         //p.Apply(Graph.LongestEdge(), Graph);
         
 

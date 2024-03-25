@@ -9,6 +9,7 @@ public enum DoorType
 {
     Door,
     WallOfLight,
+    HiddenDoor
 }
 
 public class DoorTile : EdgeTile
@@ -54,6 +55,14 @@ public class DoorTile : EdgeTile
             {
                 WallOfLightSubTile door = new();
                 door.Lock = Lock as WallOfLightLock;
+                door.Orientation = dir;
+                subTileGrid[dx, dy] = door;
+            }
+
+        if (Type == DoorType.HiddenDoor)
+            foreach ((int dx, int dy, Directions dir) in doors)
+            {
+                HiddenDoorSubTile door = new();
                 door.Orientation = dir;
                 subTileGrid[dx, dy] = door;
             }

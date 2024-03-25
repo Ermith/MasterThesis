@@ -7,6 +7,7 @@ using UnityEngine.Events;
 public class Door : MonoBehaviour, IInteractableObject, ILockObject
 {
     public float Duration = 0.5f;
+    public bool ChangeColor = true;
 
     private Transform _hinge;
 
@@ -20,8 +21,9 @@ public class Door : MonoBehaviour, IInteractableObject, ILockObject
 
     void Start()
     {
-        GetComponentInChildren<MeshRenderer>().material.color =
-            (Lock == null) ? Color.green : Color.red;
+        if (ChangeColor)
+            GetComponentInChildren<MeshRenderer>().material.color =
+                (Lock == null) ? Color.green : Color.red;
 
         _hinge = transform.Find("Hinge");
     }
@@ -103,6 +105,8 @@ public class Door : MonoBehaviour, IInteractableObject, ILockObject
     public void Unlock()
     {
         Lock = null;
-        GetComponentInChildren<MeshRenderer>().material.color = Color.green;
+
+        if (ChangeColor)
+            GetComponentInChildren<MeshRenderer>().material.color = Color.green;
     }
 }

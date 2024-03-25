@@ -171,6 +171,7 @@ MonoBehaviour:
   FloorBlueprint: {fileID: 7837130552153225658, guid: 8d6d044c788136d4e8c9bfae10432214, type: 3}
   DoorBlueprint: {fileID: 2635403507403632615, guid: 16ee88e120243694d888caa51f294c8e, type: 3}
   WallOfLightBlueprint: {fileID: 7394506146460830983, guid: 89f309c559d25d04b9a2ef09c78af180, type: 3}
+  HiddenDoorBlueprint: {fileID: 1959907301798189308, guid: ef7d6fdff446648428fe92cbf591435f, type: 3}
   KeyBlueprint: {fileID: 3527088339798993706, guid: 9b19d2c50283bdf439dd82105d99df54, type: 3}
   SecurityCameraBlueprint: {fileID: 5452511249017854686, guid: bc89579a0bacc0d428944dc5a800e863, type: 3}
   PowerSourceBlueprint: {fileID: 8614125414331960436, guid: 376b0c47b4172984bb688512d8ada202, type: 3}

@@ -61,7 +61,6 @@ public abstract class ASuperTile
 
     internal IEnumerable<(int, int)> GetShortPath(int startX, int startY, int endX, int endY, bool yFirst = false)
     {
-
         if (yFirst)
         {
             int step = MathF.Sign(endY - startY);
@@ -137,8 +136,8 @@ public abstract class ASuperTile
         int midY = height / 2;
 
         Dictionary<Directions, (int, int)> exits = new();
-        if (roomExits.North()) exits[Directions.South] = (midX, 0);
-        if (roomExits.South()) exits[Directions.North] = (midX, height - 1);
+        if (roomExits.South()) exits[Directions.South] = (midX, 0);
+        if (roomExits.North()) exits[Directions.North] = (midX, height - 1);
         if (roomExits.East()) exits[Directions.East] = (width - 1, midY);
         if (roomExits.West()) exits[Directions.West] = (0, midY);
 

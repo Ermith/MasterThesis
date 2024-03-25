@@ -78,28 +78,28 @@ public class HallwayWithRooms : Hallway
                 x, y,
                 0, 0,
                 roomWidth, roomHeight,
-                description, nwExits);
+                description, swExits);
 
         if (!seExits.None()) 
             BuildSubRoom(
                 x + midX + 1, y,
                 midX + 1, 0,
                 roomWidth, roomHeight,
-                description, neExits);
+                description, seExits);
 
         if (!nwExits.None())
             BuildSubRoom(
                 x, y + midY + 1,
                 0, midY + 1,
                 roomWidth, roomHeight,
-                description, swExits);
+                description, nwExits);
 
         if (!neExits.None())
             BuildSubRoom(
                 x + midX + 1, y + midY + 1,
                 midX + 1, midY + 1,
                 roomWidth, roomHeight,
-                description, seExits);
+                description, neExits);
 
         foreach (ILock l in Locks) l.Implement(description);
         foreach (IKey k in Keys) k.Implement(description);
