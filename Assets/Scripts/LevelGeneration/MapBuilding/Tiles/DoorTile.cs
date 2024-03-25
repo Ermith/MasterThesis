@@ -29,14 +29,14 @@ public class DoorTile : EdgeTile
         base.BuildSubTiles(x, y, subTileGrid);
         List<(int, int, Directions dir)> doors = new();
 
-        if (DoorExits.South()) doors.Add((x + HalfWidth, y, Directions.North));
+        if (DoorExits.South()) doors.Add((x + HalfWidth, y, Directions.South));
         subTileGrid[x + HalfWidth - 1, y] = new FloorSubTile();
 
-        if (DoorExits.North()) doors.Add((x + HalfWidth, y + HEIGHT - 1, Directions.North));
-        subTileGrid[x + HalfWidth - 1, y + HEIGHT - 1] = new FloorSubTile();
+        if (DoorExits.North()) doors.Add((x + HalfWidth - 1, y + HEIGHT - 1, Directions.North));
+        subTileGrid[x + HalfWidth, y + HEIGHT - 1] = new FloorSubTile();
 
-        if (DoorExits.West()) doors.Add((x, y + HalfHeight, Directions.East));
-        subTileGrid[x, y + HalfHeight - 1] = new FloorSubTile();
+        if (DoorExits.West()) doors.Add((x, y + HalfHeight -1, Directions.West));
+        subTileGrid[x, y + HalfHeight] = new FloorSubTile();
 
         if (DoorExits.East()) doors.Add((x + WIDTH - 1, y + HalfHeight, Directions.East));
         subTileGrid[x + WIDTH - 1, y + HalfHeight - 1] = new FloorSubTile();

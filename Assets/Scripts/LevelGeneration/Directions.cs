@@ -73,8 +73,8 @@ public static class DirectionsExtensions
     public static Vector3 ToVector3(this Directions directions)
     {
         Vector3 vector = new();
-        if (directions.North()) vector += Vector3.back;
-        if (directions.South()) vector += Vector3.forward;
+        if (directions.North()) vector += Vector3.forward;
+        if (directions.South()) vector += Vector3.back;
         if (directions.West()) vector += Vector3.left;
         if (directions.East()) vector += Vector3.right;
 
