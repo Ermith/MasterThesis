@@ -548,6 +548,7 @@ public class TestPattern : Pattern
 
         (ce1, ce2) = AddExtension(ce1, graph);
         ce1.To.AddKey(key);
+        ce1.To.Hallway = true;
 
         WallOfLightLock @lock2 = new(ce1.FromDirection);
         IKey key2 = @lock2.GetNewKey();
@@ -567,6 +568,7 @@ public class HiddenPathPattern : Pattern
     public override void Apply(GridEdge edge, GridGraph graph)
     {
         (GridEdge ce1, GridEdge ce2) = AddCycle(edge, graph);
+
 
         HiddenDoorLock @lock1 = new(ce1.FromDirection);
         ce1.From.AddLock(@lock1);

@@ -13,6 +13,7 @@ public class GridVertex
     private List<IKey> _keys = new();
 
     public Directions Exits;
+    public bool Hallway = false;
 
     public (int x, int y) Position;
 
@@ -54,7 +55,8 @@ public class GridEdge : BaseEdge<GridVertex>
     public Directions FromDirection;
     public Directions ToDirection;
 
-    public List<IKey> Keys;
+    public List<(Directions, IKey)> Keys;
+    public List<(Directions, ILock)> Locks;
 
     public int fromX => From.Position.x;
     public int fromY => From.Position.y;
@@ -192,6 +194,7 @@ public class GridEdge : BaseEdge<GridVertex>
 
         return null;
     }
+
 }
 
 public class GraphGenerator
@@ -237,7 +240,7 @@ public class GraphGenerator
         p.Apply(e, Graph);
 
         //e = Graph.GetRandomEdge() as GridEdge;
-        //p2.Apply(e, Graph);
+        p2.Apply(e, Graph);
         //p.Apply(Graph.LongestEdge(), Graph);
         
 

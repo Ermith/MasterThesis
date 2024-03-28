@@ -54,6 +54,40 @@ class MapBuilder
     {
         var superTileGrid = new ASuperTile[_width, _height];
 
+        foreach((IEdge<GridVertex> e, List<(int, int)> positions) in _graphDrawing.EdgePositions)
+        {
+            List<(int, int)> path = new();
+            path.Add(positions[0]);
+            for (int i = 1; i < positions.Count; i++)
+            {
+                (int fromX, int fromY) = positions[i - 1];
+                (int toX, int toY) = positions[i];
+
+                path.AddRange(Utils.GetShortPath(fromX, fromY, toX, toY).Skip(1));
+            }
+
+            for (int i = 1; i < path.Count - 1; i++)
+            {
+                (int fromX, int fromY) = path[i - 1];
+                (int toX, int toY) = path[i];
+                (int nextX, int nextY) = path[i + 1];
+
+                Directions exits = Directions.None;
+                if (fromX < toX) exits |= Directions.West;
+                if (fromX > toX) exits |= Directions.East;
+                if (fromY < toY) exits |= Directions.South;
+                if (fromY > toY) exits |= Directions.North;
+
+                if (nextX < toX) exits |= Directions.West;
+                if (nextX > toX) exits |= Directions.East;
+                if (nextY < toY) exits |= Directions.South;
+                if (nextY > toY) exits |= Directions.North;
+
+                superTileGrid[toX, toY] = new HallwayWithRooms(_superWidth, _superHeight, exits);
+            }
+        }
+
+        /*/
         foreach ((int xFrom, int xTo, int y) in _graphDrawing.HorizontalLines)
             for (int x = xFrom; x <= xTo; x++)
             {
@@ -132,6 +166,8 @@ class MapBuilder
             }
         }
 
+        //*/
+
         foreach ((var vertex, (int x, int y)) in _graphDrawing.VertexPositions)
         {
             var north = TryGetTile(x, y - 1, superTileGrid);
@@ -146,10 +182,10 @@ class MapBuilder
             if (west != null && west is ASuperTile wTile && wTile.Exits.East()) exits |= Directions.West;
 
             ASuperTile tile;
-            if (URandom.Range(0f, 1f) > 0.4f)
-                tile = new FilledRoom(_superWidth, _superHeight, true, vertex.Exits);
+            if (vertex.Hallway)
+                tile = new HallwayWithRooms(_superWidth, _superHeight, vertex.Exits);
             else
-                tile = new Room(_superWidth, _superHeight, vertex.Exits);
+                tile = new FilledRoom(_superWidth, _superHeight, true, vertex.Exits);
 
             superTileGrid[x, y] = tile;
             superTileGrid[x, y].Locks = vertex.GetLocks().ToList();

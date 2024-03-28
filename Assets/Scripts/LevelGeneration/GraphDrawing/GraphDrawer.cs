@@ -13,6 +13,7 @@ public struct GraphDrawing<T>
     public HashSet<(int x, int yFrom, int yTo)> VerticalLines;
     public HashSet<(int xFrom, int xTo, int y)> HorizontalLines;
     public Dictionary<T, (int, int)> VertexPositions;
+    public Dictionary<IEdge<T>, List<(int, int)>> EdgePositions;
     public int MaximumX;
     public int MaximumY;
     public T StartPosition;
@@ -353,8 +354,11 @@ class GraphDrawer<T>
         Dictionary<(T, T), int> edgePositionsX = EdgePositionsX(faces, embedding, stNumbering);
 
         Dictionary<T, (int, int)> vertexPositions = new();
+        Dictionary<IEdge<T>, List<(int, int)>> edgePositions = new();
+
         HashSet<(int x, int yFrom, int yTo)> verticalLines = new();
         HashSet<(int xFrom, int xTo, int y)> horizontalLines = new();
+
         int maximumX = int.MinValue;
         int maximumY = int.MinValue;
 
@@ -423,6 +427,7 @@ public class GraphGridDrawer
     public GraphDrawing<GridVertex> Draw(GridVertex startVertex, GridVertex endVertex)
     {
         Dictionary<GridVertex, (int, int)> vertexPositions = new();
+        Dictionary<IEdge<GridVertex>, List<(int, int)>> edgePositions = new();
         HashSet<(int x, int yFrom, int yTo)> verticalLines = new();
         HashSet<(int xFrom, int xTo, int y)> horizontalLines = new();
         List<int> xx = new();
@@ -445,6 +450,20 @@ public class GraphGridDrawer
 
         foreach (GridEdge e in _graph.GetEdges())
         {
+            (int midX, int midY) = e.GetMid();
+
+            var positions = new List<(int, int)>();
+            
+            positions.Add((xx.IndexOf(e.fromX), yy.IndexOf(e.fromY)));
+
+            if (e.fromX != e.toX && e.fromY != e.toY)
+                positions.Add((xx.IndexOf(midX), yy.IndexOf(midY)));
+
+            positions.Add((xx.IndexOf(e.toX), yy.IndexOf(e.toY)));
+            
+
+            edgePositions[e] = positions;
+
             var horizontal = e.GetHorizontalLine();
             var vertical = e.GetVerticalLine();
 
@@ -473,6 +492,7 @@ public class GraphGridDrawer
             VertexPositions = vertexPositions,
             HorizontalLines = horizontalLines,
             VerticalLines = verticalLines,
+            EdgePositions = edgePositions,
             MaximumX = maximumX,
             MaximumY = maximumY,
             StartPosition = startVertex,
