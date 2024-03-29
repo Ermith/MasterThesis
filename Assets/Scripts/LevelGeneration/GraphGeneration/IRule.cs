@@ -573,8 +573,10 @@ public class HiddenPathPattern : Pattern
         HiddenDoorLock @lock1 = new(ce1.FromDirection);
         ce1.From.AddLock(@lock1);
 
-        HiddenDoorLock @lock2 = new(ce1.ToDirection);
-        ce1.To.AddLock(@lock2);
+        HiddenDoorLock @lock2 = new(ce2.ToDirection);
+        ce2.To.AddLock(@lock2);
+
+        ce1.To.Hallway = true;
 
         //graph.RemoveGridEdge(e1);
         //AddExtension(e1, graph);

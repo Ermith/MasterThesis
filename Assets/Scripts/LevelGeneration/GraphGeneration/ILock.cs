@@ -106,11 +106,11 @@ public class DoorKey : IKey
 
         if (Guarded)
         {
-            (int spawnX, int spawnY) = ATile.FromSuperMid(superTile.X, superTile.Y);
+            (int spawnX, int spawnY) = ATile.FromSuperMid(superTile.X + x, superTile.Y + y);
             tile.Guard = new EnemyParams
             {
                 Behaviour = Behaviour.Guarding,
-                Spawn = (spawnX + x - 1, spawnY + y)
+                Spawn = (spawnX - 1, spawnY)
             };
 
             superTile.Enemies.Add(tile.Guard);

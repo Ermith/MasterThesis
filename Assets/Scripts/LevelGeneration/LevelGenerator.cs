@@ -132,12 +132,12 @@ public class LevelGenerator : MonoBehaviour
         float scale = 1f;
         var localScale = geometry.transform.localScale;
         //geometry.transform.localScale *= scale;
-        geometry.transform.localScale = localScale.Multiplied(x: scale, y: 1.5f, z: scale);
+        geometry.transform.localScale = localScale.Multiplied(x: scale, y: 1f, z: scale);
         foreach (EnemyParams enemy in enemies)
         {
             (int spawnX, int spawnZ) = enemy.Spawn;
             Vector3 spawn = new(spawnX, 0, spawnZ);
-            spawn = spawn * scale;
+            spawn = spawn * scale + offset;
 
             var enemyInstance = Instantiate(
                 EnemyBlueprint,

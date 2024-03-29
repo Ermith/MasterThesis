@@ -237,12 +237,14 @@ public class GraphGenerator
 
         //extensionRule.Apply(Graph.GetEdge(_start, _end) as GridEdge, Graph, new DoorLock());
         //cycleRule.Apply(e, Graph);
-        p.Apply(e, Graph);
+        //p.Apply(e, Graph);
 
         //e = Graph.GetRandomEdge() as GridEdge;
-        p2.Apply(e, Graph);
+        //p2.Apply(e, Graph);
+        p.Apply(Graph.LongestEdge(), Graph);
+        p.Apply(Graph.LongestEdge(), Graph);
         //p.Apply(Graph.LongestEdge(), Graph);
-        
+
 
         for (int i = 0; i < 0; i++)
         {
@@ -260,58 +262,6 @@ public class GraphGenerator
             GridEdge edge = Graph.GetRandomEdge() as GridEdge;
             additionRule.Apply(edge, Graph);
         }
-
-        /*/
-        for (int i = 0; i < 0; i++)
-        {
-            ILock @lock = URandom.value > 0.5f ? new DoorLock() : new DoorLock();
-            GridEdge edge;
-            do
-            {
-                edge = Graph.GetRandomEdge() as GridEdge;
-            } while (edge.From == _end || edge.To == _start || edge.From == _start);
-        
-            if (URandom.value > 0.5f)
-                cycleRule.Apply(edge, Graph, @lock);
-            else
-                extensionRule.Apply(edge, Graph, @lock);
-        }
-        //*/
-        
-        /*/
-        BaseVertex A = new();
-        BaseVertex B = new();
-        BaseVertex C = new();
-        BaseVertex D = new();
-        _start = A;
-        _end = D;
-
-        Graph.AddVertex(A);
-        Graph.AddVertex(B);
-        Graph.AddVertex(C);
-        Graph.AddVertex(D);
-        Graph.AddEdge(A, B);
-        Graph.AddEdge(A, C);
-        Graph.AddEdge(B, D);
-        Graph.AddEdge(C, D);
-
-        CycleRule cycleRule = new(this);
-        ExtensionRule extensionRule = new(this);
-
-        int count = 1;
-        for (int i = 0; i < count; i++)
-        {
-            cycleRule.Apply(Graph.GetRandomEdge(), Graph, new DoorLock());
-            extensionRule.Apply(Graph.GetRandomEdge(), Graph, new SecurityCameraLock());
-        }
-
-        //*/
-        //foreach (var vertex in Graph.GetVertices())
-        //    if (URandom.value > 0.5f)
-        //        vertex.AddLock(new EnemyLock());
-
-        // Graph from the paper
-        //PredefinedGraph();
     }
 
     // For Debugging
