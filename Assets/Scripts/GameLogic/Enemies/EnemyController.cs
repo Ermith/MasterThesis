@@ -55,9 +55,9 @@ public class EnemyController : MonoBehaviour, ILockObject
 
     private void SoundResponse(GameObject sourceTarget, Vector3 sourcePosition)
     {
-        _chasing = false;
+        _chasing = true;
         LookAt(sourcePosition);
-        MoveTo(sourcePosition, () => _chasing = true);
+        MoveTo(sourcePosition, () => _chasing = false);
     }
 
     // Update is called once per frame

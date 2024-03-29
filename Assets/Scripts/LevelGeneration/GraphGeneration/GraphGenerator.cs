@@ -240,7 +240,7 @@ public class GraphGenerator
         //p.Apply(e, Graph);
 
         //e = Graph.GetRandomEdge() as GridEdge;
-        //p2.Apply(e, Graph);
+        p2.Apply(e, Graph);
         p.Apply(Graph.LongestEdge(), Graph);
         p.Apply(Graph.LongestEdge(), Graph);
         //p.Apply(Graph.LongestEdge(), Graph);
