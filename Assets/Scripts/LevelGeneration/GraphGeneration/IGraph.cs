@@ -353,6 +353,9 @@ public class UndirectedAdjecencyGraph<T> : AGraph<T>
 
 public class GridGraph : AdjecencyGraph<GridVertex>
 {
+    public Dictionary<int, List<GridVertex>> Floors = new();
+    public List<GridEdge> InterFloorEdges = new();
+
     public GridEdge AddGridEdge(GridVertex from, GridVertex to, Directions fromExit, Directions toExit, GridEdge edge = null)
     {
         if (from.Exits.Contains(fromExit) || to.Exits.Contains(toExit))
@@ -365,13 +368,32 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         to.Exits |= toExit;
         AddEdge(from, to, edge);
 
+        if (from.Position.z != to.Position.z)
+            InterFloorEdges.Add(edge);
+
         return edge;
     }
-    public GridVertex AddGridVertex(int x, int y)
+
+    public GridEdge AddInterFloorEdge(GridVertex from, GridVertex to, GridEdge edge = null)
+    {
+        edge ??= new();
+        AddEdge(from, to, edge);
+
+        InterFloorEdges.Add(edge);
+
+        return edge;
+    }
+
+    public GridVertex AddGridVertex(int x, int y, int z = 0)
     {
         GridVertex vertex = new GridVertex();
-        vertex.Position = (x, y);
+        vertex.Position = (x, y, z);
         AddVertex(vertex);
+        
+        if (!Floors.ContainsKey(z))
+            Floors[z] = new List<GridVertex>();
+
+        Floors[z].Add(vertex);
 
         return vertex;
     }

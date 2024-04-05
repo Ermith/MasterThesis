@@ -62,13 +62,13 @@ public class LevelGenerator : MonoBehaviour
 
         _mapBuilder = new MapBuilder(GraphDrawing, SuperWidth, SuperHeight);
         Debug.Log("CREATING SUPERTILES");
-        SuperTileGrid = _mapBuilder.SuperTileGrid();
+        var superTileGrids = _mapBuilder.SuperTileGrid();
 
         Debug.Log("CREATING TILES");
-        TileGrid = _mapBuilder.TileGrid(SuperTileGrid, out IEnumerable<EnemyParams> enemies);
+        var tileGrids = _mapBuilder.TileGrid(superTileGrids, out IEnumerable<EnemyParams> enemies);
 
         Debug.Log("Creating SUBTILES");
-        SubTileGrid = _mapBuilder.SubTileGrid(TileGrid);
+        var subTileGrids = _mapBuilder.SubTileGrid(tileGrids);
 
         ASubTile.Register<WallSubTile>((ASubTile st) => Instantiate(WallBlueprint));
         ASubTile.Register<FloorSubTile>((ASubTile st) => Instantiate(FloorBlueprint));
@@ -117,16 +117,20 @@ public class LevelGenerator : MonoBehaviour
         GameObject geometry = new("Geometry");
         Vector3 offset = new(0, 0, 0);
         geometry.transform.parent = level.transform;
+        int floorHeight = 10;
 
         Debug.Log("SPAWNING OBJECTS");
-
-        for (int x = 0; x < SubTileGrid.GetLength(0); x++)
-            for (int y = 0; y < SubTileGrid.GetLength(1); y++)
-                if (SubTileGrid[x, y] != null)
-                {
-                    GameObject obj = SubTileGrid[x, y].SpawnObject(x, y);
-                    obj.transform.parent = geometry.transform;
-                }
+        for (int floor = 0; floor < subTileGrids.Count; floor++)
+        {
+            var grid = subTileGrids[floor];
+            for (int col = 0; col < grid.GetLength(0); col++)
+                for (int row = 0; row < grid.GetLength(1); row++)
+                    if (grid[col, row] != null)
+                    {
+                        GameObject obj = grid[col, row].SpawnObject(col, row, floor * floorHeight);
+                        obj.transform.parent = geometry.transform;
+                    }
+        }
 
         Debug.Log("Spawning Enemies");
         float scale = 1f;
@@ -169,12 +173,15 @@ public class LevelGenerator : MonoBehaviour
 
         // Just offset it for now
         level.transform.position = offset;
-
-        GameObject.Instantiate(VictoryTrigger).transform.position = _mapBuilder.GetEndPosition() * scale + offset;
-        FindObjectOfType<LevelCamera>().SetPosition(SubTileGrid.GetLength(0), SubTileGrid.GetLength(1), scale, offset);
+        
+        var pos = _mapBuilder.GetEndPosition() * scale + offset;
+        pos.y *= floorHeight;
+        GameObject.Instantiate(VictoryTrigger).transform.position = pos;
+        //FindObjectOfType<LevelCamera>().SetPosition(SubTileGrid.GetLength(0), SubTileGrid.GetLength(1), scale, offset);
 
 
         var playerSpawn = _mapBuilder.GetSpawnPosition() * scale + offset;
+        playerSpawn.y *= floorHeight;
         Debug.Log($"REPOSITIONING THE PLAYER {playerSpawn}");
         // Spawn player at the correct position
         // Needs to be 1 frame delayed because of bug, when setting position works only occasionally

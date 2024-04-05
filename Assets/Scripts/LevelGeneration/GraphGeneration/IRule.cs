@@ -5,7 +5,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
-
+using UnityEngine.UIElements;
 using URandom = UnityEngine.Random;
 
 public interface IRule
@@ -83,7 +83,7 @@ public class CycleRule : BaseRule
 
     private (GridEdge, GridEdge) AddExtension(GridEdge edge, GridGraph graph)
     {
-        (int midX, int midY) = edge.GetMid();
+        (int midX, int midY, int midZ) = edge.GetMid();
         GridVertex v = graph.AddGridVertex(midX, midY);
         GridEdge e1 = graph.AddGridEdge(edge.From, v, edge.FromDirection, edge.FromDirection.Opposite());
         GridEdge e2 = graph.AddGridEdge(v, edge.To, edge.ToDirection.Opposite(), edge.ToDirection);
@@ -148,7 +148,7 @@ public class CycleRule : BaseRule
         bool right = edgeDirs.Contains(Directions.West);
         bool up = edgeDirs.Contains(Directions.South);
 
-        (int midX, int midY) = edge.GetMid();
+        (int midX, int midY, int midZ) = edge.GetMid();
         int newX = graph.GetNewX(midX, edge.minY, edge.maxY, right);
         int newY = graph.GetNewY(midY, edge.minX, edge.maxX, up);
 
@@ -359,8 +359,8 @@ public abstract class Pattern
 {
     protected (GridEdge, GridEdge) AddExtension(GridEdge edge, GridGraph graph)
     {
-        (int midX, int midY) = edge.GetMid();
-        GridVertex v = graph.AddGridVertex(midX, midY);
+        (int midX, int midY, int midZ) = edge.GetMid();
+        GridVertex v = graph.AddGridVertex(midX, midY, midZ);
         GridEdge e1 = graph.AddGridEdge(edge.From, v, edge.FromDirection, edge.FromDirection.Opposite());
         GridEdge e2 = graph.AddGridEdge(v, edge.To, edge.ToDirection.Opposite(), edge.ToDirection);
 
@@ -404,7 +404,7 @@ public abstract class Pattern
             cbDir = (y == b.Position.y) ? dir.Opposite() : Directions.North;
         }
 
-        GridVertex c = graph.AddGridVertex(x, y);
+        GridVertex c = graph.AddGridVertex(x, y, a.Position.z);
         GridEdge e1 = graph.AddGridEdge(a, c, dir, caDir);
         GridEdge e2 = graph.AddGridEdge(c, b, cbDir, dir);
 
@@ -424,7 +424,7 @@ public abstract class Pattern
         bool right = edgeDirs.Contains(Directions.West);
         bool up = edgeDirs.Contains(Directions.South);
 
-        (int midX, int midY) = edge.GetMid();
+        (int midX, int midY, int midZ) = edge.GetMid();
         int newX = graph.GetNewX(midX, edge.minY, edge.maxY, right);
         int newY = graph.GetNewY(midY, edge.minX, edge.maxX, up);
 
@@ -434,7 +434,7 @@ public abstract class Pattern
         mockEdge.FromDirection = acDir;
         mockEdge.ToDirection = bcDir;
 
-        (int expectedX, int expectedY) = mockEdge.GetMid();
+        (int expectedX, int expectedY, int _) = mockEdge.GetMid();
         
 
         bool obstructed = newX != expectedX || newY != expectedY;
@@ -442,7 +442,7 @@ public abstract class Pattern
         Directions cbDir = obstructed ? acDir : bcDir.Opposite();
 
         // Corner Extension
-        GridVertex c = graph.AddGridVertex(newX, newY);
+        GridVertex c = graph.AddGridVertex(newX, newY, edge.From.Position.z);
         GridEdge e1 = graph.AddGridEdge(a, c, acDir, caDir);
         GridEdge e2 = graph.AddGridEdge(c, b, cbDir, bcDir);
 
@@ -529,10 +529,32 @@ public abstract class Pattern
         throw new Exception("Unable to add cycle");
     }
 
+    public GridEdge AddFork(GridVertex v, GridGraph graph)
+    {
+        Directions dir = (~v.Exits).ChooseRandom();
+        GridEdge e = null;
+
+        if (dir.Horizontal())
+        {
+            int x = graph.GetNewX(v.Position.x, v.Position.y, v.Position.y + 1, dir.East());
+            GridVertex c = graph.AddGridVertex(x, v.Position.y, v.Position.z);
+            e = graph.AddGridEdge(v, c, dir, dir.Opposite());
+        }
+
+        if (dir.Vertical())
+        {
+            int y = graph.GetNewY(v.Position.y, v.Position.x, v.Position.x + 1, dir.North());
+            GridVertex c = graph.AddGridVertex(v.Position.x, y, v.Position.z);
+            e = graph.AddGridEdge(v, c, dir, dir.Opposite());
+        }
+
+        return e;
+    }
+
     public abstract void Apply(GridEdge edge, GridGraph graph);
 }
 
-public class TestPattern : Pattern
+public class LockedCyclePattern : Pattern
 {
     public override void Apply(GridEdge edge, GridGraph graph)
     {
@@ -582,5 +604,45 @@ public class HiddenPathPattern : Pattern
         //AddExtension(e1, graph);
         //graph.RemoveGridEdge(e2);
         //AddExtension(e2, graph);
+    }
+}
+
+public class FloorExtensionPattern : Pattern
+{
+    protected (GridEdge, GridEdge) AddInterFloorExtension(GridEdge edge, GridGraph graph)
+    {
+        (int midX, int midY, int midZ) = edge.GetMid();
+        GridVertex v = graph.AddGridVertex(midX, midY, midZ);
+        GridEdge e1 = graph.AddInterFloorEdge(edge.From, v);
+        GridEdge e2 = graph.AddInterFloorEdge(v, edge.To);
+
+        return (e1, e2);
+    }
+    public override void Apply(GridEdge edge, GridGraph graph)
+    {
+        // edge has to connect 2 floors
+
+        graph.RemoveGridEdge(edge);
+        (GridEdge a, GridEdge b) = AddInterFloorExtension(edge, graph);
+        GridEdge fork = AddFork(a.To, graph);
+    }
+}
+
+public class FloorAdditionPattern : Pattern
+{
+    public override void Apply(GridEdge edge, GridGraph graph)
+    {
+        GridVertex v = edge.From;
+        GridEdge fork = AddFork(v, graph);
+        v = fork.To;
+
+        GridVertex under = graph.AddGridVertex(v.Position.x, v.Position.y, v.Position.z - BaseRule.STEP);
+        GridEdge interFloorEdge = graph.AddInterFloorEdge(under, v);
+        fork = AddFork(under, graph);
+
+        // TODO: Add to the correct vertical direction
+        DoorLock @lock = new(Directions.None); 
+        IKey key = @lock.GetNewKey();
+        fork.To.AddKey(key);
     }
 }

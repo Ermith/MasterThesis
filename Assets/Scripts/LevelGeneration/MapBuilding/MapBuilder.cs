@@ -24,19 +24,26 @@ class MapBuilder
         _height = _graphDrawing.MaximumY + 1;
     }
 
-    public ASubTile[,] SubTileGrid(ATile[,] tileGrid)
+    public List<ASubTile[,]> SubTileGrid(List<ATile[,]> tileGrids)
     {
         int width = _width * _superWidth;
         int height = _height * _superHeight;
-        var subTileGrid = new ASubTile[width * ATile.WIDTH, height * ATile.HEIGHT];
+        List<ASubTile[,]> subGrids = new();
 
-        for (int x = 0; x < width; x++)
-            for (int y = 0; y < height; y++)
-                if (tileGrid[x, y] != null)
-                    tileGrid[x, y].BuildSubTiles(x * ATile.WIDTH, y * ATile.HEIGHT, subTileGrid);
+        for (int i = 0; i < tileGrids.Count; i++)
+        {
+            var subGrid = new ASubTile[width * ATile.WIDTH, height * ATile.HEIGHT];
+            var tileGrid = tileGrids[i];
 
+            for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
+                    if (tileGrid[x, y] != null)
+                        tileGrid[x, y].BuildSubTiles(x * ATile.WIDTH, y * ATile.HEIGHT, subGrid);
 
-        return subTileGrid;
+            subGrids.Add(subGrid);
+        }
+
+        return subGrids;
     }
 
     private Tile TryGetTile<Tile>(int x, int y, Tile[,] grid)
@@ -50,18 +57,45 @@ class MapBuilder
         return grid[x, y];
     }
 
-    public ASuperTile[,] SuperTileGrid()
+    public List<ASuperTile[,]> SuperTileGrid()
     {
-        var superTileGrid = new ASuperTile[_width, _height];
+        var floorTransitions = new List<(int x, int y, int zFrom, int zTo)>();
+        var superTileGrids = new List<ASuperTile[,]>();
+        for (int i = 0; i < _graphDrawing.MaximumZ + 1; i++)
+            superTileGrids.Add(new ASuperTile[_width, _height]);
 
-        foreach((IEdge<GridVertex> e, List<(int, int)> positions) in _graphDrawing.EdgePositions)
+        foreach ((var vertex, (int x, int y, int z)) in _graphDrawing.VertexPositions)
         {
+            ASuperTile tile = (vertex.Hallway)
+                ? new HallwayWithRooms(_superWidth, _superHeight, vertex.Exits)
+                : new FilledRoom(_superWidth, _superHeight, true, vertex.Exits);
+
+            tile.Locks = vertex.GetLocks().ToList();
+            tile.Keys = vertex.GetKeys().ToList();
+
+            superTileGrids[z][x, y] = tile;
+        }
+
+        foreach ((IEdge<GridVertex> e, List<(int x, int y, int z)> positions) in _graphDrawing.EdgePositions)
+        {
+            // Interfloor connection
+            var firstPosition = positions[0];
+            var lastPosition = positions[positions.Count - 1];
+
+            if (firstPosition.z != lastPosition.z)
+            {
+                floorTransitions.Add((firstPosition.x, firstPosition.y, firstPosition.z, lastPosition.z));
+                continue;
+            }
+
             List<(int, int)> path = new();
-            path.Add(positions[0]);
+            path.Add((firstPosition.x, firstPosition.y));
+            var grid = superTileGrids[firstPosition.z];
+
             for (int i = 1; i < positions.Count; i++)
             {
-                (int fromX, int fromY) = positions[i - 1];
-                (int toX, int toY) = positions[i];
+                (int fromX, int fromY, int _) = positions[i - 1];
+                (int toX, int toY, int _) = positions[i];
 
                 path.AddRange(Utils.GetShortPath(fromX, fromY, toX, toY).Skip(1));
             }
@@ -83,171 +117,59 @@ class MapBuilder
                 if (nextY < toY) exits |= Directions.South;
                 if (nextY > toY) exits |= Directions.North;
 
-                superTileGrid[toX, toY] = new HallwayWithRooms(_superWidth, _superHeight, exits);
+                grid[toX, toY] = new Hallway(_superWidth, _superHeight, exits);
             }
         }
 
-        /*/
-        foreach ((int xFrom, int xTo, int y) in _graphDrawing.HorizontalLines)
-            for (int x = xFrom; x <= xTo; x++)
-            {
-                Directions exits;
-                if (x == xFrom) exits = Directions.East;
-                else if (x == xTo) exits = Directions.West;
-                else exits = Directions.East | Directions.West;
-
-                ASuperTile tile;
-                float t = URandom.Range(0f, 1f);
-
-                if (t > 0.0f)
-                    tile = new HallwayWithRooms(_superWidth, _superHeight, exits);
-                else if (t > 0.5f)
-                    tile = new WideHallway(_superWidth, _superHeight, exits);
-                else if (t > 2)
-                    tile = new FilledRoom(_superWidth, _superHeight, false, exits);
-                else
-                    tile = new Hallway(_superWidth, _superHeight, exits);
-
-                superTileGrid[x, y] = tile;
-
-                //if (tile is Hallway)
-                
-
-
-                t = URandom.value;
-                if (t > 0.5f && tile is not Hallway)
-                {
-                    var cameraLock = new SecurityCameraLock();
-                    var powerSource = cameraLock.GetNewKey();
-                    tile.Locks.Add(cameraLock);
-                    tile.Keys.Add(powerSource);
-                } else
-                    tile.Locks.Add(new EnemyLock());
-            }
-
-        foreach ((int x, int yFrom, int yTo) in _graphDrawing.VerticalLines)
-        {
-            for (int y = yFrom; y <= yTo; y++)
-            {
-                var tile = superTileGrid[x, y];
-
-                Directions exits;
-                if (y == yFrom) exits = Directions.North;
-                else if (y == yTo) exits = Directions.South;
-                else exits = Directions.North | Directions.South;
-
-                if (tile != null)
-                {
-                    tile.Exits |= exits;
-                    continue;
-                }
-
-                float t = URandom.Range(0f, 1f);
-                if (t > 0.0f)
-                    tile = new HallwayWithRooms(_superWidth, _superHeight, exits);
-                else if (t > 0.5f)
-                    tile = new WideHallway(_superWidth, _superHeight, exits);
-                else if (t > 2f)
-                    tile = new FilledRoom(_superWidth, _superHeight, false, exits);
-                else
-                    tile = new Hallway(_superWidth, _superHeight, exits);
-
-                superTileGrid[x, y] = tile;
-
-                t = URandom.value;
-                if (t > 0.5f && tile is not Hallway)
-                {
-                    var cameraLock = new SecurityCameraLock();
-                    var powerSource = cameraLock.GetNewKey();
-                    tile.Locks.Add(cameraLock);
-                    tile.Keys.Add(powerSource);
-                } else
-                    tile.Locks.Add(new EnemyLock());
-            }
-        }
-
-        //*/
-
-        foreach ((var vertex, (int x, int y)) in _graphDrawing.VertexPositions)
-        {
-            var north = TryGetTile(x, y - 1, superTileGrid);
-            var south = TryGetTile(x, y + 1, superTileGrid);
-            var east = TryGetTile(x + 1, y, superTileGrid);
-            var west = TryGetTile(x - 1, y, superTileGrid);
-
-            Directions exits = Directions.None;
-            if (north != null && north is ASuperTile nTile && nTile.Exits.South()) exits |= Directions.North;
-            if (south != null && south is ASuperTile sTile && sTile.Exits.North()) exits |= Directions.South;
-            if (east != null && east is ASuperTile eTile && eTile.Exits.West()) exits |= Directions.East;
-            if (west != null && west is ASuperTile wTile && wTile.Exits.East()) exits |= Directions.West;
-
-            ASuperTile tile;
-            if (vertex.Hallway)
-                tile = new HallwayWithRooms(_superWidth, _superHeight, vertex.Exits);
-            else
-                tile = new FilledRoom(_superWidth, _superHeight, true, vertex.Exits);
-
-            superTileGrid[x, y] = tile;
-            superTileGrid[x, y].Locks = vertex.GetLocks().ToList();
-            superTileGrid[x, y].Keys = vertex.GetKeys().ToList();
-
-            //if (tile is FilledRoom room)
-
-            if (vertex == _graphDrawing.StartPosition) continue;
-
-
-            float t = URandom.value;
-            if (t > 0.5f)
-            {
-                var cameraLock = new SecurityCameraLock();
-                var powerSource = cameraLock.GetNewKey();
-                tile.Locks.Add(cameraLock);
-                tile.Keys.Add(powerSource);
-            } else
-                tile.Locks.Add(new EnemyLock());
-
-        }
-
-        return superTileGrid;
+        return superTileGrids;
     }
 
-    public ATile[,] TileGrid(ASuperTile[,] superTileGrid, out IEnumerable<EnemyParams> enemiesParams)
+    public List<ATile[,]> TileGrid(List<ASuperTile[,]> superTileGrids, out IEnumerable<EnemyParams> enemiesParams)
     {
         int width = _width * _superWidth;
         int height = _height * _superHeight;
-        var tileGrid = new ATile[width, height];
+
+        List<ATile[,]> tileGrids = new();
         List<EnemyParams> enemies = new();
 
-        for (int x = 0; x < _width; x++)
-            for (int y = 0; y < _height; y++)
-                if (superTileGrid[x, y] != null)
-                {
-                    var enemyParams = superTileGrid[x, y].BuildTiles(x * _superWidth, y * _superHeight, tileGrid);
+        for (int i = 0; i < superTileGrids.Count; i++)
+        {
+            var grid = new ATile[width, height];
+            var superGrid = superTileGrids[i];
+            
+            for (int x = 0; x < _width; x++)
+                for (int y = 0; y < _height; y++)
+                    if (superGrid[x, y] != null)
+                    {
+                        var tileEnemies = superGrid[x, y].BuildTiles(x * _superWidth, y * _superHeight, grid);
 
-                    foreach (var enemy in enemyParams)
-                        enemies.Add(enemy);
-                }
+                        foreach (var enemy in tileEnemies)
+                            enemies.Add(enemy);
+                    }
+
+            tileGrids.Add(grid);
+        }
 
         enemiesParams = enemies.ToArray();
-        return tileGrid;
+        return tileGrids;
     }
 
     public Vector3 GetSpawnPosition()
     {
-        (int x, int y) = _graphDrawing.VertexPositions[_graphDrawing.StartPosition];
+        (int x, int y, int z) = _graphDrawing.VertexPositions[_graphDrawing.StartPosition];
         return new Vector3(
             (x + 0.5f) * _superWidth * ATile.WIDTH,
-            0,
+            z,
             (y + 0.5f) * _superHeight * ATile.HEIGHT
         );
     }
 
     public Vector3 GetEndPosition()
     {
-        (int x, int y) = _graphDrawing.VertexPositions[_graphDrawing.EndPosition];
+        (int x, int y, int z) = _graphDrawing.VertexPositions[_graphDrawing.EndPosition];
         return new Vector3(
             (x + 0.5f) * _superWidth * ATile.WIDTH,
-            0,
+            z,
             (y + 0.5f) * _superHeight * ATile.HEIGHT
         );
     }

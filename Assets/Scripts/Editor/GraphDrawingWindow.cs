@@ -96,7 +96,7 @@ public class GraphDrawingWindow : EditorWindow
                 new Vector3(x, yFrom) * spacing * scale + offset,
                 new Vector3(x, yTo) * spacing * scale + offset);
 
-        foreach ((var _, (int x, int y)) in drawParams.VertexPositions)
+        foreach ((var _, (int x, int y, int _)) in drawParams.VertexPositions)
             Handles.DrawSolidDisc(
                 new Vector3(x, y) * spacing * scale + offset,
                 Vector3.back, radius);
@@ -116,7 +116,7 @@ public class GraphDrawingWindow : EditorWindow
                 new Vector3(x, yFrom) * spacing * scale + offset,
                 new Vector3(x, yTo) * spacing * scale + offset);
 
-        foreach ((GridVertex vertex, (int x, int y)) in drawParams.VertexPositions)
+        foreach ((GridVertex vertex, (int x, int y, int _)) in drawParams.VertexPositions)
         {
             ILock[] locks = vertex.GetLocks().ToArray();
             int count = locks.Length;
@@ -127,11 +127,11 @@ public class GraphDrawingWindow : EditorWindow
             DrawVertex(location, color, radius, name);
         }
 
-        foreach ((GridVertex vertex, (int x, int y)) in drawParams.VertexPositions)
+        foreach ((GridVertex vertex, (int x, int y, int _)) in drawParams.VertexPositions)
             foreach (IKey key in vertex.GetKeys())
                 foreach (ILock @lock in key.Locks)
                 {
-                    (int xTo, int yTo) = drawParams.VertexPositions[_levelGenerator.LockVertexMapping[@lock]];
+                    (int xTo, int yTo, int _) = drawParams.VertexPositions[_levelGenerator.LockVertexMapping[@lock]];
 
                     Vector3 from = new(x, y);
                     Vector3 to = new(xTo, yTo);

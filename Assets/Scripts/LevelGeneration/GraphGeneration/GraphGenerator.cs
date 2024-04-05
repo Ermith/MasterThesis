@@ -14,8 +14,10 @@ public class GridVertex
 
     public Directions Exits;
     public bool Hallway = false;
+    public bool Top;
+    public bool Bottom;
 
-    public (int x, int y) Position;
+    public (int x, int y, int z) Position;
 
     public void AddLock(ILock l)
     {
@@ -60,8 +62,10 @@ public class GridEdge : BaseEdge<GridVertex>
 
     public int fromX => From.Position.x;
     public int fromY => From.Position.y;
+    public int fromZ => From.Position.z;
     public int toX => To.Position.x;
     public int toY => To.Position.y;
+    public int toZ => To.Position.z;
     
     public int minX => Mathf.Min(fromX, toX);
     public int minY => Mathf.Min(fromY, toY);
@@ -70,22 +74,24 @@ public class GridEdge : BaseEdge<GridVertex>
 
     public bool Hidden;
 
-    public (int x, int y) GetMid()
+    public (int x, int y, int z) GetMid()
     {
+        int newZ = fromZ + (toZ - fromZ) / 2;
+
         if (fromX == toX)
-            return (fromX, fromY + (toY - fromY) / 2);
+            return (fromX, fromY + (toY - fromY) / 2, newZ);
 
         if (fromY == toY)
-            return (fromX + (toX - fromX) / 2, fromY);
+            return (fromX + (toX - fromX) / 2, fromY, newZ);
 
         if (FromDirection.Horizontal())
-            return (toX, fromY);
+            return (toX, fromY, newZ);
 
         if (FromDirection.Vertical())
-            return (fromX, toY);
+            return (fromX, toY, newZ);
 
         // Should not happen
-        return (fromX, fromY);
+        return (fromX, fromY, newZ);
     }
 
     public int? GetHorizontalOffset(int lowerBound, int upperBound, int x)
@@ -157,7 +163,7 @@ public class GridEdge : BaseEdge<GridVertex>
         if (fromX == toX)
             return (fromX, minY, maxY);
 
-        (int midX, int midY) = GetMid();
+        (int midX, int midY, int midZ) = GetMid();
 
         if (fromX == midX)
             return (
@@ -178,7 +184,7 @@ public class GridEdge : BaseEdge<GridVertex>
         if (fromY == toY)
             return (minX, maxX, toY);
 
-        (int midX, int midY) = GetMid();
+        (int midX, int midY, int midZ) = GetMid();
 
         if (fromY == midY)
             return (
@@ -221,46 +227,36 @@ public class GraphGenerator
 
     public void Generate()
     {
-        _start = Graph.AddGridVertex(0, 0);
-        _end = Graph.AddGridVertex(BaseRule.STEP, BaseRule.STEP);
-        GridEdge e = Graph.AddGridEdge(_start, _end, Directions.North, Directions.West);
+        var f1 = Graph.AddGridVertex(0, 0, 0);
+        var f2 = Graph.AddGridVertex(0, 0, BaseRule.STEP);
 
-        //GridVertex c = Graph.AddGridVertex(BaseRule.STEP, 0);
-        //GridVertex d = Graph.AddGridVertex(2*BaseRule.STEP, 0);
-        //Graph.AddGridEdge(c, d, Directions.East, Directions.West);
+        _start = Graph.AddGridVertex(0, -BaseRule.STEP, 0);
+        _end = Graph.AddGridVertex(0, BaseRule.STEP, BaseRule.STEP);
+
+        var interFloorEdge = Graph.AddInterFloorEdge(f1, f2);
+        var startEdge = Graph.AddGridEdge(_start, f1, Directions.North, Directions.South);
+        var endEdge = Graph.AddGridEdge(f2, _end, Directions.North, Directions.South);
 
         CycleRule cycleRule = new(this);
         ExtensionRule extensionRule = new(this);
         AdditionRule additionRule = new(this);
-        Pattern p = new TestPattern();
-        Pattern p2 = new HiddenPathPattern();
+        Pattern cycle = new LockedCyclePattern();
+        Pattern hiddenPath = new HiddenPathPattern();
+        Pattern floorExtension = new FloorExtensionPattern();
+        Pattern floorAddition = new FloorAdditionPattern();
 
-        //extensionRule.Apply(Graph.GetEdge(_start, _end) as GridEdge, Graph, new DoorLock());
-        //cycleRule.Apply(e, Graph);
-        //p.Apply(e, Graph);
+        // Inter Floor Patterns
+        floorExtension.Apply(interFloorEdge, Graph);
+        floorAddition.Apply(Graph.InterFloorEdges[0], Graph);
 
-        //e = Graph.GetRandomEdge() as GridEdge;
-        p2.Apply(e, Graph);
-        p.Apply(Graph.LongestEdge(), Graph);
-        p.Apply(Graph.LongestEdge(), Graph);
-        //p.Apply(Graph.LongestEdge(), Graph);
-
+        // Single Floor Patterns
+        cycle.Apply(startEdge, Graph);
+        hiddenPath.Apply(endEdge, Graph);
 
         for (int i = 0; i < 0; i++)
         {
-            GridEdge edge = Graph.GetRandomEdge() as GridEdge;
-            edge = Graph.LongestEdge();
-            cycleRule.Apply(edge, Graph);
-
-            edge = Graph.GetRandomEdge() as GridEdge;
-            edge = Graph.LongestEdge();
+            var edge = Graph.LongestEdge();
             extensionRule.Apply(edge, Graph);
-        }
-
-        for (int i = 0; i < 0; i++)
-        {
-            GridEdge edge = Graph.GetRandomEdge() as GridEdge;
-            additionRule.Apply(edge, Graph);
         }
     }
 

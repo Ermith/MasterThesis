@@ -12,10 +12,11 @@ public struct GraphDrawing<T>
 {
     public HashSet<(int x, int yFrom, int yTo)> VerticalLines;
     public HashSet<(int xFrom, int xTo, int y)> HorizontalLines;
-    public Dictionary<T, (int, int)> VertexPositions;
-    public Dictionary<IEdge<T>, List<(int, int)>> EdgePositions;
+    public Dictionary<T, (int, int, int)> VertexPositions;
+    public Dictionary<IEdge<T>, List<(int, int, int)>> EdgePositions;
     public int MaximumX;
     public int MaximumY;
+    public int MaximumZ;
     public T StartPosition;
     public T EndPosition;
 }
@@ -353,14 +354,15 @@ class GraphDrawer<T>
         Dictionary<T, int> stNumbering = _graph.STNumbering(start, end);
         Dictionary<(T, T), int> edgePositionsX = EdgePositionsX(faces, embedding, stNumbering);
 
-        Dictionary<T, (int, int)> vertexPositions = new();
-        Dictionary<IEdge<T>, List<(int, int)>> edgePositions = new();
+        Dictionary<T, (int, int, int)> vertexPositions = new();
+        Dictionary<IEdge<T>, List<(int, int, int)>> edgePositions = new();
 
         HashSet<(int x, int yFrom, int yTo)> verticalLines = new();
         HashSet<(int xFrom, int xTo, int y)> horizontalLines = new();
 
         int maximumX = int.MinValue;
         int maximumY = int.MinValue;
+        int maximumZ = int.MinValue;
 
         // Vertical Lines
         foreach ((T from, T to) in _graph.GetEdgePairs())
@@ -379,6 +381,7 @@ class GraphDrawer<T>
             maximumX = Math.Max(maximumX, x);
             maximumY = Math.Max(maximumY, yFrom);
             maximumY = Math.Max(maximumY, yTo);
+            maximumZ = Math.Max(maximumZ, 0);
         }
 
         // Horizontal Lines + Vertex Positions
@@ -396,7 +399,7 @@ class GraphDrawer<T>
 
             int y = stNumbering[vertex];
             int xmid = xmin + (xmax - xmin) / 2;
-            vertexPositions[vertex] = (xmid, y);
+            //vertexPositions[vertex] = (xmid, y);
             horizontalLines.Add((xmin, xmax, y));
 
             maximumX = Math.Max(maximumX, xmax);
@@ -426,40 +429,44 @@ public class GraphGridDrawer
 
     public GraphDrawing<GridVertex> Draw(GridVertex startVertex, GridVertex endVertex)
     {
-        Dictionary<GridVertex, (int, int)> vertexPositions = new();
-        Dictionary<IEdge<GridVertex>, List<(int, int)>> edgePositions = new();
+        Dictionary<GridVertex, (int, int, int)> vertexPositions = new();
+        Dictionary<IEdge<GridVertex>, List<(int, int, int)>> edgePositions = new();
         HashSet<(int x, int yFrom, int yTo)> verticalLines = new();
         HashSet<(int xFrom, int xTo, int y)> horizontalLines = new();
         List<int> xx = new();
         List<int> yy = new();
+        List<int> zz = new();
 
         foreach (GridVertex v in _graph.GetVertices())
         {
             if (!xx.Contains(v.Position.x)) xx.Add(v.Position.x);
             if (!yy.Contains(v.Position.y)) yy.Add(v.Position.y);
+            if (!zz.Contains(v.Position.z)) zz.Add(v.Position.z);
         }
 
         xx.Sort();
         yy.Sort();
+        zz.Sort();
 
         int maximumX = xx.Count - 1;
         int maximumY = yy.Count - 1;
+        int maximumZ = zz.Count - 1;
 
         foreach (GridVertex v in _graph.GetVertices())
-            vertexPositions.Add(v, (xx.IndexOf(v.Position.x), yy.IndexOf(v.Position.y)));
+            vertexPositions.Add(v, (xx.IndexOf(v.Position.x), yy.IndexOf(v.Position.y), zz.IndexOf(v.Position.z)));
 
         foreach (GridEdge e in _graph.GetEdges())
         {
-            (int midX, int midY) = e.GetMid();
+            (int midX, int midY, int midZ) = e.GetMid();
 
-            var positions = new List<(int, int)>();
+            var positions = new List<(int, int, int)>();
             
-            positions.Add((xx.IndexOf(e.fromX), yy.IndexOf(e.fromY)));
+            positions.Add((xx.IndexOf(e.fromX), yy.IndexOf(e.fromY), zz.IndexOf(e.fromZ)));
 
             if (e.fromX != e.toX && e.fromY != e.toY)
-                positions.Add((xx.IndexOf(midX), yy.IndexOf(midY)));
+                positions.Add((xx.IndexOf(midX), yy.IndexOf(midY), zz.IndexOf(e.fromZ)));
 
-            positions.Add((xx.IndexOf(e.toX), yy.IndexOf(e.toY)));
+            positions.Add((xx.IndexOf(e.toX), yy.IndexOf(e.toY), zz.IndexOf(e.toZ)));
             
 
             edgePositions[e] = positions;
@@ -495,6 +502,7 @@ public class GraphGridDrawer
             EdgePositions = edgePositions,
             MaximumX = maximumX,
             MaximumY = maximumY,
+            MaximumZ = maximumZ,
             StartPosition = startVertex,
             EndPosition = endVertex,
         };

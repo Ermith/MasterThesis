@@ -12,4 +12,5 @@ public class EnemyParams
     public bool Retrace;
     public ILock Lock;
     public Behaviour Behaviour;
+    public int Floor;
 }

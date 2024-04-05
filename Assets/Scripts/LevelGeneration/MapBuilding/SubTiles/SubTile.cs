@@ -19,10 +19,10 @@ public abstract class ASubTile
         _spawnFunctions[typeof(T)] = spawnFunction;
     }
 
-    public virtual GameObject SpawnObject(int x, int y)
+    public virtual GameObject SpawnObject(int x, int y, int z)
     {
         var tileObj = _spawnFunctions[GetType()](this);
-        Vector3 pos = new(x, 0, y);
+        Vector3 pos = new(x, z, y);
         tileObj.transform.position = pos;
         tileObj.name = GetType().Name;
 
