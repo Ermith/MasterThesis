@@ -16,6 +16,7 @@ public class GameController : MonoBehaviour
 
     public Canvas PauseCanvas;
     public Canvas HUDCanvas;
+    public Map Map;
 
     private Transform _interactText;
 
@@ -40,6 +41,11 @@ public class GameController : MonoBehaviour
             else Pause();
         }
 
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            if (_paused) CloseMap();
+            else OpenMap();
+        }
     }
 
     public static void Restart()
@@ -67,6 +73,20 @@ public class GameController : MonoBehaviour
     public static void ExecuteAfterUnscaled(Action action, float time)
     {
         Instance.StartCoroutine(WaitCoroutine(action, time));
+    }
+
+    public static void OpenMap()
+    {
+        Instance._paused = true;
+        Time.timeScale = 0f;
+        Instance.Map.gameObject.SetActive(true);
+    }
+
+    public static void CloseMap()
+    {
+        Instance._paused = false;
+        Time.timeScale = 1f;
+        Instance.Map.gameObject.SetActive(false);
     }
 
     private static IEnumerator WaitCoroutine(Action action, float wait)

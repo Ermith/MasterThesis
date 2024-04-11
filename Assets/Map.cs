@@ -1,27 +1,31 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Map : MonoBehaviour
 {
     public GraphDrawing<GridVertex> Drawing;
-    public GameObject Room;
+    public MapTile Room;
     public LineRenderer Edge;
     public LineRenderer GridLine;
     public GameObject MapVisual;
     public float Duration = 1.0f;
     public TMP_Text Text;
+    public Camera Camera;
+    public Transform CameraPoint;
 
     private List<GameObject> _floors = new();
     private int _currentFloor;
+    private float _maxZoom;
+    private float _minZoom;
 
-    public void Start()
+    public void Awake()
     {
-        MapVisual = new GameObject("MapVisual");
-        MapVisual.transform.parent = transform;
-        MapVisual.transform.localPosition = Vector3.zero;
+
     }
 
     private GameObject CreateGrid()
@@ -59,6 +63,10 @@ public class Map : MonoBehaviour
 
     public void CreateMap()
     {
+        MapVisual = new GameObject("MapVisual");
+        MapVisual.transform.parent = transform;
+        MapVisual.transform.localPosition = Vector3.zero;
+
         for (int i = 0; i < Drawing.MaximumZ + 1; i++)
         {
             var floor = new GameObject($"Floor {i}");
@@ -68,12 +76,16 @@ public class Map : MonoBehaviour
             grid.transform.parent = floor.transform;
             grid.transform.localPosition = (Vector3.left + Vector3.back) * 0.5f;
             _floors.Add(floor);
+            floor.SetActive(false);
         }
 
-        foreach ((GridVertex _, (int x, int y, int z)) in Drawing.VertexPositions)
+        foreach ((GridVertex v, (int x, int y, int z)) in Drawing.VertexPositions)
         {
-            var obj = GameObject.Instantiate(Room, _floors[z].transform);
+            var obj = GameObject.Instantiate<MapTile>(Room, _floors[z].transform);
             obj.transform.localPosition = new Vector3(x, 0, y);
+            obj.UpExit = v.Top;
+            obj.DownExit = v.Bottom;
+            obj.SetName(v.ToString());
         }
 
         foreach ((IEdge<GridVertex> edge, List<(int, int, int)> positions) in Drawing.EdgePositions)
@@ -90,6 +102,14 @@ public class Map : MonoBehaviour
             line.transform.parent = _floors[positions[0].Item3].transform;
             line.transform.localPosition = new Vector3(0, 0.01f, 0);
         }
+
+        float a = Drawing.MaximumX + 1;
+        float b = Drawing.MaximumY + 1;
+        _maxZoom = Mathf.Sqrt(a * a + b * b) / 2;
+        Camera.orthographicSize = _maxZoom;
+        CameraPoint.localPosition = new Vector3(a / 2 - 0.5f, 0, b / 2 - 0.5f);
+
+        SetVisibleFloor(0);
     }
 
     public void ChangeFloor(int i)
@@ -100,7 +120,9 @@ public class Map : MonoBehaviour
     public void IncreaseFloor(bool up)
     {
         int step = up ? 1 : -1;
-        ChangeFloor((_currentFloor + step + _floors.Count) % _floors.Count);
+        int floor = Math.Clamp(_currentFloor + step, 0, _floors.Count-1);
+
+        ChangeFloor(floor);
     }
 
     public void Update()
@@ -110,6 +132,37 @@ public class Map : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.DownArrow))
             IncreaseFloor(false);
+
+
+        var zoom = Camera.orthographicSize;
+
+        if (Input.GetKeyDown(KeyCode.Minus) || Input.GetKeyDown(KeyCode.KeypadMinus))
+        {
+            zoom = Mathf.Min(zoom + 0.5f, _maxZoom);
+            Camera.orthographicSize = zoom;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Plus) || Input.GetKeyDown(KeyCode.KeypadPlus))
+        {
+            zoom = Mathf.Max(zoom - 0.5f, 1.5f);
+            Camera.orthographicSize = zoom;
+        }
+
+        Directions dir = Directions.None;
+        if (Input.GetKey(KeyCode.W)) dir |= Directions.North;
+        if (Input.GetKey(KeyCode.S)) dir |= Directions.South;
+        if (Input.GetKey(KeyCode.D)) dir |= Directions.East;
+        if (Input.GetKey(KeyCode.A)) dir |= Directions.West;
+        var vec = dir.ToVector3().normalized;
+        vec = Quaternion.Euler(0, CameraPoint.rotation.eulerAngles.y, 0) * vec;
+        var pos = CameraPoint.localPosition + vec * 0.05f * zoom;
+        pos.x = Mathf.Clamp(pos.x, 0, Drawing.MaximumX + 1);
+        pos.z = Mathf.Clamp(pos.z, 0, Drawing.MaximumY + 1);
+
+        
+
+
+        CameraPoint.localPosition = pos;
     }
 
     private IEnumerator ChangeFloorCoroutine(int i, float duration)
@@ -118,17 +171,22 @@ public class Map : MonoBehaviour
         Vector3 from = MapVisual.transform.localPosition;
         Vector3 to = new Vector3(0, -i, 0);
 
-        _floors[_currentFloor].SetActive(false);
-        _floors[i].SetActive(true);
-        _currentFloor = i;
-        Text.text = $"{i + 1}/{_floors.Count}";
+        SetVisibleFloor(i);
 
         while (timer < duration)
         {
-            timer += Time.deltaTime;
+            timer += Time.unscaledDeltaTime;
             float t = timer / duration;
             MapVisual.transform.localPosition = Vector3.Lerp(from, to, Easing.SmoothStep(t));
             yield return null;
         }
+    }
+
+    private void SetVisibleFloor(int i)
+    {
+        _floors[_currentFloor].SetActive(false);
+        _floors[i].SetActive(true);
+        _currentFloor = i;
+        Text.text = $"{i + 1}/{_floors.Count}";
     }
 }
