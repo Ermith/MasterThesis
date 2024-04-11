@@ -22,8 +22,11 @@ public class LevelGenerator : MonoBehaviour
     public GameObject SoundTrapBlueprint;
     public GameObject RefugeBlueprint;
     public GameObject VictoryTrigger;
+    public GameObject StairsBlueprint;
     public EnemyController EnemyBlueprint;
     public GameObject Player;
+
+    public Map Map;
 
     GridGraph _graph;
     GraphGenerator _graphGenerator;
@@ -46,6 +49,7 @@ public class LevelGenerator : MonoBehaviour
         PowerSourceKey.Blueprint = PowerSourceBlueprint;
         TrapLock.Blueprint = TrapBlueprint;
         SoundTrapLock.Blueprint = SoundTrapBlueprint;
+        StairwayRoom.Blueprint = StairsBlueprint;
 
         _graph = new GridGraph();
         _graphGenerator = new GraphGenerator(_graph);
@@ -112,12 +116,13 @@ public class LevelGenerator : MonoBehaviour
             return obj;
         });
 
+        ASubTile.Register<NoneSubTile>((ASubTile st) => { return new GameObject(); });
 
         GameObject level = new("Level");
         GameObject geometry = new("Geometry");
         Vector3 offset = new(0, 0, 0);
         geometry.transform.parent = level.transform;
-        int floorHeight = 10;
+        int floorHeight = 3;
 
         Debug.Log("SPAWNING OBJECTS");
         for (int floor = 0; floor < subTileGrids.Count; floor++)
@@ -125,11 +130,11 @@ public class LevelGenerator : MonoBehaviour
             var grid = subTileGrids[floor];
             for (int col = 0; col < grid.GetLength(0); col++)
                 for (int row = 0; row < grid.GetLength(1); row++)
-                    if (grid[col, row] != null)
-                    {
-                        GameObject obj = grid[col, row].SpawnObject(col, row, floor * floorHeight);
-                        obj.transform.parent = geometry.transform;
-                    }
+                {
+                    grid[col, row] ??= new FloorSubTile();
+                    GameObject obj = grid[col, row].SpawnObject(col, row, floor * floorHeight);
+                    obj.transform.parent = geometry.transform;
+                }
         }
 
         Debug.Log("Spawning Enemies");
@@ -186,6 +191,9 @@ public class LevelGenerator : MonoBehaviour
         // Spawn player at the correct position
         // Needs to be 1 frame delayed because of bug, when setting position works only occasionally
         StartCoroutine(DelayedSpawn(playerSpawn));
+
+        Map.Drawing = GraphDrawing;
+        Map.CreateMap();
     }
 
     private IEnumerator DelayedSpawn(Vector3 spawnPosition)

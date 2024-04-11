@@ -9,12 +9,14 @@ public class EdgeTile : ATile
     public Directions Edges { get; set; }
     public Directions Exits { get; set; }
     public int Thickness { get; private set; }
+    public bool Floor;
 
-    public EdgeTile(Directions edges, int thickness = 1, Directions exits = Directions.None)
+    public EdgeTile(Directions edges, int thickness = 1, Directions exits = Directions.None, bool floor = true)
     {
         Edges = edges;
         Exits = exits;
         Thickness = thickness;
+        Floor = floor;
     }
 
     private bool IsWall(int x, int y)
@@ -65,10 +67,9 @@ public class EdgeTile : ATile
         for (int i = 0; i < WIDTH; i++)
             for (int j = 0; j < HEIGHT; j++)
             {
-                subTileGrid[x + i, y + j] =
-                    IsWall(i, j)
-                    ? new WallSubTile()
-                    : new FloorSubTile();
+                if (IsWall(i, j)) subTileGrid[x + i, y + j] = new WallSubTile();
+                else if (Floor) subTileGrid[x + i, y + j] = new FloorSubTile();
+                else subTileGrid[x + i, y + j] = new NoneSubTile();
             }
 
         subTileGrid[x + HalfWidth, y + HalfHeight].Objects = Objects;

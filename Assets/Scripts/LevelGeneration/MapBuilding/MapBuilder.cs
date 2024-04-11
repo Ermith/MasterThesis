@@ -66,9 +66,11 @@ class MapBuilder
 
         foreach ((var vertex, (int x, int y, int z)) in _graphDrawing.VertexPositions)
         {
-            ASuperTile tile = (vertex.Hallway)
-                ? new HallwayWithRooms(_superWidth, _superHeight, vertex.Exits)
-                : new FilledRoom(_superWidth, _superHeight, true, vertex.Exits);
+            ASuperTile tile;
+
+            if (vertex.Top || vertex.Bottom) tile = new StairwayRoom(_superWidth, _superHeight, vertex.Exits, up: vertex.Top, down: vertex.Bottom, reveresed: z % 2 == 0);
+            else if (vertex.Hallway) tile = new HallwayWithRooms(_superWidth, _superHeight, vertex.Exits);
+            else tile = new Room(_superWidth, _superHeight, vertex.Exits);
 
             tile.Locks = vertex.GetLocks().ToList();
             tile.Keys = vertex.GetKeys().ToList();

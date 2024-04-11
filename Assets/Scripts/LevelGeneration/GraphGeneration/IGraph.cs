@@ -380,6 +380,10 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         AddEdge(from, to, edge);
 
         InterFloorEdges.Add(edge);
+        var top = from.Position.z > to.Position.z ? from : to;
+        var bot = from.Position.z < to.Position.z ? from : to;
+        top.Bottom = true;
+        bot.Top = true;
 
         return edge;
     }

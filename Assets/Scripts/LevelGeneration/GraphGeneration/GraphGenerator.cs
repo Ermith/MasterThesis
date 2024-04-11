@@ -14,8 +14,8 @@ public class GridVertex
 
     public Directions Exits;
     public bool Hallway = false;
-    public bool Top;
-    public bool Bottom;
+    public bool Top = false;
+    public bool Bottom = false;
 
     public (int x, int y, int z) Position;
 

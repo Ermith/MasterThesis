@@ -590,7 +590,13 @@ public class HiddenPathPattern : Pattern
     public override void Apply(GridEdge edge, GridGraph graph)
     {
         (GridEdge ce1, GridEdge ce2) = AddCycle(edge, graph);
+        graph.RemoveGridEdge(edge);
+        (GridEdge e1, GridEdge e2) = AddExtension(edge, graph);
 
+        SecurityCameraLock cameraLock = new();
+        var cameraKey = cameraLock.GetNewKey();
+        e1.To.AddLock(cameraLock);
+        ce1.To.AddKey(cameraKey);
 
         HiddenDoorLock @lock1 = new(ce1.FromDirection);
         ce1.From.AddLock(@lock1);
@@ -641,7 +647,9 @@ public class FloorAdditionPattern : Pattern
         fork = AddFork(under, graph);
 
         // TODO: Add to the correct vertical direction
-        DoorLock @lock = new(Directions.None); 
+        DoorLock @lock = new(up: true);
+        edge.From.AddLock(@lock);
+        
         IKey key = @lock.GetNewKey();
         fork.To.AddKey(key);
     }

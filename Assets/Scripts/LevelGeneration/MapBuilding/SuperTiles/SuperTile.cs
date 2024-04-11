@@ -17,6 +17,8 @@ public class SuperTileDescription
     public ATile[,] TileGrid;
     public Directions Exits;
     public bool PatrolLooped;
+    public (int, int)? UpExit;
+    public (int, int)? DownExit;
     
     public ATile Get(int x, int y) => TileGrid[x + X, y + Y];
 }

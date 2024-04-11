@@ -11,6 +11,7 @@ public class Stairs : MonoBehaviour
 
     [Range(1, 100)]
     public int Steps;
+    public Vector3 Size;
 
     // Start is called before the first frame update
     void Start()
@@ -31,55 +32,66 @@ public class Stairs : MonoBehaviour
         List<Vector3> vertices = new();
         List<int> triangles = new();
 
+        float width = Size.x;
+        float height = Size.y;
+        float length = Size.z;
+
         for (int step = 1; step <= Steps; step++)
         {
-            float current = (float)step / Steps * 2 - 1; // -0.4
-            float previous = (float)(step - 1) / Steps * 2 - 1; // -1
-            float next = (float)(step + 1) / Steps * 2 - 1;
+            float top = (float)step / Steps * height;
+            float bot = (float)(step - 1) / Steps * height;
 
+            float fwd = (float)step / Steps * length;
+            float back = (float)(step - 1) / Steps * length;
+
+            // left
             AddQuad(
-                new Vector3(1, current, previous),
-                new Vector3(1, current, 1),
-                new Vector3(1, previous, 1),
-                new Vector3(1, previous, previous),
-                vertices, triangles);
-            AddQuad(
-                new Vector3(-1, current, previous),
-                new Vector3(-1, current, 1),
-                new Vector3(-1, previous, 1),
-                new Vector3(-1, previous, previous),
+                new Vector3(0, top, back),
+                new Vector3(0, top, length),
+                new Vector3(0, bot, length),
+                new Vector3(0, bot, back),
                 vertices, triangles, true);
 
+            // right
             AddQuad(
-                new Vector3(-1, current, previous),
-                new Vector3(1, current, previous),
-                new Vector3(1, previous, previous),
-                new Vector3(-1, previous, previous),
+                new Vector3(width, top, back),
+                new Vector3(width, top, length),
+                new Vector3(width, bot, length),
+                new Vector3(width, bot, back),
                 vertices, triangles);
 
+            // front
             AddQuad(
-                new Vector3(-1, current, current),
-                new Vector3(1, current, current),
-                new Vector3(1, current, previous),
-                new Vector3(-1, current, previous),
+                new Vector3(0, top, back),
+                new Vector3(width, top, back),
+                new Vector3(width, bot, back),
+                new Vector3(0, bot, back),
+                vertices, triangles);
+
+            // top
+            AddQuad(
+                new Vector3(0, top, fwd),
+                new Vector3(width, top, fwd),
+                new Vector3(width, top, back),
+                new Vector3(0, top, back),
                 vertices, triangles);
         }
 
         // Bottom
         AddQuad(
-            new Vector3(-1, -1, 1),
-            new Vector3(1, -1, 1),
-            new Vector3(1, -1, -1),
-            new Vector3(-1, -1, -1),
+            new Vector3(0, 0, length),
+            new Vector3(width, 0, length),
+            new Vector3(width, 0, 0),
+            new Vector3(0, 0, 0),
             vertices, triangles, true
             );
 
         // Back
         AddQuad(
-            new Vector3(-1, 1, 1),
-            new Vector3(1, 1, 1),
-            new Vector3(1, -1, 1),
-            new Vector3(-1, -1, 1),
+            new Vector3(0, height, length),
+            new Vector3(width, height, length),
+            new Vector3(width, 0, length),
+            new Vector3(0, 0, length),
             vertices, triangles, true
             );
 

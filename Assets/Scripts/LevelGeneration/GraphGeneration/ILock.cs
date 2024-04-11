@@ -29,6 +29,8 @@ public interface IKey
 public class DoorLock : ILock
 {
     private Directions _exits;
+    private bool _upExit;
+    private bool _downExit;
     public IList<ILockObject> Instances { get; } = new List<ILockObject>();
 
     public IKey GetNewKey()
@@ -44,11 +46,25 @@ public class DoorLock : ILock
             if (superTile.ExitsTiles.TryGetValue(dir, out (int x, int y) t))
                 if (superTile.Get(t.x, t.y) is DoorTile door)
                     door.Lock = this;
+
+        if (_upExit && superTile.UpExit.HasValue)
+        {
+            var doorTile = superTile.Get(superTile.UpExit.Value.Item1, superTile.UpExit.Value.Item2) as DoorTile;
+            doorTile.Lock = this;
+        }
+
+        if (_downExit && superTile.DownExit.HasValue)
+        {
+            var doorTile = superTile.Get(superTile.DownExit.Value.Item1, superTile.DownExit.Value.Item2) as DoorTile;
+            doorTile.Lock = this;
+        }
     }
 
-    public DoorLock(Directions exits)
+    public DoorLock(Directions exits = Directions.None, bool up = false, bool down = false)
     {
         _exits = exits;
+        _upExit = up;
+        _downExit = down;
     }
 }
 
