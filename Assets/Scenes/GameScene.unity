@@ -5,7 +5,7 @@ OcclusionCullingSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_OcclusionBakeSettings:
-    smallestOccluder: 5
+    smallestOccluder: 1
     smallestHole: 0.25
     backfaceThreshold: 100
   m_SceneGUID: 00000000000000000000000000000000
@@ -357,6 +357,14 @@ PrefabInstance:
       propertyPath: Player
       value: 
       objectReference: {fileID: 1960187402}
+    - target: {fileID: 1254682151865299276, guid: 7004fa0423c529a4db6c5e017e2adbe1, type: 3}
+      propertyPath: FloorMesh
+      value: 
+      objectReference: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+    - target: {fileID: 1254682151865299276, guid: 7004fa0423c529a4db6c5e017e2adbe1, type: 3}
+      propertyPath: FloorMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 92e5728056755f84e8586c8bef3517ad, type: 2}
     - target: {fileID: 4939464382187098842, guid: 7004fa0423c529a4db6c5e017e2adbe1, type: 3}
       propertyPath: Room
       value: 

@@ -8,6 +8,10 @@ public class MapTile : MonoBehaviour
     public TMP_Text TileName;
     public TMP_Text Down;
     public TMP_Text Up;
+    public Color HighLightColor = Color.yellow;
+
+    private Material _material;
+    private Color _originalColor;
 
     public bool UpExit
     {
@@ -24,7 +28,8 @@ public class MapTile : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        _material = GetComponentInChildren<MeshRenderer>().material;
+        _originalColor = _material.color;
     }
 
     // Update is called once per frame
@@ -36,5 +41,10 @@ public class MapTile : MonoBehaviour
     public void SetName(string name)
     {
         TileName.text = name;
+    }
+
+    public void Highlight(bool highlighted)
+    {
+        _material.color = highlighted ? HighLightColor : _originalColor;
     }
 }

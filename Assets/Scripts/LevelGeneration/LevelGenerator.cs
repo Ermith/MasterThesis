@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -28,10 +29,19 @@ public class LevelGenerator : MonoBehaviour
 
     public Map Map;
 
+    public Material FloorMaterial;
+    public Material WallMaterial;
+    public Mesh FloorMesh;
+
     GridGraph _graph;
     GraphGenerator _graphGenerator;
     GraphGridDrawer _graphDrawer;
     MapBuilder _mapBuilder;
+
+    private bool _done = false;
+
+    private List<Matrix4x4> _floorMatrices = new();
+    private Matrix4x4[] _fuck;
 
     // Intermediate Results
     public GridGraph Graph { get; private set; }
@@ -75,7 +85,11 @@ public class LevelGenerator : MonoBehaviour
         var subTileGrids = _mapBuilder.SubTileGrid(tileGrids);
 
         ASubTile.Register<WallSubTile>((ASubTile st) => Instantiate(WallBlueprint));
-        ASubTile.Register<FloorSubTile>((ASubTile st) => Instantiate(FloorBlueprint));
+        ASubTile.Register<FloorSubTile>((ASubTile st) => {
+
+            //return new GameObject();
+            return Instantiate(FloorBlueprint);
+        });
         ASubTile.Register<DoorSubTile>((ASubTile st) =>
         {
             var door = st as DoorSubTile;
@@ -124,15 +138,37 @@ public class LevelGenerator : MonoBehaviour
         geometry.transform.parent = level.transform;
         int floorHeight = 3;
 
+        // Roof
+        int w = subTileGrids[subTileGrids.Count - 1].GetLength(0);
+        int h = subTileGrids[subTileGrids.Count - 1].GetLength(1);
+        subTileGrids.Add(new ASubTile[w, h]);
+
         Debug.Log("SPAWNING OBJECTS");
-        for (int floor = 0; floor < subTileGrids.Count; floor++)
+        for (int floor = subTileGrids.Count - 1; floor >= 0; floor--)
         {
             var grid = subTileGrids[floor];
             for (int col = 0; col < grid.GetLength(0); col++)
                 for (int row = 0; row < grid.GetLength(1); row++)
                 {
-                    grid[col, row] ??= new FloorSubTile();
+                    if (grid[col, row] == null)
+                    {
+                        if (floor > 0 && subTileGrids[floor - 1][col, row] != null)
+                            grid[col, row] = new FloorSubTile();
+                        else
+                            continue;
+                    }
+
+                    //grid[col, row] ??= new FloorSubTile();
+
                     GameObject obj = grid[col, row].SpawnObject(col, row, floor * floorHeight);
+
+                    if (grid[col, row] is FloorSubTile)
+                    {
+                        var m = new Matrix4x4();
+                        m.SetTRS(obj.transform.position, obj.transform.rotation, obj.transform.localScale.Set(y: 0.01f));
+                        _floorMatrices.Add(m);
+                    }
+
                     obj.transform.parent = geometry.transform;
                 }
         }
@@ -194,11 +230,34 @@ public class LevelGenerator : MonoBehaviour
 
         Map.Drawing = GraphDrawing;
         Map.CreateMap();
+        _done = true;
+        _fuck = _floorMatrices.ToArray();
     }
 
     private IEnumerator DelayedSpawn(Vector3 spawnPosition)
     {
         yield return null;
         Player.transform.position = spawnPosition;
+    }
+
+    void Update()
+    {
+        RenderParams ps = new RenderParams(FloorMaterial);
+        Debug.Log(_floorMatrices.Count);
+        var f = _fuck.Take(1023).ToArray();
+        List<Matrix4x4> buffer = new();
+
+        int i = 0;
+        while (i < _fuck.Length)
+        {
+            buffer.Clear();
+            for (int j = 0; j < 1023 && i + j < _fuck.Length; j++)
+            {
+                buffer.Add(_fuck[i + j]);
+            }
+
+            i += 1023;
+            Graphics.RenderMeshInstanced(ps, FloorMesh, 0, buffer.ToArray());
+        }
     }
 }
