@@ -158,7 +158,8 @@ public class EnemyLock : ILock
             Spawn = patrol[spawnIndex],
             PatrolIndex = spawnIndex,
             Lock = this,
-            Behaviour = Behaviour.Patroling
+            Behaviour = Behaviour.Patroling,
+            Floor = superTile.Floor
         });
     }
 }

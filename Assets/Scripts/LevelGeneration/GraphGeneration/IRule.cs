@@ -570,6 +570,7 @@ public class LockedCyclePattern : Pattern
         (ce1, ce2) = AddExtension(ce1, graph);
         ce1.To.AddKey(key);
         ce1.To.Hallway = true;
+        ce1.To.AddLock(new EnemyLock());
 
         WallOfLightLock @lock2 = new(ce1.FromDirection);
         IKey key2 = @lock2.GetNewKey();
