@@ -17,11 +17,15 @@ public class Map : MonoBehaviour
     public TMP_Text Text;
     public Camera Camera;
     public Transform CameraPoint;
+    public GameObject HighlightTile;
 
     private List<GameObject> _floors = new();
+    private MapTile[,,] _mapTiles;
     private int _currentFloor;
     private float _maxZoom;
     private float _minZoom;
+    private MapTile _highlightedTile;
+    private GameObject _highlightTile;
 
     public void Awake()
     {
@@ -79,6 +83,8 @@ public class Map : MonoBehaviour
             floor.SetActive(false);
         }
 
+        _mapTiles = new MapTile[Drawing.MaximumZ + 1, Drawing.MaximumX + 1, Drawing.MaximumY + 1];
+
         foreach ((GridVertex v, (int x, int y, int z)) in Drawing.VertexPositions)
         {
             var obj = GameObject.Instantiate<MapTile>(Room, _floors[z].transform);
@@ -86,6 +92,7 @@ public class Map : MonoBehaviour
             obj.UpExit = v.Top;
             obj.DownExit = v.Bottom;
             obj.SetName(v.ToString());
+            _mapTiles[z, x, y] = obj;
         }
 
         foreach ((IEdge<GridVertex> edge, List<(int, int, int)> positions) in Drawing.EdgePositions)
@@ -110,6 +117,7 @@ public class Map : MonoBehaviour
         CameraPoint.localPosition = new Vector3(a / 2 - 0.5f, 0, b / 2 - 0.5f);
 
         SetVisibleFloor(0);
+        _highlightTile = GameObject.Instantiate(HighlightTile);
     }
 
     public void ChangeFloor(int i)
@@ -120,7 +128,7 @@ public class Map : MonoBehaviour
     public void IncreaseFloor(bool up)
     {
         int step = up ? 1 : -1;
-        int floor = Math.Clamp(_currentFloor + step, 0, _floors.Count-1);
+        int floor = Math.Clamp(_currentFloor + step, 0, _floors.Count - 1);
 
         ChangeFloor(floor);
     }
@@ -159,7 +167,7 @@ public class Map : MonoBehaviour
         pos.x = Mathf.Clamp(pos.x, 0, Drawing.MaximumX + 1);
         pos.z = Mathf.Clamp(pos.z, 0, Drawing.MaximumY + 1);
 
-        
+
 
 
         CameraPoint.localPosition = pos;
@@ -188,5 +196,13 @@ public class Map : MonoBehaviour
         _floors[i].SetActive(true);
         _currentFloor = i;
         Text.text = $"{i + 1}/{_floors.Count}";
+    }
+
+    public void Highlight(int x, int y, int floor)
+    {
+        _highlightTile.transform.parent = _floors[floor].transform;
+        _highlightTile.transform.localPosition = new Vector3(x, -0.01f, y);
+
+        ChangeFloor(floor);
     }
 }

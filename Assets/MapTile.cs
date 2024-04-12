@@ -26,7 +26,7 @@ public class MapTile : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         _material = GetComponentInChildren<MeshRenderer>().material;
         _originalColor = _material.color;
@@ -45,6 +45,6 @@ public class MapTile : MonoBehaviour
 
     public void Highlight(bool highlighted)
     {
-        _material.color = highlighted ? HighLightColor : _originalColor;
+        GetComponentInChildren<MeshRenderer>().material.color = highlighted ? HighLightColor : _originalColor;
     }
 }

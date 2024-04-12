@@ -39,9 +39,11 @@ public class LevelGenerator : MonoBehaviour
     MapBuilder _mapBuilder;
 
     private bool _done = false;
+    private int _floorHeight = 3;
 
     private List<Matrix4x4> _floorMatrices = new();
     private Matrix4x4[] _fuck;
+    private GameObject _geometry;
 
     // Intermediate Results
     public GridGraph Graph { get; private set; }
@@ -134,9 +136,9 @@ public class LevelGenerator : MonoBehaviour
 
         GameObject level = new("Level");
         GameObject geometry = new("Geometry");
+        _geometry = geometry;
         Vector3 offset = new(0, 0, 0);
         geometry.transform.parent = level.transform;
-        int floorHeight = 3;
 
         // Roof
         int w = subTileGrids[subTileGrids.Count - 1].GetLength(0);
@@ -160,7 +162,7 @@ public class LevelGenerator : MonoBehaviour
 
                     //grid[col, row] ??= new FloorSubTile();
 
-                    GameObject obj = grid[col, row].SpawnObject(col, row, floor * floorHeight);
+                    GameObject obj = grid[col, row].SpawnObject(col, row, floor * _floorHeight);
                     obj.transform.position = obj.transform.position.Added(y: 0.1f * floor);
 
                     if (grid[col, row] is FloorSubTile)
@@ -217,13 +219,13 @@ public class LevelGenerator : MonoBehaviour
         level.transform.position = offset;
         
         var pos = _mapBuilder.GetEndPosition() * scale + offset;
-        pos.y *= floorHeight;
+        pos.y *= _floorHeight;
         GameObject.Instantiate(VictoryTrigger).transform.position = pos;
         //FindObjectOfType<LevelCamera>().SetPosition(SubTileGrid.GetLength(0), SubTileGrid.GetLength(1), scale, offset);
 
 
         var playerSpawn = _mapBuilder.GetSpawnPosition() * scale + offset;
-        playerSpawn.y *= floorHeight;
+        playerSpawn.y *= _floorHeight;
         Debug.Log($"REPOSITIONING THE PLAYER {playerSpawn}");
         // Spawn player at the correct position
         // Needs to be 1 frame delayed because of bug, when setting position works only occasionally
@@ -243,8 +245,8 @@ public class LevelGenerator : MonoBehaviour
 
     void Update()
     {
+        /**/
         RenderParams ps = new RenderParams(FloorMaterial);
-        Debug.Log(_floorMatrices.Count);
         var f = _fuck.Take(1023).ToArray();
         List<Matrix4x4> buffer = new();
 
@@ -260,5 +262,16 @@ public class LevelGenerator : MonoBehaviour
             i += 1023;
             Graphics.RenderMeshInstanced(ps, FloorMesh, 0, buffer.ToArray());
         }
+        //*/
+    }
+
+    public (int x, int y, int floor) GridCoordinates(Vector3 position)
+    {
+        Vector3 relative = position - _geometry.transform.position;
+        int x = (int)Mathf.Floor(relative.x / (SuperWidth * ATile.WIDTH));
+        int y = (int)Mathf.Floor(relative.z / (SuperHeight * ATile.HEIGHT));
+        int floor = (int)Mathf.Floor(relative.y / _floorHeight);
+
+        return (x, y, floor);
     }
 }

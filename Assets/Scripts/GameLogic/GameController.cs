@@ -18,6 +18,8 @@ public class GameController : MonoBehaviour
     public Canvas PauseCanvas;
     public Canvas HUDCanvas;
     public Map Map;
+    public PlayerController Player;
+    public LevelGenerator LevelGenerator;
 
     private Transform _interactText;
 
@@ -79,9 +81,12 @@ public class GameController : MonoBehaviour
 
     public static void OpenMap()
     {
+        (int x, int y, int floor) = Instance.LevelGenerator.GridCoordinates(Instance.Player.transform.position);
+
         Instance._mapPaused = true;
         Time.timeScale = 0f;
         Instance.Map.gameObject.SetActive(true);
+        Instance.Map.Highlight(x, y, floor);
     }
 
     public static void CloseMap()
