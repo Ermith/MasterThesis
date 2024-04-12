@@ -161,11 +161,12 @@ public class LevelGenerator : MonoBehaviour
                     //grid[col, row] ??= new FloorSubTile();
 
                     GameObject obj = grid[col, row].SpawnObject(col, row, floor * floorHeight);
+                    obj.transform.position = obj.transform.position.Added(y: 0.1f * floor);
 
                     if (grid[col, row] is FloorSubTile)
                     {
                         var m = new Matrix4x4();
-                        m.SetTRS(obj.transform.position, obj.transform.rotation, obj.transform.localScale.Set(y: 0.01f));
+                        m.SetTRS(obj.transform.position.Added(y:-0.05f), obj.transform.rotation, obj.transform.localScale.Set(y: 0.1f));
                         _floorMatrices.Add(m);
                     }
 

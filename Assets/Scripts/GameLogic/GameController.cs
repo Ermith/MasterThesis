@@ -12,7 +12,8 @@ public class GameController : MonoBehaviour
     public static GameController Instance;
     public static AudioManager AudioManager => Instance.GetComponent<AudioManager>();
     private bool _paused = false;
-    public static bool IsPaused => Instance._paused;
+    private bool _mapPaused = false;
+    public static bool IsPaused => Instance._paused || Instance._mapPaused;
 
     public Canvas PauseCanvas;
     public Canvas HUDCanvas;
@@ -37,13 +38,14 @@ public class GameController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (_paused) Resume();
+            if (_mapPaused) CloseMap();
+            else if (_paused) Resume();
             else Pause();
         }
 
-        if (Input.GetKeyDown(KeyCode.M))
+        if (Input.GetKeyDown(KeyCode.M) && !_paused)
         {
-            if (_paused) CloseMap();
+            if (_mapPaused) CloseMap();
             else OpenMap();
         }
     }
@@ -77,14 +79,14 @@ public class GameController : MonoBehaviour
 
     public static void OpenMap()
     {
-        Instance._paused = true;
+        Instance._mapPaused = true;
         Time.timeScale = 0f;
         Instance.Map.gameObject.SetActive(true);
     }
 
     public static void CloseMap()
     {
-        Instance._paused = false;
+        Instance._mapPaused = false;
         Time.timeScale = 1f;
         Instance.Map.gameObject.SetActive(false);
     }
