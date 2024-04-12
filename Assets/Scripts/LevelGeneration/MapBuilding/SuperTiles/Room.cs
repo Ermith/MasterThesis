@@ -8,7 +8,7 @@ using UnityEngine;
 public class Room : ASuperTile
 {
 
-    public Room(int width, int height, Directions exits = Directions.None) : base(width, height, exits)
+    public Room(int width, int height, int floor, Directions exits = Directions.None) : base(width, height, floor, exits)
     {
     }
 

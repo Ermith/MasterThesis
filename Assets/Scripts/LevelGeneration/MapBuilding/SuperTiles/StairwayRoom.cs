@@ -12,7 +12,7 @@ class StairwayRoom : ASuperTile
     private bool _upExit;
     private bool _downExit;
 
-    public StairwayRoom(int width, int height, Directions exits = Directions.None, bool reveresed = false, bool up = false, bool down = false) : base(width, height, exits)
+    public StairwayRoom(int width, int height, int floor, Directions exits = Directions.None, bool reveresed = false, bool up = false, bool down = false) : base(width, height, floor, exits)
     {
         _reversed = reveresed;
         _upExit = up;

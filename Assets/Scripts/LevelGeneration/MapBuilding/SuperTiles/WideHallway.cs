@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class WideHallway : ASuperTile
 {
-    public WideHallway(int width, int height, Directions exits)
-        : base(width, height, exits)
+    public WideHallway(int width, int height, int floor, Directions exits)
+        : base(width, height, floor, exits)
     {
         Exits = exits;
     }

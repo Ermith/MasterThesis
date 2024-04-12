@@ -184,7 +184,7 @@ public class LevelGenerator : MonoBehaviour
         foreach (EnemyParams enemy in enemies)
         {
             (int spawnX, int spawnZ) = enemy.Spawn;
-            Vector3 spawn = new(spawnX, 0, spawnZ);
+            Vector3 spawn = new(spawnX, (enemy.Floor + 0.1f) * _floorHeight, spawnZ);
             spawn = spawn * scale + offset;
 
             var enemyInstance = Instantiate(
@@ -199,7 +199,7 @@ public class LevelGenerator : MonoBehaviour
                 List<Vector3> patrol = new();
                 foreach ((int x, int z) in enemy.Patrol)
                 {
-                    patrol.Add(new Vector3(x, 0, z) * scale + offset);
+                    patrol.Add(new Vector3(x, (enemy.Floor + 0.1f) * _floorHeight, z) * scale + offset);
                 }
 
                 enemyInstance.Patrol(patrol.ToArray(), enemy.PatrolIndex, enemy.Retrace);

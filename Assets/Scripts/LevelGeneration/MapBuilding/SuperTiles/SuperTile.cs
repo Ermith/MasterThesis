@@ -19,6 +19,7 @@ public class SuperTileDescription
     public bool PatrolLooped;
     public (int, int)? UpExit;
     public (int, int)? DownExit;
+    public int Floor;
     
     public ATile Get(int x, int y) => TileGrid[x + X, y + Y];
 }
@@ -29,6 +30,8 @@ public abstract class ASuperTile
     public int Width { get; set; }
     public int Height { get; set; }
 
+    public int Floor { get; set; }
+
     public List<ILock> Locks { get; set; }
     public List<IKey> Keys { get; set;  }
 
@@ -36,7 +39,7 @@ public abstract class ASuperTile
     public Dictionary<Directions, (int, int)> ExitTiles;
     public List<(int, int)> InternalExitTiles;
 
-    public ASuperTile(int width, int height, Directions exits = Directions.None)
+    public ASuperTile(int width, int height, int floor, Directions exits = Directions.None)
     {
         Width = width;
         Height = height;
@@ -45,6 +48,7 @@ public abstract class ASuperTile
         Keys = new();
         ExitTiles = new();
         InternalExitTiles = new();
+        Floor = floor;
     }
 
     internal Directions EdgeDirectinons(int x, int y, int width, int height)
@@ -106,7 +110,8 @@ public abstract class ASuperTile
             Width = Width,
             Height = Height,
             Exits = Exits,
-            ExitsTiles = exits
+            ExitsTiles = exits,
+            Floor = Floor
         };
     }
 

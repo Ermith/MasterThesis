@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 public class FilledRoom : ASuperTile
 {
     bool _subRoom = false;
-    public FilledRoom(int width, int height, bool subRoom = false, Directions exits = Directions.None) : base(width, height, exits)
+    int _floor = 0;
+
+    public FilledRoom(int width, int height, int floor, bool subRoom = false, Directions exits = Directions.None) : base(width, height, floor, exits)
     {
         _subRoom = subRoom;
     }

@@ -8,7 +8,7 @@ using URandom = UnityEngine.Random;
 
 public class Hallway : ASuperTile
 {
-    public Hallway(int width, int height, Directions exits = Directions.None) : base(width, height, exits)
+    public Hallway(int width, int height, int floor, Directions exits = Directions.None) : base(width, height, floor, exits)
     {
     }
 

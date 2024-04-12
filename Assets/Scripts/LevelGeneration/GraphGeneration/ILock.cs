@@ -23,6 +23,7 @@ public interface ILock
 public interface IKey
 {
     IList<ILock> Locks { get; }
+    bool Guarded { get; set; }
     public void Implement(SuperTileDescription superTile);
 }
 
@@ -102,7 +103,7 @@ public class DoorKey : IKey
     public static GameObject Blueprint;
 
     public IList<ILock> Locks { get; } = new List<ILock>();
-    public bool Guarded = true;
+    public bool Guarded { get; set; } = true;
 
     public void Implement(SuperTileDescription superTile)
     {
@@ -126,7 +127,8 @@ public class DoorKey : IKey
             tile.Guard = new EnemyParams
             {
                 Behaviour = Behaviour.Guarding,
-                Spawn = (spawnX - 1, spawnY)
+                Spawn = (spawnX - 1, spawnY),
+                Floor = superTile.Floor
             };
 
             superTile.Enemies.Add(tile.Guard);
@@ -196,6 +198,8 @@ public class PowerSourceKey : IKey
 {
     public static GameObject Blueprint;
 
+    public bool Guarded { get; set; } = true;
+
     public IList<ILock> Locks { get; } = new List<ILock>();
 
     public void Implement(SuperTileDescription superTile)
@@ -213,6 +217,19 @@ public class PowerSourceKey : IKey
             gameObject.GetComponent<IKeyObject>().MyKey = this;
             return gameObject;
         });
+
+        if (Guarded)
+        {
+            (int spawnX, int spawnY) = ATile.FromSuperMid(superTile.X + x, superTile.Y + y);
+            tile.Guard = new EnemyParams
+            {
+                Behaviour = Behaviour.Guarding,
+                Spawn = (spawnX - 1, spawnY),
+                Floor = superTile.Floor
+            };
+
+            superTile.Enemies.Add(tile.Guard);
+        }
     }
 }
 

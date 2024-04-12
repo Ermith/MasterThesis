@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 public class HallwayWithRooms : Hallway
 {
-    public HallwayWithRooms(int width, int height, Directions exits = Directions.None) : base(width, height, exits)
+    public HallwayWithRooms(int width, int height, int floor, in Directions exits = Directions.None) : base(width, height, floor, exits)
     {
     }
 
