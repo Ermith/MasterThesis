@@ -36,7 +36,7 @@ public class Sight : MonoBehaviour
     void Update()
     {
         //SetActive(VisionConeVisible);
-        _meshRenderer.enabled = VisionConeVisible;
+        //_meshRenderer.enabled = VisionConeVisible;
         if (VisionConeVisible)
             RenderVisionCone();
         

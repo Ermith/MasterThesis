@@ -50,6 +50,15 @@ public class GameController : MonoBehaviour
             if (_mapPaused) CloseMap();
             else OpenMap();
         }
+
+        if (Player.Camera.Mode == CameraModeType.TopDown)
+        {
+            (int x, int y, int floor) = LevelGenerator.GridCoordinates(Player.transform.position);
+            LevelGenerator.HighlightFloor(floor);
+        } else
+        {
+            LevelGenerator.UnHilightFloors();
+        }
     }
 
     public static void Restart()
