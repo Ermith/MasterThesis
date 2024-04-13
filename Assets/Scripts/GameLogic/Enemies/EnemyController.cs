@@ -20,7 +20,7 @@ public class EnemyController : MonoBehaviour, ILockObject
     float _turnRate = 4f;
     Vector3? _lookDirection = null;
     Vector3[] _patrolPositions = null;
-    const float EPSILON_RADIUS = 0.15f;
+    const float EPSILON_RADIUS = 0.75f;
 
     // patrol
     int _patrolIndex = 0;
@@ -197,8 +197,9 @@ public class EnemyController : MonoBehaviour, ILockObject
         if (_moveTo == null) return;
 
         Vector3 myPosition = transform.position;
-        myPosition.y = 0f;
+        //myPosition.y = 0f;
         Vector3 difference = _moveTo.Value - myPosition;
+        difference.y = 0f;
         Vector3 dir = difference.normalized;
         float distance = difference.magnitude;
         if (distance <= EPSILON_RADIUS)
