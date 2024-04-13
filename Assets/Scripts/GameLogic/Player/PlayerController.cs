@@ -160,7 +160,7 @@ public class PlayerController : MonoBehaviour
             ? Camera.transform.forward
             : Camera.GetGroundDirection();
 
-        transform.forward = direction;
+        //transform.forward = direction;
         _gun.Aim(direction);
 
         if (Input.GetMouseButtonDown(0))

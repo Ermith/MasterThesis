@@ -256,18 +256,18 @@ public class GraphGenerator
         //cycle.Apply(startEdge, Graph);
         //hiddenPath.Apply(endEdge, Graph);
 
-        for (int i = 0; i < Graph.FloorCount; i++)
-        {
-            for (int j = 0; j < 1; j++)
-            {
-                var edge = Graph.GetRandomFloorEdge(i);
-
-                if (URandom.value > 0.5)
-                    cycle.Apply(edge, Graph);
-                else
-                    hiddenPath.Apply(edge, Graph);
-            }
-        }
+        //for (int i = 0; i < Graph.FloorCount; i++)
+        //{
+        //    for (int j = 0; j < 1; j++)
+        //    {
+        //        var edge = Graph.GetRandomFloorEdge(i);
+        //
+        //        if (URandom.value > 0.5)
+        //            cycle.Apply(edge, Graph);
+        //        else
+        //            hiddenPath.Apply(edge, Graph);
+        //    }
+        //}
     }
 
     // For Debugging

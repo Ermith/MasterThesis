@@ -652,7 +652,6 @@ public class FloorLockedExtentionPattern : Pattern
         IKey key = @lock.GetNewKey();
         fork.To.AddKey(key);
 
-
         // Add fork in the middle, so the floor can be expanded
         // Additional Goal or bonus on the floor?
         fork = AddFork(a.To, graph);
@@ -746,6 +745,6 @@ public class FloorHiddenPathExtensionPattern : Pattern
         // Add secondary dangerous path
         var upperFork = AddFork(e2.To, graph, reversed: true);
         var lowerFork = AddFork(e2.From, graph, dir: upperFork.ToDirection);
-        graph.AddInterFloorEdge(upperFork.From, lowerFork.To);
+        graph.AddInterFloorEdge(lowerFork.To, upperFork.From);
     }
 }
