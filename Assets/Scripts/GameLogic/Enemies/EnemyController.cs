@@ -56,6 +56,7 @@ public class EnemyController : MonoBehaviour, ILockObject
     private void SoundResponse(GameObject sourceTarget, Vector3 sourcePosition)
     {
         _chasing = true;
+        _sight.Range = DefaultViewDistance;
         LookAt(sourcePosition);
         MoveTo(sourcePosition, () => _chasing = false);
     }
@@ -137,6 +138,10 @@ public class EnemyController : MonoBehaviour, ILockObject
 
     private void ResolveGuard()
     {
+        if ((transform.position - DefaultPosition).magnitude < 1f)
+            return;
+
+        LookAt(DefaultPosition);
         MoveTo(DefaultPosition, () => {
             LookInDirection(DefaultDirection);
             _sight.Range = GuardViewDistance;
