@@ -123,6 +123,22 @@ class MapBuilder
             }
         }
 
+        foreach ((int x, int y, int zFrom, int zTo) in floorTransitions)
+        {
+            int zMin = Math.Min(zFrom, zTo);
+            int zMax = Math.Max(zFrom, zTo);
+
+            for (int z = zMin + 1; z < zMax; z++)
+            {
+                superTileGrids[z][x, y] = new StairwayRoom(_superWidth, _superHeight, z, up: true, down: true, reveresed: z % 2 == 0);
+
+                var v = new GridVertex();
+                v.Bottom = true;
+                v.Top = true;
+                _graphDrawing.VertexPositions.Add(v, (x, y, z));
+            }
+        }
+
         return superTileGrids;
     }
 

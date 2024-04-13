@@ -241,23 +241,32 @@ public class GraphGenerator
         AdditionRule additionRule = new(this);
         Pattern cycle = new LockedCyclePattern();
         Pattern hiddenPath = new HiddenPathPattern();
-        Pattern floorExtension = new FloorLockedExtentionPattern();
+
+        Pattern floorLockedExtension = new FloorLockedExtentionPattern();
         Pattern floorLockedAddition = new FloorLockedAdditionPattern();
         Pattern floorHiddenExtension = new FloorHiddenPathExtensionPattern();
 
         // Inter Floor Patterns
         //floorExtension.Apply(interFloorEdge, Graph);
-        floorLockedAddition.Apply(Graph.InterFloorEdges[0], Graph);
-        //floorHiddenExtension.Apply(interFloorEdge, Graph);
+        //floorLockedAddition.Apply(Graph.InterFloorEdges[0], Graph);
+        floorHiddenExtension.Apply(interFloorEdge, Graph);
+        floorLockedExtension.Apply(Graph.InterFloorEdges[Graph.InterFloorEdges.Count - 1], Graph);
 
         // Single Floor Patterns
         //cycle.Apply(startEdge, Graph);
         //hiddenPath.Apply(endEdge, Graph);
 
-        for (int i = 0; i < 0; i++)
+        for (int i = 0; i < Graph.FloorCount; i++)
         {
-            var edge = Graph.LongestEdge();
-            extensionRule.Apply(edge, Graph);
+            for (int j = 0; j < 1; j++)
+            {
+                var edge = Graph.GetRandomFloorEdge(i);
+
+                if (URandom.value > 0.5)
+                    cycle.Apply(edge, Graph);
+                else
+                    hiddenPath.Apply(edge, Graph);
+            }
         }
     }
 

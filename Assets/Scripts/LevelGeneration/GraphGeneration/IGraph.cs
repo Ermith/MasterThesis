@@ -263,6 +263,7 @@ public class AdjecencyGraph<T> : AGraph<T>
     }
     public override IEdge<T> GetRandomEdge()
     {
+
         int index = URandom.Range(0, _edges.Count - 1);
         return _edges[index];
     }
@@ -354,7 +355,10 @@ public class UndirectedAdjecencyGraph<T> : AGraph<T>
 public class GridGraph : AdjecencyGraph<GridVertex>
 {
     public Dictionary<int, List<GridVertex>> Floors = new();
+    public Dictionary<int, List<GridEdge>> FloorEdges = new();
     public List<GridEdge> InterFloorEdges = new();
+
+    public int FloorCount => Floors.Keys.Count;
 
     public GridEdge AddGridEdge(GridVertex from, GridVertex to, Directions fromExit, Directions toExit, GridEdge edge = null)
     {
@@ -370,6 +374,13 @@ public class GridGraph : AdjecencyGraph<GridVertex>
 
         if (from.Position.z != to.Position.z)
             InterFloorEdges.Add(edge);
+        else
+        {
+            if (!FloorEdges.ContainsKey(from.Position.z))
+                FloorEdges[from.Position.z] = new List<GridEdge>();
+
+            FloorEdges[from.Position.z].Add(edge);
+        }
 
         return edge;
     }
@@ -477,5 +488,14 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         }
 
         return longest;
+    }
+
+    public GridEdge GetRandomFloorEdge(int i = -1)
+    {
+        var keys = FloorEdges.Keys.ToArray();
+
+        if (i == -1) i = URandom.Range(0, keys.Length);
+        int index = URandom.Range(0, FloorEdges[keys[i]].Count);
+        return FloorEdges[keys[i]][index];
     }
 }
