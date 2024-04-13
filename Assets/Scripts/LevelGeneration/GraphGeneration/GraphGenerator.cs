@@ -200,7 +200,6 @@ public class GridEdge : BaseEdge<GridVertex>
 
         return null;
     }
-
 }
 
 public class GraphGenerator
@@ -242,16 +241,18 @@ public class GraphGenerator
         AdditionRule additionRule = new(this);
         Pattern cycle = new LockedCyclePattern();
         Pattern hiddenPath = new HiddenPathPattern();
-        Pattern floorExtension = new FloorExtensionPattern();
-        Pattern floorAddition = new FloorAdditionPattern();
+        Pattern floorExtension = new FloorLockedExtentionPattern();
+        Pattern floorLockedAddition = new FloorLockedAdditionPattern();
+        Pattern floorHiddenExtension = new FloorHiddenPathExtensionPattern();
 
         // Inter Floor Patterns
-        floorExtension.Apply(interFloorEdge, Graph);
-        floorAddition.Apply(Graph.InterFloorEdges[0], Graph);
+        //floorExtension.Apply(interFloorEdge, Graph);
+        floorLockedAddition.Apply(Graph.InterFloorEdges[0], Graph);
+        //floorHiddenExtension.Apply(interFloorEdge, Graph);
 
         // Single Floor Patterns
-        cycle.Apply(startEdge, Graph);
-        hiddenPath.Apply(endEdge, Graph);
+        //cycle.Apply(startEdge, Graph);
+        //hiddenPath.Apply(endEdge, Graph);
 
         for (int i = 0; i < 0; i++)
         {

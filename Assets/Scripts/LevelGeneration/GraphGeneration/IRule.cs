@@ -434,7 +434,7 @@ public abstract class Pattern
         mockEdge.ToDirection = bcDir;
 
         (int expectedX, int expectedY, int _) = mockEdge.GetMid();
-        
+
 
         bool obstructed = newX != expectedX || newY != expectedY;
         Directions caDir = obstructed ? bcDir : acDir.Opposite();
@@ -509,7 +509,7 @@ public abstract class Pattern
         if (TrySideAddition(b, graph, out e1, out e2)) return true;
         if (TryCornerAddition(a, graph, out e1, out e2)) return true;
         if (TryCornerAddition(b, graph, out e1, out e2)) return true;
-        
+
         graph.RemoveGridEdge(a);
         (a, b) = AddExtension(a, graph);
         if (TrySideAddition(b, graph, out e1, out e2)) return true;
@@ -528,23 +528,33 @@ public abstract class Pattern
         throw new Exception("Unable to add cycle");
     }
 
-    public GridEdge AddFork(GridVertex v, GridGraph graph)
+    public GridEdge AddFork(GridVertex v, GridGraph graph, Directions dir = Directions.None, bool reversed = false)
     {
-        Directions dir = (~v.Exits).ChooseRandom();
+        if (dir.None())
+            dir = (~v.Exits).ChooseRandom();
+
         GridEdge e = null;
 
         if (dir.Horizontal())
         {
             int x = graph.GetNewX(v.Position.x, v.Position.y, v.Position.y + 1, dir.East());
             GridVertex c = graph.AddGridVertex(x, v.Position.y, v.Position.z);
-            e = graph.AddGridEdge(v, c, dir, dir.Opposite());
+
+            if (reversed)
+                e = graph.AddGridEdge(c, v, dir.Opposite(), dir);
+            else
+                e = graph.AddGridEdge(v, c, dir, dir.Opposite());
         }
 
         if (dir.Vertical())
         {
             int y = graph.GetNewY(v.Position.y, v.Position.x, v.Position.x + 1, dir.North());
             GridVertex c = graph.AddGridVertex(v.Position.x, y, v.Position.z);
-            e = graph.AddGridEdge(v, c, dir, dir.Opposite());
+
+            if (reversed)
+                e = graph.AddGridEdge(c, v, dir.Opposite(), dir);
+            else
+                e = graph.AddGridEdge(v, c, dir, dir.Opposite());
         }
 
         return e;
@@ -559,29 +569,29 @@ public class LockedCyclePattern : Pattern
     {
         graph.RemoveGridEdge(edge);
         (GridEdge e1, GridEdge e2) = AddExtension(edge, graph);
+        (GridEdge ce1, GridEdge ce2) = AddCycle(e1, graph);
+        ce1.To.Hallway = true;
 
+        // Extend path back to the main room
+        // This is so the key is right next to the original room
+        graph.RemoveGridEdge(ce1);
+        (ce1, ce2) = AddExtension(ce1, graph);
+        ce1.To.Hallway = true;
+
+        // Lock the main path
         DoorLock @lock = new(e2.FromDirection);
         IKey key = @lock.GetNewKey();
         e2.From.AddLock(@lock);
 
-        (GridEdge ce1, GridEdge ce2) = AddCycle(e1, graph);
-        graph.RemoveGridEdge(ce1);
-
-        (ce1, ce2) = AddExtension(ce1, graph);
-        ce1.To.AddKey(key);
-        ce1.To.Hallway = true;
-        ce1.To.AddLock(new EnemyLock());
-
+        // Add 'Valve' back to the main room
         WallOfLightLock @lock2 = new(ce1.FromDirection);
         IKey key2 = @lock2.GetNewKey();
-
         ce1.To.AddKey(key2);
         ce1.From.AddLock(@lock2);
 
-        //graph.RemoveGridEdge(e1);
-        //AddExtension(e1, graph);
-        //graph.RemoveGridEdge(e2);
-        //AddExtension(e2, graph);
+        // Add Key to the the side path
+        ce1.To.AddKey(key);
+        ce1.To.AddLock(new EnemyLock());
     }
 }
 
@@ -593,27 +603,29 @@ public class HiddenPathPattern : Pattern
         graph.RemoveGridEdge(edge);
         (GridEdge e1, GridEdge e2) = AddExtension(edge, graph);
 
-        SecurityCameraLock cameraLock = new();
-        var cameraKey = cameraLock.GetNewKey();
-        e1.To.AddLock(cameraLock);
-        ce1.To.AddKey(cameraKey);
 
+        // Make side path Hidden
         HiddenDoorLock @lock1 = new(ce1.FromDirection);
         ce1.From.AddLock(@lock1);
 
         HiddenDoorLock @lock2 = new(ce2.ToDirection);
         ce2.To.AddLock(@lock2);
 
-        ce1.To.Hallway = true;
+        // Make the main path dnageorus
+        SecurityCameraLock cameraLock = new();
+        var cameraKey = cameraLock.GetNewKey();
+        e1.To.AddLock(cameraLock);
 
-        //graph.RemoveGridEdge(e1);
-        //AddExtension(e1, graph);
-        //graph.RemoveGridEdge(e2);
-        //AddExtension(e2, graph);
+        // Place Bonus on the hidden side path
+        // TODO: Key does not make sense here... Make it something else
+        ce1.To.AddKey(cameraKey);
+
+
+        ce1.To.Hallway = true;
     }
 }
 
-public class FloorExtensionPattern : Pattern
+public class FloorLockedExtentionPattern : Pattern
 {
     protected (GridEdge, GridEdge) AddInterFloorExtension(GridEdge edge, GridGraph graph)
     {
@@ -630,27 +642,110 @@ public class FloorExtensionPattern : Pattern
 
         graph.RemoveGridEdge(edge);
         (GridEdge a, GridEdge b) = AddInterFloorExtension(edge, graph);
-        GridEdge fork = AddFork(a.To, graph);
+
+        // Lock path upward
+        DoorLock @lock = new(down: true);
+        a.To.AddLock(@lock);
+
+        // Add the key room in the original floor
+        GridEdge fork = AddFork(edge.From, graph);
+        IKey key = @lock.GetNewKey();
+        fork.To.AddKey(key);
+
+
+        // Add fork in the middle, so the floor can be expanded
+        // Additional Goal or bonus on the floor?
+        fork = AddFork(a.To, graph);
+        // Fork.To -> Goal/Bonus?
     }
 }
 
-public class FloorAdditionPattern : Pattern
+public class FloorLockedAdditionPattern : Pattern
 {
     public override void Apply(GridEdge edge, GridGraph graph)
     {
-        GridVertex v = edge.From;
-        GridEdge fork = AddFork(v, graph);
-        v = fork.To;
+        GridVertex oldVertex = null;
+        GridVertex newVertex = null;
+        bool up = false;
 
-        GridVertex under = graph.AddGridVertex(v.Position.x, v.Position.y, v.Position.z - BaseRule.STEP);
-        GridEdge interFloorEdge = graph.AddInterFloorEdge(under, v);
-        fork = AddFork(under, graph);
+        if (!edge.To.Bottom)
+        {
+            oldVertex = edge.To;
+            newVertex = graph.AddGridVertex(
+                oldVertex.Position.x,
+                oldVertex.Position.y,
+                oldVertex.Position.z - BaseRule.STEP);
+        } else if (!edge.To.Top)
+        {
+            oldVertex = edge.To;
+            newVertex = graph.AddGridVertex(
+                oldVertex.Position.x,
+                oldVertex.Position.y,
+                oldVertex.Position.z + BaseRule.STEP);
+            up = true;
+        } else if (!edge.From.Bottom)
+        {
+            oldVertex = edge.From;
+            newVertex = graph.AddGridVertex(
+                oldVertex.Position.x,
+                oldVertex.Position.y,
+                oldVertex.Position.z - BaseRule.STEP);
+        } else if (!edge.From.Top)
+        {
+            oldVertex = edge.From;
+            newVertex = graph.AddGridVertex(
+                oldVertex.Position.x,
+                oldVertex.Position.y,
+                oldVertex.Position.z + BaseRule.STEP);
+            up = true;
+        }
 
-        // TODO: Add to the correct vertical direction
-        DoorLock @lock = new(up: true);
-        edge.From.AddLock(@lock);
-        
-        IKey key = @lock.GetNewKey();
-        fork.To.AddKey(key);
+        var ie = graph.AddInterFloorEdge(oldVertex, newVertex);
+
+        // Make main path hidden
+        if (up) oldVertex.AddLock(new HiddenDoorLock(up: true));
+        else oldVertex.AddLock(new HiddenDoorLock(down: true));
+
+        var fork = AddFork(oldVertex, graph);
+        var newFork = AddFork(newVertex, graph, dir: fork.FromDirection, reversed: true);
+
+        var a = fork.To; var b = newFork.From;
+        graph.AddInterFloorEdge(a, b);
+
+        // TODO: Other dangers?
+        var @lock = new SecurityCameraLock();
+        a.AddLock(@lock);
+        b.AddLock(@lock);
+
+        // TODO: Add other bonus to newVertex?
+        newVertex.AddKey(@lock.GetNewKey());
+    }
+}
+
+public class FloorHiddenPathExtensionPattern : Pattern
+{
+    protected (GridEdge, GridEdge) AddInterFloorExtension(GridEdge edge, GridGraph graph)
+    {
+        (int midX, int midY, int midZ) = edge.GetMid();
+        GridVertex v = graph.AddGridVertex(midX, midY, midZ);
+        GridEdge e1 = graph.AddInterFloorEdge(edge.From, v);
+        GridEdge e2 = graph.AddInterFloorEdge(v, edge.To);
+
+        return (e1, e2);
+    }
+
+    public override void Apply(GridEdge edge, GridGraph graph)
+    {
+        graph.RemoveGridEdge(edge);
+        (GridEdge e1, GridEdge e2) = AddInterFloorExtension(edge, graph);
+
+        // e2 will be hidden path
+        HiddenDoorLock @lock = new(up: true);
+        e2.From.AddLock(@lock);
+
+        // Add secondary dangerous path
+        var upperFork = AddFork(e2.To, graph, reversed: true);
+        var lowerFork = AddFork(e2.From, graph, dir: upperFork.ToDirection);
+        graph.AddInterFloorEdge(upperFork.From, lowerFork.To);
     }
 }

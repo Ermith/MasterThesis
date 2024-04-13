@@ -305,6 +305,8 @@ public class SoundTrapLock : ILock
 public class HiddenDoorLock : ILock
 {
     private Directions _exits;
+    private bool _up;
+    private bool _down;
     public IList<ILockObject> Instances { get; } = new List<ILockObject>();
 
     public IKey GetNewKey()
@@ -321,10 +323,26 @@ public class HiddenDoorLock : ILock
                     door.Lock = this;
                     door.Type = DoorType.HiddenDoor;
                 }
+
+        if (_up && superTile.UpExit.HasValue)
+        {
+            var doorTile = superTile.Get(superTile.UpExit.Value.Item1, superTile.UpExit.Value.Item2) as DoorTile;
+            doorTile.Lock = this;
+            doorTile.Type = DoorType.HiddenDoor;
+        }
+
+        if (_down && superTile.DownExit.HasValue)
+        {
+            var doorTile = superTile.Get(superTile.DownExit.Value.Item1, superTile.DownExit.Value.Item2) as DoorTile;
+            doorTile.Lock = this;
+            doorTile.Type = DoorType.HiddenDoor;
+        }
     }
 
-    public HiddenDoorLock(Directions exits)
+    public HiddenDoorLock(Directions exits = Directions.None, bool up = false, bool down = false)
     {
         _exits = exits;
+        _up = up;
+        _down = down;
     }
 }
