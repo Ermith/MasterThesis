@@ -174,6 +174,7 @@ public abstract class ASuperTile
             DoorTile door = new(edgeFlags, Directions.None, dir);
             if (internalRoom) description.InternalExits.Add((ex, ey));
             tileGrid[x + ex, y + ey] = door;
+            description.FreeTiles.Remove((ex - (description.X - x), ey - (description.Y - y)));
         }
     }
 
