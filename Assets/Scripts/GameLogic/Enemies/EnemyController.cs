@@ -41,8 +41,10 @@ public class EnemyController : MonoBehaviour, ILockObject
     public float GuardViewDistance = 5f;
     public float DefaultViewDistance = 20f;
     public float FrustrationTime = 1f;
+    public float InvestigationTime = 5f;
 
     private float _frustrationTimer;
+    private float _investigationTimer;
 
     // Start is called before the first frame update
     void Start()
@@ -62,7 +64,11 @@ public class EnemyController : MonoBehaviour, ILockObject
         _chasing = true;
         _sight.Range = DefaultViewDistance;
         LookAt(sourcePosition);
-        MoveTo(sourcePosition, () => _chasing = false);
+        MoveTo(sourcePosition, () =>
+        {
+            _chasing = false;
+            _investigationTimer = InvestigationTime;
+        });
     }
 
     // Update is called once per frame
@@ -78,7 +84,11 @@ public class EnemyController : MonoBehaviour, ILockObject
         {
             _chasing = true;
             LookAt(player.transform.position);
-            MoveTo(player.transform.position, () => _chasing = false);
+            MoveTo(player.transform.position, () =>
+            {
+                _chasing = false;
+                _investigationTimer = InvestigationTime;
+            });
             _sight.VisionConeHilighted = true;
             _sight.Range = DefaultViewDistance;
 
@@ -127,6 +137,12 @@ public class EnemyController : MonoBehaviour, ILockObject
 
     public void ResolveBehaviour()
     {
+        if (_investigationTimer > 0)
+        {
+            _investigationTimer -= Time.deltaTime;
+            return;
+        }
+
         if (_chasing)
         {
             ResolveChase();
@@ -149,7 +165,8 @@ public class EnemyController : MonoBehaviour, ILockObject
             return;
 
         LookAt(DefaultPosition);
-        MoveTo(DefaultPosition, () => {
+        MoveTo(DefaultPosition, () =>
+        {
             LookInDirection(DefaultDirection);
             _sight.Range = GuardViewDistance;
         });
