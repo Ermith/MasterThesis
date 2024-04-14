@@ -106,7 +106,7 @@ class WalkingState : IMovementState
 
     public void StepSound(PlayerController player)
     {
-        GameController.AudioManager.PlayStep("Default", player.gameObject, volume: 0.3f);
+        GameController.AudioManager.PlayStep("Default", player.gameObject, volume: 0.3f, destroyTarget: true);
         GameController.AudioManager.AudibleEffect(player.gameObject, player.transform.position, _stepRadius);
     }
 }
@@ -169,7 +169,7 @@ class RunningState : IMovementState
 
     public void StepSound(PlayerController player)
     {
-        GameController.AudioManager.PlayStep("Default", player.gameObject, volume: 1f);
+        GameController.AudioManager.PlayStep("Default", player.gameObject, volume: 1f, destroyTarget: true);
         GameController.AudioManager.AudibleEffect(player.gameObject, player.transform.position, _stepRadius);
     }
 }

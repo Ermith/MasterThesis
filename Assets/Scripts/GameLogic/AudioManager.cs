@@ -41,7 +41,7 @@ public class AudioManager : MonoBehaviour
     #endregion
 
     #region SOUNDS
-    public AudioSource PlayOnTarget(string name, GameObject target, bool loop = false)
+    public AudioSource PlayOnTarget(string name, GameObject target, bool loop = false, bool destroyTarget = false)
     {
         Sound sound = null;
         foreach (Sound s in Sounds)
@@ -58,7 +58,7 @@ public class AudioManager : MonoBehaviour
         audio.loop = loop;
         audio.spatialBlend = sound.SpacialBlend;
         audio.dopplerLevel = 0;
-        StartCoroutine(PlayOnTargetCoroutine(audio));
+        StartCoroutine(PlayOnTargetCoroutine(audio, destroyTarget));
 
         return audio;
     }
@@ -120,7 +120,7 @@ public class AudioManager : MonoBehaviour
         return sound.AudioSource;
     }
 
-    public AudioSource PlayStep(string name, GameObject target, float? volume = null, float? pitch = null)
+    public AudioSource PlayStep(string name, GameObject target, float? volume = null, float? pitch = null, bool destroyTarget = false)
     {
         List<Sound> stepVariations = _stepDictionary[name];
         int index = URandom.Range(0, stepVariations.Count);
@@ -136,7 +136,7 @@ public class AudioManager : MonoBehaviour
         audio.pitch = pitch == null ? source.pitch : pitch.Value;
         audio.spatialBlend = source.spatialBlend;
 
-        StartCoroutine(PlayOnTargetCoroutine(audio));
+        StartCoroutine(PlayOnTargetCoroutine(audio, destroyTarget));
         return audio;
     }
 
@@ -150,13 +150,16 @@ public class AudioManager : MonoBehaviour
         Destroy(audio.gameObject);
     }
 
-    private IEnumerator PlayOnTargetCoroutine(AudioSource audio)
+    private IEnumerator PlayOnTargetCoroutine(AudioSource audio, bool destroyTarget)
     {
         audio.Play();
         while (audio.isPlaying)
             yield return null;
 
-        Destroy(audio);
+        if (destroyTarget)
+            Destroy(audio.gameObject);
+        else
+            Destroy(audio);
     }
     #endregion
 
