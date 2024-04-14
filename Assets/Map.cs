@@ -18,6 +18,7 @@ public class Map : MonoBehaviour
     public Camera Camera;
     public Transform CameraPoint;
     public GameObject HighlightTile;
+    public GameObject Compass;
 
     private List<GameObject> _floors = new();
     private MapTile[,,] _mapTiles;
@@ -204,5 +205,12 @@ public class Map : MonoBehaviour
         _highlightTile.transform.localPosition = new Vector3(x, -0.01f, y);
 
         ChangeFloor(floor);
+    }
+
+    public void OrientCompass(Vector3 rotation)
+    {
+        var angles = Compass.transform.eulerAngles;
+        angles.z = -rotation.y + 45;
+        Compass.transform.eulerAngles = angles;
     }
 }

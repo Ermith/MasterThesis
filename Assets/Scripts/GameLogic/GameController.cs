@@ -96,6 +96,7 @@ public class GameController : MonoBehaviour
         Time.timeScale = 0f;
         Instance.Map.gameObject.SetActive(true);
         Instance.Map.Highlight(x, y, floor);
+        Instance.Map.OrientCompass(Instance.Player.transform.eulerAngles);
     }
 
     public static void CloseMap()
