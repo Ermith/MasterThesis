@@ -485,6 +485,18 @@ PrefabInstance:
       propertyPath: m_PlayAutomatically
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4426805442727081813, guid: d34f97f096603bf42aa4cdeb548e7146, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426805442727081813, guid: d34f97f096603bf42aa4cdeb548e7146, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4426805442727081813, guid: d34f97f096603bf42aa4cdeb548e7146, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4426805442848528386, guid: d34f97f096603bf42aa4cdeb548e7146, type: 3}
       propertyPath: Map
       value: 
@@ -544,6 +556,14 @@ PrefabInstance:
     - target: {fileID: 4426805444400809299, guid: d34f97f096603bf42aa4cdeb548e7146, type: 3}
       propertyPath: m_Name
       value: Essentials
+      objectReference: {fileID: 0}
+    - target: {fileID: 9141433951915030240, guid: d34f97f096603bf42aa4cdeb548e7146, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9141433951915030240, guid: d34f97f096603bf42aa4cdeb548e7146, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d34f97f096603bf42aa4cdeb548e7146, type: 3}

@@ -15,12 +15,12 @@ public class CameraController : MonoBehaviour
     public float ThirdPersonDistance = 5f;
     public float ThirdPersonDampTime = 0.1f;
 
-    public CameraModeType Mode { get; private set; }
+    public CameraModeType Mode { get; private set; } = CameraModeType.FirstPerson;
 
     // Camera Mode Params
     private float _distance = 20;
     private float _horizontalRotation;
-    private float _verticalRotation; // rotation
+    private float _verticalRotation = 3f;
     private bool _horizontalRotationEnabled = true;
     private bool _verticalRotationEnabled = true;
     private float _damping = 0.1f;
@@ -305,12 +305,16 @@ public class CameraController : MonoBehaviour
     // Awake is called when the script instance is being loaded
     private void Start()
     {
+        transform.forward = Target.forward;
+        transform.position = Target.position;
         SwitchMode(CameraModeType.FirstPerson);
     }
 
     // Update is called once per frame
     void LateUpdate()
     {
+
+        Debug.Log(Mode);
         ResolveRotation();
         ResolveMovement();
         ResolveEffects();
