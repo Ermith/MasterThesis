@@ -31,7 +31,7 @@ class StairwayRoom : ASuperTile
                     dir);
 
             tileGrid[x + ex, y + ey] = door;
-            door.Type = HasDefaultDoor ? DoorType.Door : DoorType.None;
+            door.Type = HasDefaultDoor.Contains(dir) ? DoorType.Door : DoorType.None;
         }
 
         foreach ((int ex, int ey) in EdgeLocations(Width, Height))

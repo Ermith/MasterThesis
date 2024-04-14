@@ -82,6 +82,17 @@ public static class DirectionsExtensions
         return vector;
     }
 
+    public static (int x, int y) ToCoords(this Directions directions)
+    {
+        int x = 0, y = 0;
+        if (directions.North()) y += 1;
+        if (directions.South()) y -= 1;
+        if (directions.West()) x -= 1;
+        if (directions.East()) x += 1;
+
+        return (x, y);
+    }
+
     public static Directions GetRandom()
     {
         var dirs = Directions.None;

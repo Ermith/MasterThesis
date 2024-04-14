@@ -72,8 +72,6 @@ class MapBuilder
             else if (vertex.Hallway) tile = new HallwayWithRooms(_superWidth, _superHeight, z, vertex.Exits);
             else tile = new Room(_superWidth, _superHeight, z, vertex.Exits);
 
-            tile.HasDefaultDoor = (x % 2 == 0 && y % 2 == 1) || (x % 2 == 1 && y % 2 == 0);
-
             tile.Locks = vertex.GetLocks().ToList();
             tile.Keys = vertex.GetKeys().ToList();
 
@@ -141,6 +139,33 @@ class MapBuilder
             }
         }
 
+        Func<int, int, Directions, ASuperTile[,], bool> isHallway = (int x, int y, Directions dir, ASuperTile[,] grid) =>
+        {
+            (int dx, int dy) = dir.ToCoords();
+            x += dx;
+            y += dy;
+
+            if (x < 0 || y < 0 || x >= grid.GetLength(0) || y >= grid.GetLength(1))
+                return false;
+
+            return grid[x, y] is Hallway;
+        };
+
+        foreach ((var vertex, (int x, int y, int z)) in _graphDrawing.VertexPositions)
+        {
+            if (isHallway(x, y, Directions.North, superTileGrids[z]) || y % 2 == 0)
+                superTileGrids[z][x, y].HasDefaultDoor |= Directions.North;
+
+            if (isHallway(x, y, Directions.South, superTileGrids[z]) || y % 2 == 0)
+                superTileGrids[z][x, y].HasDefaultDoor |= Directions.South;
+
+            if (isHallway(x, y, Directions.East, superTileGrids[z]) || x % 2 == 0)
+                superTileGrids[z][x, y].HasDefaultDoor |= Directions.East;
+
+            if (isHallway(x, y, Directions.West, superTileGrids[z]) || x % 2 == 0)
+                superTileGrids[z][x, y].HasDefaultDoor |= Directions.West;
+        }
+
         return superTileGrids;
     }
 
@@ -156,7 +181,7 @@ class MapBuilder
         {
             var grid = new ATile[width, height];
             var superGrid = superTileGrids[i];
-            
+
             for (int x = 0; x < _width; x++)
                 for (int y = 0; y < _height; y++)
                     if (superGrid[x, y] != null)
