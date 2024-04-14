@@ -259,6 +259,8 @@ public class LevelGenerator : MonoBehaviour
     {
         // Render Floors
         RenderParams rp = new RenderParams(FloorMaterial);
+        rp.receiveShadows = true;
+        rp.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
 
         if (_activeFloor.HasValue)
             RenderInstanced(rp, FloorMesh, _floorMatrices[_activeFloor.Value]);
