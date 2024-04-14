@@ -21,6 +21,7 @@ public class EnemyController : MonoBehaviour, ILockObject
     Vector3? _lookDirection = null;
     Vector3[] _patrolPositions = null;
     const float EPSILON_RADIUS = 0.75f;
+    float _lastMovement = 0f;
 
     // patrol
     int _patrolIndex = 0;
@@ -39,6 +40,9 @@ public class EnemyController : MonoBehaviour, ILockObject
     public Vector3 DefaultDirection = Vector3.forward;
     public float GuardViewDistance = 5f;
     public float DefaultViewDistance = 20f;
+    public float FrustrationTime = 1f;
+
+    private float _frustrationTimer;
 
     // Start is called before the first frame update
     void Start()
@@ -124,7 +128,10 @@ public class EnemyController : MonoBehaviour, ILockObject
     public void ResolveBehaviour()
     {
         if (_chasing)
+        {
+            ResolveChase();
             return;
+        }
 
         if (Behaviour == Behaviour.Patroling)
             ResolvePatrol();
@@ -215,7 +222,23 @@ public class EnemyController : MonoBehaviour, ILockObject
             return;
         }
 
+
+        var pos = transform.position;
         _characterController.SimpleMove(dir * 3);
+        var movement = (transform.position - pos).magnitude;
+        _lastMovement = movement;
+    }
+
+    private void ResolveChase()
+    {
+        if (_lastMovement < 0.0001f)
+        {
+            _frustrationTimer -= Time.deltaTime;
+            _chasing = _frustrationTimer > 0;
+        } else
+        {
+            _frustrationTimer = FrustrationTime;
+        }
     }
 
     public void Unlock()
