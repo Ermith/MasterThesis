@@ -61,7 +61,7 @@ public class Sight : MonoBehaviour
             Vector3 segmentDir = transform.forward * cos + transform.right * sin;
             Vector3 vertexDir = (Vector3.forward * cos + Vector3.right * sin);
 
-            bool hit = Physics.Raycast(transform.position, segmentDir, out RaycastHit hitInfo, Range);
+            bool hit = Physics.Raycast(transform.position, segmentDir, out RaycastHit hitInfo, Range, ~(0b1100));
             vertices[segment] = hit
                 ? vertexDir * hitInfo.distance
                 : vertexDir * Range;
