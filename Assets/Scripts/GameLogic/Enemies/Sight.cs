@@ -35,11 +35,11 @@ public class Sight : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        if (!VisionConeVisible)
-            gameObject.SetActive(false);
+        //if (!VisionConeVisible)
+            //gameObject.SetActive(false);
 
-        if (!VisionConeVisible)
-          _meshRenderer.enabled = false;
+        
+        _meshRenderer.enabled = VisionConeVisible;
 
         if (VisionConeVisible)
             RenderVisionCone();

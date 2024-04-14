@@ -22,7 +22,8 @@ public class SecurityCameraController : MonoBehaviour, ILockObject
     {
         Debug.Log("Security Camera Disabled");
         GetComponentInChildren<MeshRenderer>().material.color = Color.black;
-        _sight.enabled = false;
+        //_sight.enabled = false;
+        _sight.VisionConeVisible = false;
         enabled = false;
     }
 
