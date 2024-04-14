@@ -41,6 +41,7 @@ public class PlayerController : MonoBehaviour
     private Animation _animation;
     private MeshRenderer _meshRenderer;
     public Animation Animation => _animation;
+    private Vector3 _gunPosition;
 
     private void Start()
     {
@@ -51,13 +52,14 @@ public class PlayerController : MonoBehaviour
         _visual = transform.Find("Visual").gameObject;
         _peekingBase = _viewPoint.localPosition;
         _peekDuration = PeekTime;
-        _gun = transform.Find("Gun").GetComponent<Gun>();
+        _gun = GetComponentInChildren<Gun>();
 
         _standingState = new StandingState();
         _walkingState = new WalkingState(WalkingSpeed, WalkingBobScale, WalkingStepPeriod, WalkingStepRadius);
         _runningState = new RunningState(RunningSpeed, RunningBobScale, RunningStepPeriod, RunningStepRadius);
         _slidingState = new SlidingState(SlidingSpeed, SlidingDuration);
         _movementState = _standingState;
+        _gunPosition = _gun.transform.localPosition;
     }
 
     private void Update()
@@ -97,9 +99,26 @@ public class PlayerController : MonoBehaviour
     #region Update Functions
     private void UpdateCamera()
     {
-        if (Input.GetKeyDown(KeyCode.F1)) Camera.SwitchMode(CameraModeType.FirstPerson);
-        if (Input.GetKeyDown(KeyCode.F2)) Camera.SwitchMode(CameraModeType.TopDown);
-        if (Input.GetKeyDown(KeyCode.F3)) Camera.SwitchMode(CameraModeType.ThirdPerson);
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            Camera.SwitchMode(CameraModeType.FirstPerson);
+            _gun.transform.parent = Camera.transform;
+            _gun.transform.localPosition = _gunPosition;
+        }
+
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            Camera.SwitchMode(CameraModeType.TopDown);
+            _gun.transform.parent = _viewPoint;
+            _gun.transform.localPosition = _gunPosition;
+        }
+
+        if (Input.GetKeyDown(KeyCode.F3))
+        {
+            Camera.SwitchMode(CameraModeType.ThirdPerson);
+            _gun.transform.parent = _viewPoint;
+            _gun.transform.localPosition = _gunPosition;
+        }
 
         _visual.SetActive(Camera.Mode != CameraModeType.FirstPerson);
 
@@ -184,6 +203,8 @@ public class PlayerController : MonoBehaviour
         // Rotation
         if (!_movementState.FreeLook && Camera.Mode == CameraModeType.FirstPerson)
             transform.forward = cameraForward;
+        else if (_gun.Aiming)
+            _viewPoint.forward = cameraForward;
         else if (movement.magnitude != 0)
             transform.forward = movement.normalized;
     }
