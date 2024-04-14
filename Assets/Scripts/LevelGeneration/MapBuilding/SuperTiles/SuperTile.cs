@@ -32,6 +32,8 @@ public abstract class ASuperTile
 
     public int Floor { get; set; }
 
+    public bool HasDefaultDoor = false;
+
     public List<ILock> Locks { get; set; }
     public List<IKey> Keys { get; set;  }
 
@@ -135,7 +137,7 @@ public abstract class ASuperTile
         int ox, int oy,
         int width, int height,
         SuperTileDescription description,
-        Directions roomExits, bool internalRoom = true)
+        Directions roomExits, bool internalRoom = true, bool hasDefaultDoor = true)
     {
         ATile[,] tileGrid = description.TileGrid;
 
@@ -171,7 +173,8 @@ public abstract class ASuperTile
         foreach ((Directions dir, (int ex, int ey)) in exits)
         {
             Directions edgeFlags = EdgeDirectinons(ex, ey, width, height);
-            DoorTile door = new(edgeFlags, Directions.None, dir);
+            var doorType = hasDefaultDoor ? DoorType.Door : DoorType.None;
+            DoorTile door = new(edgeFlags, Directions.None, dir,type: doorType);
             if (internalRoom) description.InternalExits.Add((ex, ey));
             tileGrid[x + ex, y + ey] = door;
             description.FreeTiles.Remove((ex - (description.X - x), ey - (description.Y - y)));

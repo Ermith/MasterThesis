@@ -24,11 +24,15 @@ class StairwayRoom : ASuperTile
         SuperTileDescription description = CreateDescription(x, y, tileGrid);
 
         foreach ((Directions dir, (int ex, int ey)) in description.ExitsTiles)
-            tileGrid[x + ex, y + ey] =
-                new DoorTile(
+        {
+                var door = new DoorTile(
                     EdgeDirectinons(ex, ey, Width, Height),
                     Directions.None,
                     dir);
+
+            tileGrid[x + ex, y + ey] = door;
+            door.Type = HasDefaultDoor ? DoorType.Door : DoorType.None;
+        }
 
         foreach ((int ex, int ey) in EdgeLocations(Width, Height))
         {

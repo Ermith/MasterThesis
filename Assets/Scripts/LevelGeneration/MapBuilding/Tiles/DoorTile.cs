@@ -7,6 +7,7 @@ using UnityEngine;
 
 public enum DoorType
 {
+    None,
     Door,
     WallOfLight,
     HiddenDoor
@@ -18,7 +19,7 @@ public class DoorTile : EdgeTile
     public Directions DoorExits;
     public DoorType Type;
 
-    public DoorTile(Directions edges, Directions freeExits, Directions doorExits, int thickness = 1, DoorType type = DoorType.Door) : base(edges, thickness, freeExits)
+    public DoorTile(Directions edges, Directions freeExits, Directions doorExits, int thickness = 1, DoorType type = DoorType.None) : base(edges, thickness, freeExits)
     {
         DoorExits = doorExits;
         Type = type;
@@ -40,6 +41,12 @@ public class DoorTile : EdgeTile
 
         if (DoorExits.East()) doors.Add((x + WIDTH - 1, y + HalfHeight, Directions.East));
         if (DoorExits.East()) subTileGrid[x + WIDTH - 1, y + HalfHeight - 1] = new FloorSubTile();
+
+        if (Type == DoorType.None)
+            foreach((int dx, int dy, Directions _) in doors)
+            {
+                subTileGrid[dx, dy] = new FloorSubTile();
+            }
 
         if (Type == DoorType.Door)
             foreach ((int dx, int dy, Directions dir) in doors)

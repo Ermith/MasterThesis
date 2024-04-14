@@ -45,19 +45,24 @@ public class DoorLock : ILock
     {
         foreach (Directions dir in _exits.Enumerate())
             if (superTile.ExitsTiles.TryGetValue(dir, out (int x, int y) t))
-                if (superTile.Get(t.x, t.y) is DoorTile door)
-                    door.Lock = this;
+                if (superTile.Get(t.x, t.y) is DoorTile doorTile)
+                {
+                    doorTile.Lock = this;
+                    doorTile.Type = DoorType.Door;
+                }
 
         if (_upExit && superTile.UpExit.HasValue)
         {
             var doorTile = superTile.Get(superTile.UpExit.Value.Item1, superTile.UpExit.Value.Item2) as DoorTile;
             doorTile.Lock = this;
+            doorTile.Type = DoorType.Door;
         }
 
         if (_downExit && superTile.DownExit.HasValue)
         {
             var doorTile = superTile.Get(superTile.DownExit.Value.Item1, superTile.DownExit.Value.Item2) as DoorTile;
             doorTile.Lock = this;
+            doorTile.Type = DoorType.Door;
         }
     }
 
@@ -72,6 +77,8 @@ public class DoorLock : ILock
 public class WallOfLightLock : ILock
 {
     private Directions _exits;
+    private bool _upExit;
+    private bool _downExit;
     public IList<ILockObject> Instances { get; } = new List<ILockObject>();
 
     public IKey GetNewKey()
@@ -85,16 +92,33 @@ public class WallOfLightLock : ILock
     {
         foreach (Directions dir in _exits.Enumerate())
             if (superTile.ExitsTiles.TryGetValue(dir, out (int x, int y) t))
-                if (superTile.Get(t.x, t.y) is DoorTile door)
+                if (superTile.Get(t.x, t.y) is DoorTile doorTile)
                 {
-                    door.Lock = this;
-                    door.Type = DoorType.WallOfLight;
+                    doorTile.Lock = this;
+                    doorTile.Type = DoorType.WallOfLight;
                 }
+
+
+        if (_upExit && superTile.UpExit.HasValue)
+        {
+            var doorTile = superTile.Get(superTile.UpExit.Value.Item1, superTile.UpExit.Value.Item2) as DoorTile;
+            doorTile.Lock = this;
+            doorTile.Type = DoorType.WallOfLight;
+        }
+
+        if (_downExit && superTile.DownExit.HasValue)
+        {
+            var doorTile = superTile.Get(superTile.DownExit.Value.Item1, superTile.DownExit.Value.Item2) as DoorTile;
+            doorTile.Lock = this;
+            doorTile.Type = DoorType.WallOfLight;
+        }
     }
 
-    public WallOfLightLock(Directions exits)
+    public WallOfLightLock(Directions exits = Directions.None, bool upExit = false, bool downExit = false)
     {
         _exits = exits;
+        _upExit = upExit;
+        _downExit = downExit;
     }
 }
 
@@ -318,10 +342,10 @@ public class HiddenDoorLock : ILock
     {
         foreach (Directions dir in _exits.Enumerate())
             if (superTile.ExitsTiles.TryGetValue(dir, out (int x, int y) t))
-                if (superTile.Get(t.x, t.y) is DoorTile door)
+                if (superTile.Get(t.x, t.y) is DoorTile doorTile)
                 {
-                    door.Lock = this;
-                    door.Type = DoorType.HiddenDoor;
+                    doorTile.Lock = this;
+                    doorTile.Type = DoorType.HiddenDoor;
                 }
 
         if (_up && superTile.UpExit.HasValue)

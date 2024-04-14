@@ -72,6 +72,8 @@ class MapBuilder
             else if (vertex.Hallway) tile = new HallwayWithRooms(_superWidth, _superHeight, z, vertex.Exits);
             else tile = new Room(_superWidth, _superHeight, z, vertex.Exits);
 
+            tile.HasDefaultDoor = (x % 2 == 0 && y % 2 == 1) || (x % 2 == 1 && y % 2 == 0);
+
             tile.Locks = vertex.GetLocks().ToList();
             tile.Keys = vertex.GetKeys().ToList();
 
