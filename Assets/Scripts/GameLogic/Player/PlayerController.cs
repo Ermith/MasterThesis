@@ -74,11 +74,12 @@ public class PlayerController : MonoBehaviour
         SwitchState();
     }
 
-    public bool IsHidden { get; private set; }
+    private int _hidden = 0;
+    public bool IsHidden => _hidden > 0;
     public void SetHidden(bool hidden)
     {
-        IsHidden = hidden;
-        _meshRenderer.material.color = hidden ? Color.black : Color.white;
+        _hidden += hidden ? 1 : -1;
+        _meshRenderer.material.color = IsHidden ? Color.black : Color.white;
     }
 
     private bool _dead = false;
