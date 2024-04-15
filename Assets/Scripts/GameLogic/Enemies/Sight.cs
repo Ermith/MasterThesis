@@ -8,6 +8,7 @@ public class Sight : MonoBehaviour
     private MeshFilter _meshFilter;
     private MeshRenderer _meshRenderer;
     private Mesh _mesh;
+    private Mesh _emptyMesh;
     private Color _baseColor;
     private Color _highlightColor = Color.red;
 
@@ -29,6 +30,7 @@ public class Sight : MonoBehaviour
         _baseColor = _meshRenderer.material.color;
         _meshFilter = this.AddComponent<MeshFilter>();
         _mesh = new Mesh();
+        _emptyMesh = new Mesh();
         _meshFilter.mesh = _mesh;
     }
 
@@ -39,8 +41,9 @@ public class Sight : MonoBehaviour
             //gameObject.SetActive(false);
 
         
-        _meshRenderer.enabled = VisionConeVisible;
+        //_meshRenderer.enabled = VisionConeVisible;
 
+        _meshFilter.mesh = VisionConeVisible ? _mesh : _emptyMesh;
         if (VisionConeVisible)
             RenderVisionCone();
         
