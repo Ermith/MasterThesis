@@ -60,6 +60,9 @@ public class PlayerController : MonoBehaviour
         _slidingState = new SlidingState(SlidingSpeed, SlidingDuration);
         _movementState = _standingState;
         _gunPosition = _gun.transform.localPosition;
+
+        _gun.transform.parent = Camera.transform;
+        _gun.transform.localPosition = _gunPosition;
     }
 
     private void Update()
