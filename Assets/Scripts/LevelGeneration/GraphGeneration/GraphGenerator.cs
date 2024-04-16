@@ -249,16 +249,16 @@ public class GraphGenerator
 
         // Inter Floor Patterns
         //floorExtension.Apply(interFloorEdge, Graph);
-        //floorLockedAddition.Apply(Graph.InterFloorEdges[0], Graph);
-        //floorHiddenExtension.Apply(interFloorEdge, Graph);
+        floorLockedAddition.Apply(Graph.InterFloorEdges[0], Graph);
+        floorHiddenExtension.Apply(interFloorEdge, Graph);
         //floorLockedExtension.Apply(Graph.InterFloorEdges[Graph.InterFloorEdges.Count - 1], Graph);
 
         // Single Floor Patterns
-        doubleLock.Apply(startEdge, Graph);
+        //doubleLock.Apply(startEdge, Graph);
         //cycle.Apply(startEdge, Graph);
         //hiddenPath.Apply(endEdge, Graph);
 
-        /*/
+        //*/
         for (int i = 0; i < Graph.FloorCount; i++)
         {
             for (int j = 0; j < 1; j++)
