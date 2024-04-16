@@ -42,9 +42,11 @@ public class EnemyController : MonoBehaviour, ILockObject
     public float DefaultViewDistance = 20f;
     public float FrustrationTime = 1f;
     public float InvestigationTime = 5f;
+    public float StepTime = 0.6f;
 
     private float _frustrationTimer;
     private float _investigationTimer;
+    private float _stepTimer;
 
     // Start is called before the first frame update
     void Start()
@@ -251,6 +253,14 @@ public class EnemyController : MonoBehaviour, ILockObject
         _characterController.SimpleMove(dir * 3);
         var movement = (transform.position - pos).magnitude;
         _lastMovement = movement;
+
+        if (_stepTimer >= StepTime)
+        {
+            GameController.AudioManager.PlayStep("Default", gameObject);
+            _stepTimer %= StepTime;
+        }
+
+        _stepTimer += Time.deltaTime;
     }
 
     private void ResolveChase()

@@ -135,6 +135,9 @@ MonoBehaviour:
   DefaultDirection: {x: 0, y: 0, z: 1}
   GuardViewDistance: 3
   DefaultViewDistance: 15
+  FrustrationTime: 1
+  InvestigationTime: 5
+  StepTime: 0.6
 --- !u!114 &7240094474568271847
 MonoBehaviour:
   m_ObjectHideFlags: 0
