@@ -20,6 +20,7 @@ public class GameController : MonoBehaviour
     public Map Map;
     public PlayerController Player;
     public LevelGenerator LevelGenerator;
+    public InfoScreen InfoScreen;
 
     private Transform _interactText;
 
@@ -59,6 +60,23 @@ public class GameController : MonoBehaviour
         {
             LevelGenerator.UnHilightFloors();
         }
+
+
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            InfoScreen.gameObject.SetActive(true);
+            InfoScreen.SetCamoCount(0);
+            InfoScreen.SetTrapKitCount(0);
+            InfoScreen.ClearKeys();
+            foreach (IKey key in Player.Keys)
+                if (key is DoorKey doorKey)
+                    InfoScreen.AddKey(doorKey);
+
+            InfoScreen.RefreshKeys();
+        }
+
+        if (Input.GetKeyUp(KeyCode.I))
+            InfoScreen.gameObject.SetActive(false);
     }
 
     public static void Restart()

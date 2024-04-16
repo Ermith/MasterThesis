@@ -92,7 +92,7 @@ public class Map : MonoBehaviour
             obj.transform.localPosition = new Vector3(x, 0, y);
             obj.UpExit = v.Top;
             obj.DownExit = v.Bottom;
-            obj.SetName(v.ToString());
+            obj.SetName($"{x}.{y}");
             _mapTiles[z, x, y] = obj;
         }
 

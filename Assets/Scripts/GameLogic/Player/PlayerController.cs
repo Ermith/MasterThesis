@@ -323,10 +323,10 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Keys
-    private List<IKey> _keys = new List<IKey>();
+    public List<IKey> Keys = new List<IKey>();
     public bool HasKeyForLock(ILock @lock)
     {
-        foreach (IKey key in _keys)
+        foreach (IKey key in Keys)
             if (key.Locks.Contains(@lock))
                 return true;
 
@@ -336,7 +336,7 @@ public class PlayerController : MonoBehaviour
     public void AddKey(IKey key)
     {
         GameController.AudioManager.Play("Jingle");
-        _keys.Add(key);
+        Keys.Add(key);
     }
 
     #endregion

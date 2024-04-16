@@ -21,14 +21,16 @@ class StairwayRoom : ASuperTile
 
     public override List<EnemyParams> BuildTiles(int x, int y, ATile[,] tileGrid)
     {
-        SuperTileDescription description = CreateDescription(x, y, tileGrid);
+        Description = CreateDescription(x, y, tileGrid);
 
-        foreach ((Directions dir, (int ex, int ey)) in description.ExitsTiles)
+        foreach ((Directions dir, (int ex, int ey)) in Description.ExitsTiles)
         {
                 var door = new DoorTile(
                     EdgeDirectinons(ex, ey, Width, Height),
                     Directions.None,
                     dir);
+
+            door.RoomName = GetName();
 
             tileGrid[x + ex, y + ey] = door;
             door.Type = HasDefaultDoor.Contains(dir) ? DoorType.Door : DoorType.None;
@@ -39,7 +41,7 @@ class StairwayRoom : ASuperTile
             if (tileGrid[x + ex, y + ey] == null)
             {
                 tileGrid[x + ex, y + ey] = new EdgeTile(EdgeDirectinons(ex, ey, Width, Height));
-                description.PatrolPath.Add((ex, ey));
+                Description.PatrolPath.Add((ex, ey));
             }
         }
 
@@ -47,7 +49,7 @@ class StairwayRoom : ASuperTile
                 x + 1, y + 1,
                 1, 1,
                 Width - 2, Height - 2,
-                description,
+                Description,
                 Directions.North | Directions.South,
                 internalRoom: true);
 
@@ -61,19 +63,22 @@ class StairwayRoom : ASuperTile
             for (int i = 1; i <= Height - 2; i++)
             {
                 (tileGrid[upX, y + i] as EdgeTile).Edges |= upDir;
-                description.FreeTiles.Remove((upX - x, i));
+                Description.FreeTiles.Remove((upX - x, i));
             }
 
             var up = tileGrid[upX, y + 1] as EdgeTile;
-            tileGrid[upX, y + 1] = new DoorTile(up.Edges, Directions.None, upDir);
+            var door = new DoorTile(up.Edges, Directions.None, upDir);
+            door.Up = true;
+            door.RoomName = GetName();
+            tileGrid[upX, y + 1] = door;
             tileGrid[upX, y + 2].Objects.Add(() => {
                 var obj = GameObject.Instantiate(Blueprint);
                 obj.transform.forward = Vector3.forward;
                 return obj;
             });
 
-            description.UpExit = (upX - x, 1);
-            description.FreeTiles.Add((upX - x, Height - 2));
+            Description.UpExit = (upX - x, 1);
+            Description.FreeTiles.Add((upX - x, Height - 2));
         }
 
         if (_downExit)
@@ -86,20 +91,23 @@ class StairwayRoom : ASuperTile
             for (int i = 1; i <= Height - 2; i++)
             {
                 (tileGrid[downX, y + i] as EdgeTile).Edges |= downDir;
-                description.FreeTiles.Remove((downX - x, i));
+                Description.FreeTiles.Remove((downX - x, i));
             }
 
             var down = tileGrid[downX, y + 3] as EdgeTile;
-            tileGrid[downX, y + 3] = new DoorTile(down.Edges, Directions.None, downDir);
+            var door = new DoorTile(down.Edges, Directions.None, downDir);
+            door.Down = true;
+            door.RoomName = GetName();
+            tileGrid[downX, y + 3] = door;
             (tileGrid[downX, y + 2] as EdgeTile).Floor = false;
 
-            description.DownExit = (downX - x, 3);
+            Description.DownExit = (downX - x, 3);
         }
 
 
-        foreach (ILock l in Locks) l.Implement(description);
-        foreach (IKey k in Keys) k.Implement(description);
+        foreach (ILock l in Locks) l.Implement(Description);
+        foreach (IKey k in Keys) k.Implement(Description);
 
-        return description.Enemies;
+        return Description.Enemies;
     }
 }

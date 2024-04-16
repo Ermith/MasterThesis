@@ -16,7 +16,7 @@ public class WideHallway : ASuperTile
 
     public override List<EnemyParams> BuildTiles(int x, int y, ATile[,] tileGrid)
     {
-        SuperTileDescription description = CreateDescription(x, y, tileGrid);
+        Description = CreateDescription(x, y, tileGrid);
         int midX = Width / 2;
         int midY = Height / 2;
 
@@ -30,7 +30,7 @@ public class WideHallway : ASuperTile
             tileGrid[x + midX + i - 1, y + midY + j - 1] = new EdgeTile(edgeFlags);
         }
 
-        foreach ((Directions dir, (int ex, int ey)) in description.ExitsTiles)
+        foreach ((Directions dir, (int ex, int ey)) in Description.ExitsTiles)
             foreach ((int px, int py) in GetShortPath(midX, midY, ex, ey))
             {
                 // Neighbor 1 and Neighbor 2
@@ -107,12 +107,12 @@ public class WideHallway : ASuperTile
                 patrol.Add(ATile.FromSuperMid(x + px, y + py));
         }
 
-        description.PatrolPath = patrol;
-        description.PatrolLooped = true;
+        Description.PatrolPath = patrol;
+        Description.PatrolLooped = true;
 
-        foreach (ILock l in Locks) l.Implement(description);
-        foreach (IKey k in Keys) k.Implement(description);
+        foreach (ILock l in Locks) l.Implement(Description);
+        foreach (IKey k in Keys) k.Implement(Description);
 
-        return description.Enemies;
+        return Description.Enemies;
     }
 }

@@ -93,6 +93,17 @@ public static class DirectionsExtensions
         return (x, y);
     }
 
+    public static string ToStr(this Directions directions)
+    {
+        StringBuilder sb = new();
+        if (directions.North()) sb.Append('N');
+        if (directions.South()) sb.Append('S');
+        if (directions.East()) sb.Append('E');
+        if (directions.West()) sb.Append('W');
+
+        return sb.ToString();
+    }
+
     public static Directions GetRandom()
     {
         var dirs = Directions.None;

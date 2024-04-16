@@ -18,6 +18,9 @@ public class DoorTile : EdgeTile
     public ILock Lock = null;
     public Directions DoorExits;
     public DoorType Type;
+    public string RoomName;
+    public bool Up;
+    public bool Down;
 
     public DoorTile(Directions edges, Directions freeExits, Directions doorExits, int thickness = 1, DoorType type = DoorType.None) : base(edges, thickness, freeExits)
     {
@@ -54,6 +57,9 @@ public class DoorTile : EdgeTile
                 DoorSubTile door = new();
                 door.DoorLock = Lock as DoorLock;
                 door.Orientation = dir;
+                door.Up = Up;
+                door.Down = Down;
+                door.SetName(RoomName);
                 subTileGrid[dx, dy] = door;
             }
 

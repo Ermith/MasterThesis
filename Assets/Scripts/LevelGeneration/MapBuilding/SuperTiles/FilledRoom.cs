@@ -16,15 +16,16 @@ public class FilledRoom : ASuperTile
 
     public override List<EnemyParams> BuildTiles(int x, int y, ATile[,] tileGrid)
     {
-        SuperTileDescription description = CreateDescription(x, y, tileGrid);
+        Description = CreateDescription(x, y, tileGrid);
 
-        foreach ((Directions dir, (int ex, int ey)) in description.ExitsTiles)
+        foreach ((Directions dir, (int ex, int ey)) in Description.ExitsTiles)
         {
             var door = new DoorTile(
                 EdgeDirectinons(ex, ey, Width, Height),
                 Directions.None,
                 dir);
 
+            door.RoomName = GetName();
             tileGrid[x + ex, y + ey] = door;
             door.Type = HasDefaultDoor.Contains(dir) ? DoorType.Door : DoorType.None;
         }
@@ -35,7 +36,7 @@ public class FilledRoom : ASuperTile
             if (tileGrid[x + ex, y + ey] == null)
             {
                 tileGrid[x + ex, y + ey] = new EdgeTile(EdgeDirectinons(ex, ey, Width, Height));
-                description.FreeTiles.Add((ex, ey));
+                Description.FreeTiles.Add((ex, ey));
             }
         }
 
@@ -44,14 +45,14 @@ public class FilledRoom : ASuperTile
                 x + 1, y + 1,
                 1, 1,
                 Width - 2, Height - 2,
-                description,
+                Description,
                 DirectionsExtensions.GetRandom(),
                 internalRoom: true);
         else
             BuildWall(
                 x + 1, y + 1,
                 Width - 2, Height - 2,
-                description);
+                Description);
 
         var corners = new (int, int)[] {
             (0, 0),
@@ -68,19 +69,19 @@ public class FilledRoom : ASuperTile
             foreach ((int px, int py) in GetShortPath(cx, cy, nextCx, nextCy))
             {
                 patrol.Add(ATile.FromSuperMid(x + px, y + py));
-                description.FreeTiles.Remove((px, py));
+                Description.FreeTiles.Remove((px, py));
             }
         }
 
-        description.PatrolPath = patrol;
-        description.PatrolLooped = true;
+        Description.PatrolPath = patrol;
+        Description.PatrolLooped = true;
 
         foreach (IKey k in Keys)
-            k.Implement(description);
+            k.Implement(Description);
 
         foreach (ILock l in Locks)
-            l.Implement(description);
+            l.Implement(Description);
 
-        return description.Enemies;
+        return Description.Enemies;
     }
 }

@@ -12,13 +12,13 @@ public class HallwayWithRooms : Hallway
 
     public override List<EnemyParams> BuildTiles(int x, int y, ATile[,] tileGrid)
     {
-        SuperTileDescription description = CreateDescription(x, y, tileGrid);
+        Description = CreateDescription(x, y, tileGrid);
 
         int midX = Width / 2;
         int midY = Height / 2;
         List<(int, int)> patrol = new();
 
-        foreach ((Directions dir, (int ex, int ey)) in description.ExitsTiles)
+        foreach ((Directions dir, (int ex, int ey)) in Description.ExitsTiles)
             foreach ((int px, int py) in GetShortPath(midX, midY, ex, ey))
             {
                 patrol.Add(ATile.FromSuperMid(x + px, y + py));
@@ -28,8 +28,8 @@ public class HallwayWithRooms : Hallway
                 tileGrid[x + px, y + py] = new EdgeTile(dir.Perpendicular());
             }
 
-        description.PatrolPath = patrol;
-        description.PatrolLooped = false;
+        Description.PatrolPath = patrol;
+        Description.PatrolLooped = false;
 
         Directions midWalls = ~Exits;
         tileGrid[x + midX, y + midY] = new EdgeTile(midWalls);
@@ -43,7 +43,7 @@ public class HallwayWithRooms : Hallway
         {
             nwExits |= Directions.East;
             neExits |= Directions.West;
-            var tile = description.Get(midX, midY + 1 + roomHeight / 2) as EdgeTile;
+            var tile = Description.Get(midX, midY + 1 + roomHeight / 2) as EdgeTile;
             tile.Exits |= nwExits | neExits;
         }
 
@@ -51,7 +51,7 @@ public class HallwayWithRooms : Hallway
         {
             swExits |= Directions.East;
             seExits |= Directions.West;
-            var tile = description.Get(midX, roomHeight / 2) as EdgeTile;
+            var tile = Description.Get(midX, roomHeight / 2) as EdgeTile;
             tile.Exits |= swExits | seExits;
         }
 
@@ -59,7 +59,7 @@ public class HallwayWithRooms : Hallway
         {
             nwExits |= Directions.South;
             swExits |= Directions.North;
-            var tile = description.Get(roomWidth / 2, midY) as EdgeTile;
+            var tile = Description.Get(roomWidth / 2, midY) as EdgeTile;
             tile.Exits |= nwExits | swExits;
         }
 
@@ -67,7 +67,7 @@ public class HallwayWithRooms : Hallway
         {
             neExits |= Directions.South;
             seExits |= Directions.North;
-            var tile = description.Get(midX + 1 + roomWidth / 2, midY) as EdgeTile;
+            var tile = Description.Get(midX + 1 + roomWidth / 2, midY) as EdgeTile;
             tile.Exits |= neExits | seExits;
         }
 
@@ -76,32 +76,32 @@ public class HallwayWithRooms : Hallway
                 x, y,
                 0, 0,
                 roomWidth, roomHeight,
-                description, swExits);
+                Description, swExits);
 
         if (!seExits.None()) 
             BuildSubRoom(
                 x + midX + 1, y,
                 midX + 1, 0,
                 roomWidth, roomHeight,
-                description, seExits);
+                Description, seExits);
 
         if (!nwExits.None())
             BuildSubRoom(
                 x, y + midY + 1,
                 0, midY + 1,
                 roomWidth, roomHeight,
-                description, nwExits);
+                Description, nwExits);
 
         if (!neExits.None())
             BuildSubRoom(
                 x + midX + 1, y + midY + 1,
                 midX + 1, midY + 1,
                 roomWidth, roomHeight,
-                description, neExits);
+                Description, neExits);
 
-        foreach (ILock l in Locks) l.Implement(description);
-        foreach (IKey k in Keys) k.Implement(description);
+        foreach (ILock l in Locks) l.Implement(Description);
+        foreach (IKey k in Keys) k.Implement(Description);
 
-        return description.Enemies;
+        return Description.Enemies;
     }
 }

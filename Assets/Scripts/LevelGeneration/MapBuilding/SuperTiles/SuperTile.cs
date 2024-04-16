@@ -40,6 +40,12 @@ public abstract class ASuperTile
     public Directions Exits { get; set; }
     public Dictionary<Directions, (int, int)> ExitTiles;
     public List<(int, int)> InternalExitTiles;
+    public SuperTileDescription Description { get; protected set; }
+
+    public string GetName()
+    {
+        return $"{Description.X}.{Description.Y}F{Description.Floor}";
+    }
 
     public ASuperTile(int width, int height, int floor, Directions exits = Directions.None)
     {
@@ -176,6 +182,7 @@ public abstract class ASuperTile
             DoorTile door = new(edgeFlags, Directions.None, dir, type: DoorType.Door);
             if (internalRoom) description.InternalExits.Add((ex, ey));
             tileGrid[x + ex, y + ey] = door;
+            door.RoomName = GetName();
             description.FreeTiles.Remove((ex - (description.X - x), ey - (description.Y - y)));
         }
     }

@@ -103,6 +103,7 @@ public class LevelGenerator : MonoBehaviour
             doorObject.Lock?.Instances.Add(doorObject);
             doorObject.transform.forward = door.Orientation.ToVector3();
             doorObject.ChangeColor = true;
+            doorObject.name = door.Name;
             return doorTileObject;
         });
 

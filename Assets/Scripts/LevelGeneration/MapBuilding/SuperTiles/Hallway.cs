@@ -14,13 +14,13 @@ public class Hallway : ASuperTile
 
     public override List<EnemyParams> BuildTiles(int x, int y, ATile[,] tileGrid)
     {
-        SuperTileDescription description = CreateDescription(x, y, tileGrid);
+        Description = CreateDescription(x, y, tileGrid);
 
         int midX = Width / 2;
         int midY = Height / 2;
         List<(int, int)> patrol = new();
 
-        foreach ((Directions dir, (int ex, int ey)) in description.ExitsTiles)
+        foreach ((Directions dir, (int ex, int ey)) in Description.ExitsTiles)
             foreach ((int px, int py) in GetShortPath(midX, midY, ex, ey))
             {
                 patrol.Add(ATile.FromSuperMid(x + px, y + py));
@@ -34,17 +34,17 @@ public class Hallway : ASuperTile
                     tileGrid[x + px, y + py] = new RefugeEdgeTile(dir.Perpendicular(), dir.Perpendicular(), thickness: 2);
             }
 
-        description.PatrolPath = patrol;
-        description.PatrolLooped = false;
+        Description.PatrolPath = patrol;
+        Description.PatrolLooped = false;
         
 
         Directions midWalls = ~Exits;
         tileGrid[x + midX, y + midY] = new RefugeEdgeTile(midWalls, midWalls, thickness: 2);
-        description.FreeTiles.Add((midX, midY));
+        Description.FreeTiles.Add((midX, midY));
 
-        foreach (ILock l in Locks) l.Implement(description);
-        foreach (IKey k in Keys) k.Implement(description);
+        foreach (ILock l in Locks) l.Implement(Description);
+        foreach (IKey k in Keys) k.Implement(Description);
 
-        return description.Enemies;
+        return Description.Enemies;
     }
 }
