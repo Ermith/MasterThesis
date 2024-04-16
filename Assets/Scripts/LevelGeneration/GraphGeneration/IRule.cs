@@ -615,6 +615,7 @@ public class HiddenPathPattern : Pattern
         SecurityCameraLock cameraLock = new();
         var cameraKey = cameraLock.GetNewKey();
         e1.To.AddLock(cameraLock);
+        e1.To.AddLock(new TrapLock());
 
         // Place Bonus on the hidden side path
         // TODO: Key does not make sense here... Make it something else
@@ -636,6 +637,7 @@ public class FloorLockedExtentionPattern : Pattern
 
         return (e1, e2);
     }
+
     public override void Apply(GridEdge edge, GridGraph graph)
     {
         // edge has to connect 2 floors

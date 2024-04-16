@@ -274,18 +274,22 @@ public class TrapLock : ILock
         var freeTiles = superTile.FreeTiles.ToArray();
         if (freeTiles.Length <= 0) return;
 
-        for (int i = 0; i < freeTiles.Length / 1; i++)
+        for (int i = 0; i < freeTiles.Length; i++)
         {
             int tileIndex = URandom.Range(0, superTile.FreeTiles.Count - 1);
-            (int x, int y) = freeTiles[tileIndex];
+            (int x, int y) = freeTiles[i];
             var tile = superTile.Get(x, y);
-            superTile.FreeTiles.Remove((x, y));
+            //superTile.FreeTiles.Remove((x, y));
             tile.Objects.Add(() =>
             {
                 var obj = GameObject.Instantiate(Blueprint);
-                var lo = obj.GetComponent<ILockObject>();
-                lo.Lock = this;
-                Instances.Add(lo);
+                var lo = obj.GetComponentsInChildren<ILockObject>();
+
+                foreach (var l in lo)
+                {
+                    l.Lock = this;
+                    Instances.Add(l);
+                }
                 return obj;
             });
         }
@@ -308,12 +312,12 @@ public class SoundTrapLock : ILock
         var freeTiles = superTile.FreeTiles.ToArray();
         if (freeTiles.Length <= 0) return;
 
-        for (int i = 0; i < freeTiles.Length / 1; i++)
+        for (int i = 0; i < freeTiles.Length / 2; i++)
         {
             int tileIndex = URandom.Range(0, superTile.FreeTiles.Count - 1);
             (int x, int y) = freeTiles[tileIndex];
             var tile = superTile.Get(x, y);
-            superTile.FreeTiles.Remove((x, y));
+            //superTile.FreeTiles.Remove((x, y));
             tile.Objects.Add(() =>
             {
                 var obj = GameObject.Instantiate(Blueprint);
