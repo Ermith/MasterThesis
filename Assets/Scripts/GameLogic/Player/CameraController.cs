@@ -313,11 +313,10 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-
-        Debug.Log(Mode);
         ResolveRotation();
         ResolveMovement();
         ResolveEffects();
+        ResolveCollision();
     }
 
     private IEnumerator DistanceCoroutine(float distance, float time)
@@ -336,5 +335,19 @@ public class CameraController : MonoBehaviour
 
         _distance = distance;
         _coroutine = null;
+    }
+
+    private void ResolveCollision()
+    {
+        if (Mode == CameraModeType.TopDown)
+            return;
+
+        var dir = transform.position - Target.position;
+        int mask = ~((1 << 2) | (1 << 6));
+        if (Physics.Raycast(Target.position, dir.normalized, out RaycastHit hitInfo, dir.magnitude, mask))
+        {
+            transform.position = Target.position + dir.normalized * (hitInfo.distance - 1f);
+        }
+
     }
 }

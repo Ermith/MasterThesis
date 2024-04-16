@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
@@ -344,6 +345,7 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 _peekingOffset;
     private Vector3 _peekingBase;
+    private Vector3 _peekingWorldBase;
     private Vector3 _peekingFrom;
     private Vector3 _peekingTo;
     private float _peekDuration;
@@ -392,6 +394,15 @@ public class PlayerController : MonoBehaviour
         Vector3 cameraRight = -Vector3.Cross(cameraForawd, Vector3.up);
         _viewPoint.localPosition = _peekingBase.Added(y: _peekingOffset.y);
         _viewPoint.position += cameraForawd * _peekingOffset.z + cameraRight * _peekingOffset.x;
+
+        // Collision
+        var worldBase = transform.localToWorldMatrix.MultiplyPoint(_peekingBase);
+        var dir = _viewPoint.position - worldBase;
+        int mask = ~((1 << 2) | (1 << 6));
+        if (Physics.Raycast(worldBase, dir.normalized, out RaycastHit hitInfo, dir.magnitude, mask))
+        {
+            _viewPoint.position = worldBase + dir.normalized * (hitInfo.distance - 0.4f);
+        }
     }
 
     private Vector3? PeekStartRequest()
