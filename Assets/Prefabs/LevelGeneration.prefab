@@ -183,3 +183,7 @@ MonoBehaviour:
   EnemyBlueprint: {fileID: 7240094474568271842, guid: fa0c4d815c803c042876b3b83aa0ccb4, type: 3}
   Player: {fileID: 7394506146460830983, guid: 89f309c559d25d04b9a2ef09c78af180, type: 3}
   Map: {fileID: 0}
+  FloorMaterial: {fileID: 2100000, guid: 92e5728056755f84e8586c8bef3517ad, type: 2}
+  WallMaterial: {fileID: 2100000, guid: 5ced1d1b073013a45862988b6a729fc5, type: 2}
+  FloorMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  WallMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}

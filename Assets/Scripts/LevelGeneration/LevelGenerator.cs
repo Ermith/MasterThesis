@@ -32,6 +32,7 @@ public class LevelGenerator : MonoBehaviour
     public Material FloorMaterial;
     public Material WallMaterial;
     public Mesh FloorMesh;
+    public Mesh WallMesh;
 
     GridGraph _graph;
     GraphGenerator _graphGenerator;
@@ -42,8 +43,10 @@ public class LevelGenerator : MonoBehaviour
     private int _floorHeight = 3;
 
     private List<Matrix4x4>[] _floorMatrices;
+    private List<Matrix4x4>[] _wallMatrices;
     private GameObject _geometry;
     private GameObject[] _floors;
+    private GameObject[] _walls;
     private int? _activeFloor;
 
     // Intermediate Results
@@ -152,6 +155,10 @@ public class LevelGenerator : MonoBehaviour
         for (int i = 0; i < _floorMatrices.Length; i++)
             _floorMatrices[i] = new List<Matrix4x4>();
 
+        _wallMatrices = new List<Matrix4x4>[subTileGrids.Count];
+        for (int i = 0; i < _wallMatrices.Length; i++)
+            _wallMatrices[i] = new List<Matrix4x4>();
+
         Debug.Log("SPAWNING OBJECTS");
         for (int floor = subTileGrids.Count - 1; floor >= 0; floor--)
         {
@@ -182,6 +189,13 @@ public class LevelGenerator : MonoBehaviour
                         var m = new Matrix4x4();
                         m.SetTRS(obj.transform.position.Added(y: -0.05f), obj.transform.rotation, obj.transform.localScale.Set(y: 0.1f));
                         _floorMatrices[floor].Add(m);
+                    }
+
+                    if (grid[col, row] is WallSubTile)
+                    {
+                        var m = new Matrix4x4();
+                        m.SetTRS(obj.transform.position.Added(y: 1.5f), obj.transform.rotation, obj.transform.localScale.Set(y: 3f));
+                        _wallMatrices[floor].Add(m);
                     }
 
                     obj.transform.parent = floorGameObject.transform;
@@ -259,16 +273,26 @@ public class LevelGenerator : MonoBehaviour
     void Update()
     {
         // Render Floors
-        RenderParams rp = new RenderParams(FloorMaterial);
-        rp.receiveShadows = true;
-        rp.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+        RenderParams floorParams = new RenderParams(FloorMaterial);
+        floorParams.receiveShadows = true;
+        floorParams.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+
+        RenderParams wallParams = new RenderParams(WallMaterial);
+        wallParams.receiveShadows = true;
+        wallParams.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+
 
         if (_activeFloor.HasValue)
-            RenderInstanced(rp, FloorMesh, _floorMatrices[_activeFloor.Value]);
-        else
+        {
+            RenderInstanced(floorParams, FloorMesh, _floorMatrices[_activeFloor.Value]);
+            RenderInstanced(wallParams, WallMesh, _wallMatrices[_activeFloor.Value]);
+        } else
         {
             foreach (var floor in _floorMatrices)
-                RenderInstanced(rp, FloorMesh, floor);
+                RenderInstanced(floorParams, FloorMesh, floor);
+
+            foreach (var wall in _wallMatrices)
+                RenderInstanced(wallParams, WallMesh, wall);
         }
 
         /*/
