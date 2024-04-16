@@ -25,7 +25,6 @@ public class HallwayWithRooms : Hallway
 
                 if ((px, py) == (midX, midY)) continue;
 
-                //description.FreeTiles.Add((px, py));
                 tileGrid[x + px, y + py] = new EdgeTile(dir.Perpendicular());
             }
 
@@ -34,7 +33,6 @@ public class HallwayWithRooms : Hallway
 
         Directions midWalls = ~Exits;
         tileGrid[x + midX, y + midY] = new EdgeTile(midWalls);
-        description.FreeTiles.Add((midX, midY));
 
         Directions nwExits, neExits, swExits, seExits;
         nwExits = neExits = swExits = seExits = Directions.None;

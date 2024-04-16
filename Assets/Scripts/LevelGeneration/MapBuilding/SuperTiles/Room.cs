@@ -37,7 +37,10 @@ public class Room : ASuperTile
         {
             (int ex, int ey) = description.ExitsTiles[dir];
             foreach ((int px, int py) in GetShortPath(ex, ey, midX, midY))
+            {
                 patrol.Add(ATile.FromSuperMid(x + px, y + py));
+                description.FreeTiles.Remove((px, py));
+            }
         }
 
         description.PatrolPath = patrol;

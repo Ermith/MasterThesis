@@ -36,7 +36,11 @@ class StairwayRoom : ASuperTile
 
         foreach ((int ex, int ey) in EdgeLocations(Width, Height))
         {
-            tileGrid[x + ex, y + ey] ??= new EdgeTile(EdgeDirectinons(ex, ey, Width, Height));
+            if (tileGrid[x + ex, y + ey] == null)
+            {
+                tileGrid[x + ex, y + ey] = new EdgeTile(EdgeDirectinons(ex, ey, Width, Height));
+                description.PatrolPath.Add((ex, ey));
+            }
         }
 
         BuildSubRoom(

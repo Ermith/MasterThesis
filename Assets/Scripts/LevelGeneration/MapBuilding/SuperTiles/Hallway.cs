@@ -26,7 +26,7 @@ public class Hallway : ASuperTile
                 patrol.Add(ATile.FromSuperMid(x + px, y + py));
                 if ((px, py) == (midX, midY)) continue;
 
-                description.FreeTiles.Add((px, py));
+                //description.FreeTiles.Add((px, py));
 
                 if ((px + py) % 2 == 0)
                     tileGrid[x + px, y + py] = new EdgeTile(dir.Perpendicular(), thickness: 2);

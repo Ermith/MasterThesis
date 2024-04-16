@@ -32,8 +32,11 @@ public class FilledRoom : ASuperTile
 
         foreach ((int ex, int ey) in EdgeLocations(Width, Height))
         {
-            tileGrid[x + ex, y + ey] ??= new EdgeTile(EdgeDirectinons(ex, ey, Width, Height));
-            description.FreeTiles.Add((ex, ey));
+            if (tileGrid[x + ex, y + ey] == null)
+            {
+                tileGrid[x + ex, y + ey] = new EdgeTile(EdgeDirectinons(ex, ey, Width, Height));
+                description.FreeTiles.Add((ex, ey));
+            }
         }
 
         if (_subRoom)
@@ -63,7 +66,10 @@ public class FilledRoom : ASuperTile
             (int cx, int cy) = corners[i];
             (int nextCx, int nextCy) = corners[(i + 1) % 4];
             foreach ((int px, int py) in GetShortPath(cx, cy, nextCx, nextCy))
+            {
                 patrol.Add(ATile.FromSuperMid(x + px, y + py));
+                description.FreeTiles.Remove((px, py));
+            }
         }
 
         description.PatrolPath = patrol;

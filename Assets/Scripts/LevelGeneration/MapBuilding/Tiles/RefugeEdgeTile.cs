@@ -19,7 +19,7 @@ public class RefugeEdgeTile : EdgeTile
         if (Refuges.North())
         {
             int rx = x + HalfWidth;
-            int ry = y + Thickness - 1;
+            int ry = y + + HEIGHT - 1 - Thickness + 1;
 
             subTileGrid[rx, ry] = new RefugeSubTile();
             subTileGrid[rx - 1, ry] = new RefugeSubTile();
@@ -29,7 +29,7 @@ public class RefugeEdgeTile : EdgeTile
         if (Refuges.South())
         {
             int rx = x + HalfWidth;
-            int ry = y + HEIGHT - 1 - Thickness + 1;
+            int ry = y + Thickness - 1;
 
             subTileGrid[rx, ry] = new RefugeSubTile();
             subTileGrid[rx - 1, ry] = new RefugeSubTile();

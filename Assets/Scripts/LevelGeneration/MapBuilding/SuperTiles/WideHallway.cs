@@ -28,7 +28,6 @@ public class WideHallway : ASuperTile
             edgeFlags = edgeFlags.Without(Exits);
 
             tileGrid[x + midX + i - 1, y + midY + j - 1] = new EdgeTile(edgeFlags);
-            description.FreeTiles.Add((midX + i - 1, midY + j - 1));
         }
 
         foreach ((Directions dir, (int ex, int ey)) in description.ExitsTiles)
@@ -59,9 +58,6 @@ public class WideHallway : ASuperTile
                 tileGrid[x + nx1, y + ny1] ??= new EdgeTile(edges1);
                 tileGrid[x + nx2, y + ny2] ??= new EdgeTile(edges2);
                 tileGrid[x + px, y + py] ??= new ColumnTile(dir.Opposite(), mid: false);
-
-                description.FreeTiles.Add((nx1, ny1));
-                description.FreeTiles.Add((nx2, ny2));
             }
 
 
