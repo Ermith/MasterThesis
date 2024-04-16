@@ -626,6 +626,35 @@ public class HiddenPathPattern : Pattern
     }
 }
 
+public class DoubleLockCyclePattern : Pattern
+{
+    public override void Apply(GridEdge edge, GridGraph graph)
+    {
+        graph.RemoveGridEdge(edge);
+        (GridEdge e1, GridEdge e2) = AddExtension(edge, graph);
+        (GridEdge ce1, GridEdge ce2) = AddCycle(e1, graph);
+
+        // Lock & Key 'A'
+        var doorLock = new DoorLock(ce1.FromDirection);
+        var key = doorLock.GetNewKey();
+        ce1.From.AddLock(doorLock);
+        e1.To.AddKey(key);
+
+        // Lock & Key 'B'
+        doorLock = new DoorLock(e2.FromDirection);
+        key = doorLock.GetNewKey();
+        e2.From.AddLock(doorLock);
+        ce2.From.AddKey(key);
+
+        // Valve
+        var wallOfLight = new WallOfLightLock(ce2.FromDirection);
+        var powerBox = wallOfLight.GetNewKey();
+        ce2.From.AddLock(wallOfLight);
+        ce2.From.AddKey(powerBox);
+
+    }
+}
+
 public class FloorLockedExtentionPattern : Pattern
 {
     protected (GridEdge, GridEdge) AddInterFloorExtension(GridEdge edge, GridGraph graph)
