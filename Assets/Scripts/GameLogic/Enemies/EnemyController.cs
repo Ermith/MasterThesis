@@ -21,7 +21,7 @@ public class EnemyController : MonoBehaviour, ILockObject
     Vector3? _lookDirection = null;
     Vector3[] _patrolPositions = null;
     const float EPSILON_RADIUS = 0.75f;
-    float _lastMovement = 0f;
+    float _lastMovement = float.MaxValue;
 
     // patrol
     int _patrolIndex = 0;
@@ -133,6 +133,12 @@ public class EnemyController : MonoBehaviour, ILockObject
         DefaultPosition = position;
         DefaultDirection = direction;
         Behaviour = Behaviour.Guarding;
+        LookAt(DefaultPosition);
+        MoveTo(DefaultPosition, () =>
+        {
+            LookInDirection(DefaultDirection);
+            _sight.Range = GuardViewDistance;
+        });
     }
 
     public void ResolveBehaviour()
@@ -140,6 +146,7 @@ public class EnemyController : MonoBehaviour, ILockObject
         if (_investigationTimer > 0)
         {
             _investigationTimer -= Time.deltaTime;
+            Debug.Log("Investigating");
             return;
         }
 
@@ -252,9 +259,11 @@ public class EnemyController : MonoBehaviour, ILockObject
         {
             _frustrationTimer -= Time.deltaTime;
             _chasing = _frustrationTimer > 0;
+            Debug.Log("CHASE FRUSTRATION END");
         } else
         {
             _frustrationTimer = FrustrationTime;
+            Debug.Log("CHASING");
         }
     }
 
