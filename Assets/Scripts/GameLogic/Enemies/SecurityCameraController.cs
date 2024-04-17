@@ -24,7 +24,7 @@ public class SecurityCameraController : MonoBehaviour, ILockObject
     public void SetOrientation(Directions dirs)
     {
         transform.localRotation = Quaternion.LookRotation(dirs.ToVector3(), Vector3.up);
-        _defaultRotation = transform.eulerAngles;
+        _defaultRotation = TurnPoint.eulerAngles;
     }
 
     public void Unlock()
@@ -85,13 +85,13 @@ public class SecurityCameraController : MonoBehaviour, ILockObject
             _turnTimer += Time.deltaTime;
 
             var fromRotation = _right
-                ? new Vector3(0, -TurnDegree, 0)
-                : new Vector3(0, TurnDegree, 0);
+                ? _defaultRotation.Added(y: -TurnDegree)
+                : _defaultRotation.Added(y: TurnDegree);
 
 
             var targetRotation = _right
-                ? new Vector3(0, TurnDegree, 0)
-                : new Vector3(0, -TurnDegree, 0);
+                ? _defaultRotation.Added(y: TurnDegree)
+                : _defaultRotation.Added(y: -TurnDegree);
 
             TurnPoint.eulerAngles = Vector3.Lerp(fromRotation, targetRotation, _turnTimer / TurnPeriod);
 
