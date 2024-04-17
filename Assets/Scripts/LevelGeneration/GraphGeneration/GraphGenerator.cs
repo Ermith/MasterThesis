@@ -249,15 +249,15 @@ public class GraphGenerator
 
         // Inter Floor Patterns
         //floorExtension.Apply(interFloorEdge, Graph);
-        //floorLockedAddition.Apply(Graph.InterFloorEdges[0], Graph);
+        floorLockedAddition.Apply(Graph.InterFloorEdges[0], Graph);
         //floorHiddenExtension.Apply(interFloorEdge, Graph);
         //floorLockedExtension.Apply(Graph.InterFloorEdges[Graph.InterFloorEdges.Count - 1], Graph);
 
         // Single Floor Patterns
         //doubleLock.Apply(startEdge, Graph);
         //cycle.Apply(startEdge, Graph);
-        hiddenPath.DangerType = DangerType.DeathTraps;
-        hiddenPath.Apply(startEdge, Graph);
+        //hiddenPath.DangerType = DangerType.DeathTraps;
+        //hiddenPath.Apply(startEdge, Graph);
 
         /*/
         for (int i = 0; i < Graph.FloorCount; i++)
@@ -265,11 +265,14 @@ public class GraphGenerator
             for (int j = 0; j < 1; j++)
             {
                 var edge = Graph.GetRandomFloorEdge(i);
-        
-                if (URandom.value > 0.5)
+
+                float random = URandom.value;
+                if (random > 0.66)
                     cycle.Apply(edge, Graph);
-                else
+                else if (random > 0.33)
                     hiddenPath.Apply(edge, Graph);
+                else
+                    doubleLock.Apply(edge, Graph);
             }
         }
         //*/

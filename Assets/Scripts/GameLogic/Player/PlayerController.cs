@@ -70,6 +70,7 @@ public class PlayerController : MonoBehaviour
         if (_invisible)
             _invisibilityTimer -= Time.deltaTime;
 
+        _meshRenderer.material.color = IsHidden ? Color.black : Color.white;
         GameController.SetInvisOverlay(_invisible);
     }
 
