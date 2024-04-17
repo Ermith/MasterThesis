@@ -46,7 +46,7 @@ public class FilledRoom : ASuperTile
                 1, 1,
                 Width - 2, Height - 2,
                 Description,
-                DirectionsExtensions.GetRandom(),
+                DirectionsExtensions.GetAll(),
                 internalRoom: true);
         else
             BuildWall(

@@ -167,7 +167,7 @@ public abstract class ASuperTile
                 
                 if (!edgeFlags.None())
                 {
-                    tile = ((i + j) % 2 == 0) 
+                    tile = ((i + j) % 2 == 0 && refuges) 
                         ? new RefugeEdgeTile(edgeFlags, edgeFlags)
                         : new EdgeTile(edgeFlags, thickness: refuges ? 2 : 1);
                     description.FreeTiles.Add((i + ox, j + oy));
