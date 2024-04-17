@@ -1256,7 +1256,7 @@ GameObject:
   - component: {fileID: 8329201719287615549}
   - component: {fileID: 7626477405365052786}
   - component: {fileID: 7838938269739179121}
-  m_Layer: 2
+  m_Layer: 3
   m_Name: SoundTrap
   m_TagString: Trap
   m_Icon: {fileID: 0}
@@ -1340,6 +1340,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SoundRange: 15
+  InteractionTime: 5
 --- !u!1 &4715363523207087545
 GameObject:
   m_ObjectHideFlags: 0

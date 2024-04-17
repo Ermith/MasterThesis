@@ -615,7 +615,7 @@ public class HiddenPathPattern : Pattern
         SecurityCameraLock cameraLock = new();
         var cameraKey = cameraLock.GetNewKey();
         e1.To.AddLock(cameraLock);
-        e1.To.AddLock(new TrapLock());
+        e1.To.AddLock(new SoundTrapLock());
 
         // Place Bonus on the hidden side path
         // TODO: Key does not make sense here... Make it something else
