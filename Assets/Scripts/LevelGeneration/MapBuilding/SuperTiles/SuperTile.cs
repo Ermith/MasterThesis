@@ -44,7 +44,7 @@ public abstract class ASuperTile
 
     public string GetName()
     {
-        return $"{Description.X}.{Description.Y}F{Description.Floor}";
+        return $"{Description.X / Width}.{Description.Y / Height}F{Description.Floor + 1}";
     }
 
     public ASuperTile(int width, int height, int floor, Directions exits = Directions.None)
