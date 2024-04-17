@@ -19,6 +19,8 @@ public class Door : MonoBehaviour, IInteractableObject, ILockObject
 
     public bool CanInteract => true;
 
+    public InteractionType InteractionType => InteractionType.Single;
+
     void Start()
     {
         if (ChangeColor)
@@ -34,7 +36,7 @@ public class Door : MonoBehaviour, IInteractableObject, ILockObject
 
     }
 
-    public void Interact(PlayerController player)
+    public float Interact(PlayerController player)
     {
         if (Lock != null)
         {
@@ -45,13 +47,15 @@ public class Door : MonoBehaviour, IInteractableObject, ILockObject
             else
             {
                 GameController.AudioManager.Play("DoorLocked", position: transform.position);
-                return;
+                return -1;
             }
         }
 
         Vector3 playerDir = (player.transform.position - transform.position).normalized;
         float dot = Vector3.Dot(transform.forward, playerDir);
         if (_open) Close(); else Open(dot < 0);
+
+        return -1;
     }
 
     [ContextMenu("Open Door")]

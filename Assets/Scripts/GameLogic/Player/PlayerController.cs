@@ -166,8 +166,24 @@ public class PlayerController : MonoBehaviour
             return;
         };
 
-        GameController.ShowInteraction(usableObject.InteractionPrompt());
-        if (Input.GetKeyDown(KeyCode.F)) usableObject.Interact(this);
+        if (usableObject.InteractionType == InteractionType.Single)
+        {
+            GameController.ShowInteraction(usableObject.InteractionPrompt());
+            if (Input.GetKeyDown(KeyCode.F)) usableObject.Interact(this);
+        }
+
+        if (usableObject.InteractionType == InteractionType.Continuous)
+        {
+            if (Input.GetKey(KeyCode.F))
+            {
+                float p = usableObject.Interact(this);
+                GameController.ShowContinuousInteraction(usableObject.InteractionPrompt(), p);
+            } else
+            {
+                GameController.ShowContinuousInteraction(usableObject.InteractionPrompt());
+            }
+
+        }
     }
 
     private void UpdateShooting()

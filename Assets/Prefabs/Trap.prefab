@@ -178,7 +178,7 @@ GameObject:
   - component: {fileID: 5561247663393078695}
   - component: {fileID: 9181305914274265521}
   m_Layer: 0
-  m_Name: TrapObject
+  m_Name: Trap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

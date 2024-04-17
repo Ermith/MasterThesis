@@ -4,9 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+public enum InteractionType
+{
+    Single,
+    Continuous
+}
+
 interface IInteractableObject
 {
     bool CanInteract { get; }
-    void Interact(PlayerController player);
+    InteractionType InteractionType { get; }
+    float Interact(PlayerController player);
     string InteractionPrompt();
 }

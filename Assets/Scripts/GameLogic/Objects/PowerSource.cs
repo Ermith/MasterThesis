@@ -8,9 +8,11 @@ public class PowerSource : MonoBehaviour, IInteractableObject, IKeyObject
 
     public bool CanInteract => enabled;
 
-    public void Interact(PlayerController player)
+    public InteractionType InteractionType => InteractionType.Single;
+
+    public float Interact(PlayerController player)
     {
-        if (!CanInteract) return;
+        if (!CanInteract) return -1;
 
         foreach (var @lock in MyKey.Locks)
             foreach (var lockObject in @lock.Instances)
@@ -24,6 +26,8 @@ public class PowerSource : MonoBehaviour, IInteractableObject, IKeyObject
 
         GetComponentInChildren<MeshRenderer>().material.color = Color.black;
         enabled = false;
+
+        return -1;
     }
 
     public string InteractionPrompt() => "Cut Power";

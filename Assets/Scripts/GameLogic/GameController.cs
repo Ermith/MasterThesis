@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using UnityEngine.UIElements.Experimental;
 
 [RequireComponent(
@@ -21,8 +23,10 @@ public class GameController : MonoBehaviour
     public PlayerController Player;
     public LevelGenerator LevelGenerator;
     public InfoScreen InfoScreen;
+    public GameObject InteractionBar;
+    public Image InteractionFill;
 
-    private Transform _interactText;
+    public GameObject InteractionText;
 
 
     // Awake is called before the Start method
@@ -33,7 +37,6 @@ public class GameController : MonoBehaviour
         Time.timeScale = 1f;
         UnityEngine.Random.InitState(-488536290);
         Debug.Log(UnityEngine.Random.seed);
-        _interactText = HUDCanvas.transform.Find("Interact Text");
     }
 
     // Update is called once per frame
@@ -139,13 +142,22 @@ public class GameController : MonoBehaviour
 
     public static void ShowInteraction(string text)
     {
-        Instance._interactText.gameObject.SetActive(true);
-        Instance._interactText.GetComponentInChildren<TMPro.TMP_Text>().text = $"Press F to : {text}";
+        Instance.InteractionText.gameObject.SetActive(true);
+        Instance.InteractionText.GetComponentInChildren<TMPro.TMP_Text>().text = $"Press F to : {text}";
+    }
+
+    public static void ShowContinuousInteraction(string text, float interaction = -1)
+    {
+        Instance.InteractionText.gameObject.SetActive(true);
+        Instance.InteractionText.GetComponentInChildren<TMPro.TMP_Text>().text = $"Hold F to : {text}";
+        Instance.InteractionBar.gameObject.SetActive(interaction > 0);
+        Instance.InteractionFill.fillAmount = interaction;
     }
 
     public static void HideInteraction()
     {
-        Instance._interactText.gameObject.SetActive(false);
+        Instance.InteractionText.gameObject.SetActive(false);
+        Instance.InteractionBar.gameObject.SetActive(false);
     }
 
     public static void Pause()
