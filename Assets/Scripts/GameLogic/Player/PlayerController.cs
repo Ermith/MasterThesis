@@ -160,7 +160,7 @@ public class PlayerController : MonoBehaviour
         // rotation
         float yaw = -Input.GetAxis("Mouse X");
         float pitch = Input.GetAxis("Mouse Y");
-        Camera.Rotate(yaw, pitch, MouseSensitivity);
+        Camera.Rotate(yaw, pitch, GameSettings.MouseSensitivity);
     }
 
     private void UpdateInteraction()

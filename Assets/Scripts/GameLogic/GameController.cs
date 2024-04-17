@@ -28,6 +28,8 @@ public class GameController : MonoBehaviour
     public GameObject InvisOverlay;
 
     public GameObject InteractionText;
+    private GameObject _settingsMenu;
+    private GameObject _menu;
 
 
     // Awake is called before the Start method
@@ -38,6 +40,8 @@ public class GameController : MonoBehaviour
         Time.timeScale = 1f;
         UnityEngine.Random.InitState(-488536290);
         Debug.Log(UnityEngine.Random.seed);
+        _settingsMenu = PauseCanvas.transform.Find("SettingsPanel").gameObject;
+        _menu = PauseCanvas.transform.Find("MenuPanel").gameObject;
     }
 
     // Update is called once per frame
@@ -175,6 +179,14 @@ public class GameController : MonoBehaviour
     public static void Resume()
     {
         GameController.AudioManager.Play("Blick", volume: 0.3f);
+
+        if (Instance._settingsMenu.activeSelf)
+        {
+            Instance._settingsMenu.SetActive(false);
+            Instance._menu.SetActive(true);
+            return;
+        }
+
         Instance._paused = false;
         Time.timeScale = 1f;
         Instance.PauseCanvas.gameObject.SetActive(false);

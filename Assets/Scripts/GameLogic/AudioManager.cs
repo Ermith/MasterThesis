@@ -1,3 +1,4 @@
+using Palmmedia.ReportGenerator.Core;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -110,7 +111,7 @@ public class AudioManager : MonoBehaviour
             return audio;
         }
 
-        sound.AudioSource.volume = sound.Volume;// * Settings.SFXVolume;
+        sound.AudioSource.volume = sound.Volume * GameSettings.Volume;
         sound.AudioSource.pitch = (pitch == null) ? sound.Pitch : pitch.Value;
         sound.AudioSource.spatialBlend = 0;
         sound.AudioSource.dopplerLevel = 0;
@@ -142,6 +143,7 @@ public class AudioManager : MonoBehaviour
 
     private IEnumerator PlaySpacialSoundCoroutine(AudioSource audio)
     {
+        audio.volume *= GameSettings.Volume;
         audio.Play();
 
         while (audio.isPlaying)
@@ -152,6 +154,7 @@ public class AudioManager : MonoBehaviour
 
     private IEnumerator PlayOnTargetCoroutine(AudioSource audio, bool destroyTarget)
     {
+        audio.volume *= GameSettings.Volume;
         audio.Play();
         while (audio.isPlaying)
             yield return null;
@@ -187,6 +190,7 @@ public class AudioManager : MonoBehaviour
         Music.AudioSource.dopplerLevel = 0;
 
         Music.AudioSource.loop = true;
+        Music.AudioSource.volume *= GameSettings.Volume;
         Music.AudioSource.Play();
 
         foreach (Sound s in StepSounds)
