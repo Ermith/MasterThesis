@@ -70,7 +70,8 @@ class MapBuilder
 
             if (vertex.Top || vertex.Bottom) tile = new StairwayRoom(_superWidth, _superHeight, z, vertex.Exits, up: vertex.Top, down: vertex.Bottom, reveresed: z % 2 == 0);
             else if (vertex.Hallway) tile = new HallwayWithRooms(_superWidth, _superHeight, z, vertex.Exits);
-            else tile = new FilledRoom(_superWidth, _superHeight, z, exits: vertex.Exits, subRoom: true);
+            //else tile = new FilledRoom(_superWidth, _superHeight, z, exits: vertex.Exits, subRoom: true);
+            else tile = new Room(_superWidth, _superHeight, z, vertex.Exits);
 
             tile.Locks = vertex.GetLocks().ToList();
             tile.Keys = vertex.GetKeys().ToList();
