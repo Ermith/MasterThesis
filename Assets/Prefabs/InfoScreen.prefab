@@ -282,7 +282,7 @@ GameObject:
   - component: {fileID: 2101158545261900246}
   - component: {fileID: 2101158545261900245}
   m_Layer: 5
-  m_Name: Text (TMP) (13)
+  m_Name: K_MapMovement
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -552,7 +552,7 @@ GameObject:
   - component: {fileID: 2101158545392290458}
   - component: {fileID: 2101158545392290457}
   m_Layer: 5
-  m_Name: Text (TMP) (9)
+  m_Name: K_TopDownCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -957,7 +957,7 @@ GameObject:
   - component: {fileID: 2101158545654387256}
   - component: {fileID: 2101158545654387143}
   m_Layer: 5
-  m_Name: Text (TMP) (12)
+  m_Name: K_MapZoom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1092,7 +1092,7 @@ GameObject:
   - component: {fileID: 2101158545666303324}
   - component: {fileID: 2101158545666303323}
   m_Layer: 5
-  m_Name: Text (TMP) (11)
+  m_Name: K_Map
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1227,7 +1227,7 @@ GameObject:
   - component: {fileID: 2101158545709402288}
   - component: {fileID: 2101158545709402303}
   m_Layer: 5
-  m_Name: Text (TMP) (5)
+  m_Name: K_Shoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1980,7 +1980,7 @@ GameObject:
   - component: {fileID: 2101158546051250982}
   - component: {fileID: 2101158546051250981}
   m_Layer: 5
-  m_Name: Text (TMP) (3)
+  m_Name: K_Slide
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2115,7 +2115,7 @@ GameObject:
   - component: {fileID: 2101158546111409045}
   - component: {fileID: 2101158546111409044}
   m_Layer: 5
-  m_Name: Text (TMP) (2)
+  m_Name: K_Sprint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2250,7 +2250,7 @@ GameObject:
   - component: {fileID: 2101158546128294465}
   - component: {fileID: 2101158546128294464}
   m_Layer: 5
-  m_Name: Text (TMP) (1)
+  m_Name: K_Movement
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2421,7 +2421,7 @@ GameObject:
   - component: {fileID: 2101158546194330928}
   - component: {fileID: 2101158546194330943}
   m_Layer: 5
-  m_Name: Text (TMP) (10)
+  m_Name: N_ThirdPersonCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2556,7 +2556,7 @@ GameObject:
   - component: {fileID: 2101158546220925995}
   - component: {fileID: 2101158546220925994}
   m_Layer: 5
-  m_Name: Text (TMP) (7)
+  m_Name: K_Peek
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3188,7 +3188,7 @@ GameObject:
   - component: {fileID: 2101158546465713844}
   - component: {fileID: 2101158546465713843}
   m_Layer: 5
-  m_Name: Text (TMP) (8)
+  m_Name: K_FirstPersonCamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3323,7 +3323,7 @@ GameObject:
   - component: {fileID: 2101158546606408745}
   - component: {fileID: 2101158546606408744}
   m_Layer: 5
-  m_Name: Text (TMP) (6)
+  m_Name: K_Interact
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3676,7 +3676,7 @@ GameObject:
   - component: {fileID: 2101158547003197016}
   - component: {fileID: 2101158547003197031}
   m_Layer: 5
-  m_Name: Text (TMP) (4)
+  m_Name: K_Aim
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4216,7 +4216,7 @@ GameObject:
   - component: {fileID: 2101158547246139109}
   - component: {fileID: 2101158547246139108}
   m_Layer: 5
-  m_Name: Text (TMP) (14)
+  m_Name: K_MapChangeFloor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4792,7 +4792,7 @@ GameObject:
   - component: {fileID: 8175134146814337634}
   - component: {fileID: 7091026766178291563}
   m_Layer: 5
-  m_Name: KeyText (1)
+  m_Name: Key Explanation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5613,7 +5613,7 @@ GameObject:
   - component: {fileID: 7131865786766938997}
   - component: {fileID: 1161203976828027977}
   m_Layer: 5
-  m_Name: Text (TMP) (15)
+  m_Name: K_InvisCamo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
