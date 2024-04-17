@@ -19,10 +19,19 @@ public class DeathTrap : SmartCollider, ILockObject, IInteractableObject
         if (_interactionTimer >= InteractionTime)
             GameController.AudioManager.Play("Click");
 
+
+
         Debug.Log(_interactionTimer);
         _interactionTimer -= Time.deltaTime;
         Debug.Log(_interactionTimer);
-        if (_interactionTimer < 0)
+
+        if (player.TrapKitCount > 0)
+        {
+            _interactionTimer = 0;
+            player.TrapKitCount--;
+        }
+
+        if (_interactionTimer <= 0)
             Unlock();
 
         _lastInteract = true;

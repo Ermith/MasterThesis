@@ -68,8 +68,8 @@ public class GameController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.I))
         {
             InfoScreen.gameObject.SetActive(true);
-            InfoScreen.SetCamoCount(0);
-            InfoScreen.SetTrapKitCount(0);
+            InfoScreen.SetCamoCount(Player.CamoCount);
+            InfoScreen.SetTrapKitCount(Player.TrapKitCount);
             InfoScreen.ClearKeys();
             foreach (IKey key in Player.Keys)
                 if (key is DoorKey doorKey)

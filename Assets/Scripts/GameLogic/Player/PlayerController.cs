@@ -340,6 +340,8 @@ public class PlayerController : MonoBehaviour
 
     #region Keys
     public List<IKey> Keys = new List<IKey>();
+    public int CamoCount = 0;
+    public int TrapKitCount = 0;
     public bool HasKeyForLock(ILock @lock)
     {
         foreach (IKey key in Keys)

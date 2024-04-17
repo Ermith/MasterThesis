@@ -17,6 +17,7 @@ public class LevelGenerator : MonoBehaviour
     public GameObject WallOfLightBlueprint;
     public GameObject HiddenDoorBlueprint;
     public GameObject KeyBlueprint;
+    public GameObject TrapKitBlueprint;
     public GameObject SecurityCameraBlueprint;
     public GameObject PowerSourceBlueprint;
     public GameObject TrapBlueprint;
@@ -66,6 +67,7 @@ public class LevelGenerator : MonoBehaviour
         TrapLock.Blueprint = TrapBlueprint;
         SoundTrapLock.Blueprint = SoundTrapBlueprint;
         StairwayRoom.Blueprint = StairsBlueprint;
+        TrapDisarmingKit.Blueprint = TrapKitBlueprint;
 
         _graph = new GridGraph();
         _graphGenerator = new GraphGenerator(_graph);

@@ -160,6 +160,44 @@ public class DoorKey : IKey
     }
 }
 
+public class TrapDisarmingKit : IKey
+{
+    public static GameObject Blueprint;
+
+    public IList<ILock> Locks { get; } = new List<ILock>();
+    public bool Guarded { get; set; } = true;
+
+    public void Implement(SuperTileDescription superTile)
+    {
+        if (superTile.FreeTiles.Count == 0)
+            return;
+
+        int tileIndex = URandom.Range(0, superTile.FreeTiles.Count - 1);
+        (int x, int y) = superTile.FreeTiles.ToArray()[tileIndex];
+        var tile = superTile.Get(x, y);
+        superTile.FreeTiles.Remove((x, y));
+        tile.Objects.Add(() =>
+        {
+            var obj = GameObject.Instantiate(Blueprint);
+            obj.GetComponent<IKeyObject>().MyKey = this;
+            return obj;
+        });
+
+        if (Guarded)
+        {
+            (int spawnX, int spawnY) = ATile.FromSuperMid(superTile.X + x, superTile.Y + y);
+            tile.Guard = new EnemyParams
+            {
+                Behaviour = Behaviour.Guarding,
+                Spawn = (spawnX - 1, spawnY),
+                Floor = superTile.Floor
+            };
+
+            superTile.Enemies.Add(tile.Guard);
+        }
+    }
+}
+
 public class EnemyLock : ILock
 {
     public IList<ILockObject> Instances { get; } = new List<ILockObject>();
@@ -266,7 +304,7 @@ public class TrapLock : ILock
 
     public IKey GetNewKey()
     {
-        return null;
+        return new TrapDisarmingKit();
     }
 
     public void Implement(SuperTileDescription superTile)
@@ -304,7 +342,7 @@ public class SoundTrapLock : ILock
 
     public IKey GetNewKey()
     {
-        return null;
+        return new TrapDisarmingKit();
     }
 
     public void Implement(SuperTileDescription superTile)
