@@ -104,7 +104,7 @@ NavMeshSettings:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_BuildSettings:
-    serializedVersion: 2
+    serializedVersion: 3
     agentTypeID: 0
     agentRadius: 0.5
     agentHeight: 2
@@ -117,7 +117,7 @@ NavMeshSettings:
     cellSize: 0.16666667
     manualTileSize: 0
     tileSize: 256
-    accuratePlacement: 0
+    buildHeightMesh: 0
     maxJobWorkers: 0
     preserveTilesOutsideBounds: 0
     debug:
@@ -134,6 +134,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a31bbc9f96208694086503f42af3bd3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &321636580 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1254682151865299275, guid: 7004fa0423c529a4db6c5e017e2adbe1, type: 3}
+  m_PrefabInstance: {fileID: 1254682150782522504}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -220,19 +225,20 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
+  serializedVersion: 2
   m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
   m_LocalPosition: {x: -618.38, y: 3, z: 6.13}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1001 &717758603
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2368263417110128401, guid: ee08f3335631b734cb47000a0e76c702, type: 3}
@@ -292,6 +298,9 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2923507882711686208, guid: cec499182023c69458506df80e6e8310, type: 3}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ee08f3335631b734cb47000a0e76c702, type: 3}
 --- !u!1 &1960187402 stripped
 GameObject:
@@ -314,17 +323,49 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1254682151865299276, guid: 7004fa0423c529a4db6c5e017e2adbe1, type: 3}
   m_PrefabInstance: {fileID: 1254682150782522504}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 321636580}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c644eeaa5290cbe4996aba0354947701, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2120634171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 321636580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AgentTypeID: 0
+  m_CollectObjects: 2
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 115
+  m_UseGeometry: 1
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.06666667
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 0}
+  m_BuildHeightMesh: 0
 --- !u!1001 &1254682150782522504
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 1254682150548217478, guid: 7004fa0423c529a4db6c5e017e2adbe1, type: 3}
@@ -416,12 +457,19 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1254682151865299275, guid: 7004fa0423c529a4db6c5e017e2adbe1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2120634171}
   m_SourcePrefab: {fileID: 100100000, guid: 7004fa0423c529a4db6c5e017e2adbe1, type: 3}
 --- !u!1001 &2101158546815137848
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2101158545297562652, guid: c64cd29c232693c48935ccbd08ad5c63, type: 3}
@@ -537,12 +585,16 @@ PrefabInstance:
       value: Inventory
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c64cd29c232693c48935ccbd08ad5c63, type: 3}
 --- !u!1001 &3230849237765711983
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 3230849238312248032, guid: 0925c4f211d89c746ad050daf913d40d, type: 3}
@@ -594,12 +646,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0925c4f211d89c746ad050daf913d40d, type: 3}
 --- !u!1001 &4426805443388135969
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
+    serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 365123721849550135, guid: d34f97f096603bf42aa4cdeb548e7146, type: 3}
@@ -727,4 +783,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d34f97f096603bf42aa4cdeb548e7146, type: 3}
+--- !u!1660057539 &9223372036854775807
+SceneRoots:
+  m_ObjectHideFlags: 0
+  m_Roots:
+  - {fileID: 4426805443388135969}
+  - {fileID: 1254682150782522504}
+  - {fileID: 705507995}
+  - {fileID: 717758603}
+  - {fileID: 2101158546815137848}
+  - {fileID: 3230849237765711983}

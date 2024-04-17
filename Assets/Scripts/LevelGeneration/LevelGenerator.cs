@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.AI.Navigation;
 using UnityEngine;
 
 public class LevelGenerator : MonoBehaviour
@@ -241,6 +242,7 @@ public class LevelGenerator : MonoBehaviour
             {
                 Debug.Log("SPAWNING GUARD ===========================================================");
                 enemyInstance.Guard(spawn, Vector3.right);
+                enemyInstance.LookAt(spawn);
             }
 
             if (enemy.Behaviour == Behaviour.Sleeping)
@@ -266,6 +268,9 @@ public class LevelGenerator : MonoBehaviour
         Map.Drawing = GraphDrawing;
         Map.CreateMap();
         _done = true;
+        level.transform.parent = transform;
+
+        GetComponent<NavMeshSurface>().BuildNavMesh();
     }
 
     private IEnumerator DelayedSpawn(Vector3 spawnPosition)

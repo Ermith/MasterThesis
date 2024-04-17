@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.AI;
 
 public enum Behaviour
 {
@@ -22,6 +25,7 @@ public class EnemyController : MonoBehaviour, ILockObject
     Vector3[] _patrolPositions = null;
     const float EPSILON_RADIUS = 0.75f;
     float _lastMovement = float.MaxValue;
+    List<Vector3> _movementBuffer = new();
 
     // patrol
     int _patrolIndex = 0;
@@ -43,6 +47,9 @@ public class EnemyController : MonoBehaviour, ILockObject
     public float FrustrationTime = 1f;
     public float InvestigationTime = 5f;
     public float StepTime = 0.6f;
+    public float NormalSpeed = 3f;
+    public float ChasingSpeed = 5f;
+
 
     private float _frustrationTimer;
     private float _investigationTimer;
@@ -112,8 +119,9 @@ public class EnemyController : MonoBehaviour, ILockObject
 
     public void MoveTo(Vector3 position, Action callback = null)
     {
-        _moveTo = position;
+        GetComponent<NavMeshAgent>().destination = position;
         _positionReached = callback;
+        return;
     }
 
     public void Patrol(Vector3[] positions, int index = 0, bool retrace = true)
@@ -135,12 +143,12 @@ public class EnemyController : MonoBehaviour, ILockObject
         DefaultPosition = position;
         DefaultDirection = direction;
         Behaviour = Behaviour.Guarding;
-        LookAt(DefaultPosition);
-        MoveTo(DefaultPosition, () =>
-        {
-            LookInDirection(DefaultDirection);
-            _sight.Range = GuardViewDistance;
-        });
+        //LookAt(DefaultPosition);
+        //MoveTo(DefaultPosition, () =>
+        //{
+        //    LookInDirection(DefaultDirection);
+        //    _sight.Range = GuardViewDistance;
+        //});
     }
 
     public void ResolveBehaviour()
@@ -148,7 +156,6 @@ public class EnemyController : MonoBehaviour, ILockObject
         if (_investigationTimer > 0)
         {
             _investigationTimer -= Time.deltaTime;
-            Debug.Log("Investigating");
             return;
         }
 
@@ -171,9 +178,12 @@ public class EnemyController : MonoBehaviour, ILockObject
     private void ResolveGuard()
     {
         if ((transform.position - DefaultPosition).magnitude < 1f)
+        {
+            _sight.Range = GuardViewDistance;
+            LookInDirection(DefaultDirection);
             return;
+        }
 
-        LookAt(DefaultPosition);
         MoveTo(DefaultPosition, () =>
         {
             LookInDirection(DefaultDirection);
@@ -196,7 +206,6 @@ public class EnemyController : MonoBehaviour, ILockObject
             return;
 
         Vector3 position = _patrolPositions[_patrolIndex];
-        LookAt(position);
         MoveTo(position, () =>
         {
             int count = _patrolPositions.Length;
@@ -232,35 +241,14 @@ public class EnemyController : MonoBehaviour, ILockObject
 
     private void ResolveMovement()
     {
-        if (_moveTo == null) return;
+        GetComponent<NavMeshAgent>().speed = _chasing ? ChasingSpeed : NormalSpeed;
+        Vector3 d = GetComponent<NavMeshAgent>().destination;
 
-        Vector3 myPosition = transform.position;
-        //myPosition.y = 0f;
-        Vector3 difference = _moveTo.Value - myPosition;
-        difference.y = 0f;
-        Vector3 dir = difference.normalized;
-        float distance = difference.magnitude;
-        if (distance <= EPSILON_RADIUS)
+        if ((transform.position - d).magnitude < 0.5f)
         {
             _positionReached?.Invoke();
             _positionReached = null;
-            _moveTo = null;
-            return;
         }
-
-
-        var pos = transform.position;
-        _characterController.SimpleMove(dir * 3);
-        var movement = (transform.position - pos).magnitude;
-        _lastMovement = movement;
-
-        if (_stepTimer >= StepTime)
-        {
-            GameController.AudioManager.PlayStep("Default", gameObject);
-            _stepTimer %= StepTime;
-        }
-
-        _stepTimer += Time.deltaTime;
     }
 
     private void ResolveChase()
@@ -269,11 +257,9 @@ public class EnemyController : MonoBehaviour, ILockObject
         {
             _frustrationTimer -= Time.deltaTime;
             _chasing = _frustrationTimer > 0;
-            Debug.Log("CHASE FRUSTRATION END");
         } else
         {
             _frustrationTimer = FrustrationTime;
-            Debug.Log("CHASING");
         }
     }
 
