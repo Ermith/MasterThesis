@@ -12,6 +12,7 @@ public class SecurityCameraController : MonoBehaviour, ILockObject
     float _duration = 2;
 
     public ILock Lock { get; set; }
+    public float SoundRange = 22f;
 
     public void SetOrientation(Directions dirs)
     {
@@ -52,7 +53,7 @@ public class SecurityCameraController : MonoBehaviour, ILockObject
         if (!_seen && see)
         {
             GameController.AudioManager.PlayOnTarget("AlarmSiren", gameObject);
-            GameController.AudioManager.AudibleEffect(gameObject, transform.position, 15);
+            GameController.AudioManager.AudibleEffect(gameObject, transform.position, SoundRange);
         }
 
         // Leave Sight Line

@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using URandom = UnityEngine.Random;
@@ -354,8 +356,18 @@ public class AdditionRule : BaseRule
     }
 }
 
+public enum DangerType
+{
+    Random,
+    SoundTraps,
+    DeathTraps,
+    SecurityCameras
+}
+
 public abstract class Pattern
 {
+    public DangerType DangerType { get; set; } = DangerType.Random;
+
     protected (GridEdge, GridEdge) AddExtension(GridEdge edge, GridGraph graph)
     {
         (int midX, int midY, int midZ) = edge.GetMid();
@@ -603,6 +615,7 @@ public class HiddenPathPattern : Pattern
         graph.RemoveGridEdge(edge);
         (GridEdge e1, GridEdge e2) = AddExtension(edge, graph);
 
+        EnemyLock enemyLock = new();
 
         // Make side path Hidden
         HiddenDoorLock @lock1 = new(ce1.FromDirection);
@@ -612,15 +625,42 @@ public class HiddenPathPattern : Pattern
         ce2.To.AddLock(@lock2);
 
         // Make the main path dnageorus
-        SecurityCameraLock cameraLock = new();
-        var cameraKey = cameraLock.GetNewKey();
-        e1.To.AddLock(cameraLock);
-        e1.To.AddLock(new SoundTrapLock());
+
+        ILock dangerLock = null;
+        ILock secondaryLock = null;
+        if (DangerType == DangerType.Random)
+        {
+            float val = URandom.value;
+            if (val > 0.66) DangerType = DangerType.SecurityCameras;
+            else if (val > 0.33) DangerType = DangerType.SoundTraps;
+            else DangerType = DangerType.DeathTraps;
+        }
+
+        if (DangerType == DangerType.SoundTraps)
+        {
+            dangerLock = new SoundTrapLock();
+            secondaryLock = enemyLock;
+        }
+
+        if (DangerType == DangerType.DeathTraps)
+        {
+            dangerLock = new TrapLock();
+            secondaryLock = new SecurityCameraLock();
+        }
+
+        if (DangerType == DangerType.SecurityCameras)
+        {
+            dangerLock = new SecurityCameraLock();
+            secondaryLock = enemyLock;
+        }
+
+        e1.To.AddLock(dangerLock);
+        e1.To.AddLock(secondaryLock);
 
         // Place Bonus on the hidden side path
         // TODO: Key does not make sense here... Make it something else
-        ce1.To.AddKey(cameraKey);
-
+        ce1.To.AddKey(dangerLock.GetNewKey());
+        ce1.To.AddKey(enemyLock.GetNewKey());
 
         ce1.To.Hallway = true;
     }

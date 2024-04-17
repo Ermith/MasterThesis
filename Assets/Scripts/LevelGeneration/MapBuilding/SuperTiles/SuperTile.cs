@@ -143,7 +143,9 @@ public abstract class ASuperTile
         int ox, int oy,
         int width, int height,
         SuperTileDescription description,
-        Directions roomExits, bool internalRoom = true)
+        Directions roomExits,
+        bool internalRoom = true,
+        bool refuges = false)
     {
         ATile[,] tileGrid = description.TileGrid;
 
@@ -165,7 +167,9 @@ public abstract class ASuperTile
                 
                 if (!edgeFlags.None())
                 {
-                    tile = new EdgeTile(edgeFlags);
+                    tile = ((i + j) % 2 == 0) 
+                        ? new RefugeEdgeTile(edgeFlags, edgeFlags)
+                        : new EdgeTile(edgeFlags, thickness: refuges ? 2 : 1);
                     description.FreeTiles.Add((i + ox, j + oy));
                 } else
                 {

@@ -1339,8 +1339,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f08758713a837b549ba7ece95324c9bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SoundRange: 15
-  InteractionTime: 5
+  SoundRange: 22
+  InteractionTime: 2.5
 --- !u!1 &4715363523207087545
 GameObject:
   m_ObjectHideFlags: 0

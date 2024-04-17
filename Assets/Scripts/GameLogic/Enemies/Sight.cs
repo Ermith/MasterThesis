@@ -96,7 +96,7 @@ public class Sight : MonoBehaviour
         Vector3 relative = target.position - transform.position;
         float angle = Vector3.Angle(relative, transform.forward) * Mathf.Deg2Rad;
 
-        bool hit = Physics.Raycast(transform.position, relative.normalized, out RaycastHit hitInfo, relative.magnitude);
+        bool hit = Physics.Raycast(transform.position, relative.normalized, out RaycastHit hitInfo, relative.magnitude, ~(0b1100));
         if (hit && hitInfo.collider.gameObject != target.gameObject) return false;
 
         return relative.magnitude <= Range && Mathf.Abs(angle) <= Angle / 2;

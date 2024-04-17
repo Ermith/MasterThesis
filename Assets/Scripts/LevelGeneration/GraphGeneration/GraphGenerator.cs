@@ -256,6 +256,7 @@ public class GraphGenerator
         // Single Floor Patterns
         //doubleLock.Apply(startEdge, Graph);
         //cycle.Apply(startEdge, Graph);
+        hiddenPath.DangerType = DangerType.DeathTraps;
         hiddenPath.Apply(startEdge, Graph);
 
         /*/
