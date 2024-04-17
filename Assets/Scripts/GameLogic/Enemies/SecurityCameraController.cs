@@ -13,10 +13,18 @@ public class SecurityCameraController : MonoBehaviour, ILockObject
 
     public ILock Lock { get; set; }
     public float SoundRange = 22f;
+    public float TurnDegree = 80;
+    public float TurnPeriod = 3f;
+    public Transform TurnPoint;
+
+    private float _turnTimer;
+    private Vector3 _defaultRotation;
+    private bool _right = false;
 
     public void SetOrientation(Directions dirs)
     {
         transform.localRotation = Quaternion.LookRotation(dirs.ToVector3(), Vector3.up);
+        _defaultRotation = transform.eulerAngles;
     }
 
     public void Unlock()
@@ -42,6 +50,7 @@ public class SecurityCameraController : MonoBehaviour, ILockObject
     {
         _sight = GetComponentInChildren<Sight>();
         _player = FindObjectOfType<PlayerController>().transform;
+
     }
 
     // Update is called once per frame
@@ -70,6 +79,26 @@ public class SecurityCameraController : MonoBehaviour, ILockObject
                 GameController.AudioManager.PlayOnTarget("Gunshot", gameObject);
                 _player.GetComponent<PlayerController>().Die();
                 _timer %= _duration;
+            }
+        } else // turning
+        {
+            _turnTimer += Time.deltaTime;
+
+            var fromRotation = _right
+                ? new Vector3(0, -TurnDegree, 0)
+                : new Vector3(0, TurnDegree, 0);
+
+
+            var targetRotation = _right
+                ? new Vector3(0, TurnDegree, 0)
+                : new Vector3(0, -TurnDegree, 0);
+
+            TurnPoint.eulerAngles = Vector3.Lerp(fromRotation, targetRotation, _turnTimer / TurnPeriod);
+
+            if (_turnTimer >= TurnPeriod)
+            {
+                _turnTimer %= TurnPeriod;
+                _right = !_right;
             }
         }
 
