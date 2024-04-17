@@ -128,6 +128,7 @@ public class Map : MonoBehaviour
 
     public void IncreaseFloor(bool up)
     {
+        GameController.AudioManager.Play("Blick", volume: 0.3f);
         int step = up ? 1 : -1;
         int floor = Math.Clamp(_currentFloor + step, 0, _floors.Count - 1);
 

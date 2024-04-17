@@ -47,6 +47,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PauseCanvas: {fileID: 0}
   HUDCanvas: {fileID: 0}
+  Map: {fileID: 0}
+  Player: {fileID: 0}
+  LevelGenerator: {fileID: 0}
+  InfoScreen: {fileID: 0}
+  InteractionBar: {fileID: 0}
+  InteractionFill: {fileID: 0}
+  InteractionText: {fileID: 0}
 --- !u!114 &7717243770803640206
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -159,6 +166,18 @@ MonoBehaviour:
     AudioSource: {fileID: 0}
   - Name: Victory
     Clip: {fileID: 8300000, guid: dd813a43f11228049ad462a75ed7113b, type: 3}
+    Volume: 0.3
+    Pitch: 1
+    SpacialBlend: 1
+    AudioSource: {fileID: 0}
+  - Name: Click
+    Clip: {fileID: 8300000, guid: 39857f3c1213fb44cac6ad22edc5b190, type: 3}
+    Volume: 0.3
+    Pitch: 1
+    SpacialBlend: 1
+    AudioSource: {fileID: 0}
+  - Name: Blick
+    Clip: {fileID: 8300000, guid: c6ddcf4a93be58140be1ee9fa7d87813, type: 3}
     Volume: 0.3
     Pitch: 1
     SpacialBlend: 1

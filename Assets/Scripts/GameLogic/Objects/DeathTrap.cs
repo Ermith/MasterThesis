@@ -16,11 +16,14 @@ public class DeathTrap : SmartCollider, ILockObject, IInteractableObject
 
     public float Interact(PlayerController player)
     {
+        if (_interactionTimer >= InteractionTime)
+            GameController.AudioManager.Play("Click");
+
         Debug.Log(_interactionTimer);
         _interactionTimer -= Time.deltaTime;
         Debug.Log(_interactionTimer);
         if (_interactionTimer < 0)
-            Destroy(gameObject);
+            Unlock();
 
         _lastInteract = true;
 
@@ -34,6 +37,7 @@ public class DeathTrap : SmartCollider, ILockObject, IInteractableObject
 
     public void Unlock()
     {
+        GameController.AudioManager.Play("Cut");
         gameObject.SetActive(false);
     }
 

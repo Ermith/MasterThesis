@@ -111,6 +111,7 @@ public class GameController : MonoBehaviour
 
     public static void OpenMap()
     {
+        GameController.AudioManager.Play("Blick", volume: 0.3f);
         (int x, int y, int floor) = Instance.LevelGenerator.GridCoordinates(Instance.Player.transform.position);
 
         Instance._mapPaused = true;
@@ -122,6 +123,7 @@ public class GameController : MonoBehaviour
 
     public static void CloseMap()
     {
+        GameController.AudioManager.Play("Blick", volume: 0.3f);
         Instance._mapPaused = false;
         Time.timeScale = 1f;
         Instance.Map.gameObject.SetActive(false);
@@ -162,6 +164,7 @@ public class GameController : MonoBehaviour
 
     public static void Pause()
     {
+        GameController.AudioManager.Play("Blick", volume: 0.3f);
         Instance._paused = true;
         Time.timeScale = 0f;
         Instance.PauseCanvas.gameObject.SetActive(true);
@@ -170,6 +173,7 @@ public class GameController : MonoBehaviour
 
     public static void Resume()
     {
+        GameController.AudioManager.Play("Blick", volume: 0.3f);
         Instance._paused = false;
         Time.timeScale = 1f;
         Instance.PauseCanvas.gameObject.SetActive(false);
