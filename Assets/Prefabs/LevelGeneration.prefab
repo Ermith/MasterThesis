@@ -174,6 +174,7 @@ MonoBehaviour:
   HiddenDoorBlueprint: {fileID: 1959907301798189308, guid: ef7d6fdff446648428fe92cbf591435f, type: 3}
   KeyBlueprint: {fileID: 3527088339798993706, guid: 582fbcc671b70b646a25a005b0c238bf, type: 3}
   TrapKitBlueprint: {fileID: 3527088339798993706, guid: 9b19d2c50283bdf439dd82105d99df54, type: 3}
+  CamoBlueprint: {fileID: 3527088339798993706, guid: 01ead65452b4bb845b5613b7bf8a1eca, type: 3}
   SecurityCameraBlueprint: {fileID: 5452511249017854686, guid: bc89579a0bacc0d428944dc5a800e863, type: 3}
   PowerSourceBlueprint: {fileID: 8614125414331960436, guid: 376b0c47b4172984bb688512d8ada202, type: 3}
   TrapBlueprint: {fileID: 5882171629686246166, guid: 0b1491e76facedd4dbd599a7e8c4e23e, type: 3}

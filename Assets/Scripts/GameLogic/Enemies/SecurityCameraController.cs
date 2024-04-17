@@ -6,7 +6,7 @@ public class SecurityCameraController : MonoBehaviour, ILockObject
 {
     private Directions lookDirection = Directions.None;
     Sight _sight;
-    Transform _player;
+    PlayerController _player;
     bool _seen = false;
     float _timer = 0;
     float _duration = 2;
@@ -49,14 +49,14 @@ public class SecurityCameraController : MonoBehaviour, ILockObject
     void Start()
     {
         _sight = GetComponentInChildren<Sight>();
-        _player = FindObjectOfType<PlayerController>().transform;
+        _player = FindObjectOfType<PlayerController>();
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        bool see = _sight.CanSee(_player);
+        bool see = _sight.CanSee(_player.transform) && !_player.IsHidden;
 
         // Enter Sight Line
         if (!_seen && see)

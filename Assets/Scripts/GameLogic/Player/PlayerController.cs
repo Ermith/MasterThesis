@@ -43,6 +43,35 @@ public class PlayerController : MonoBehaviour
     private MeshRenderer _meshRenderer;
     public Animation Animation => _animation;
     private Vector3 _gunPosition;
+    public float InvisibilityTime;
+    private float _invisibilityTimer;
+
+    public void UseInvisibiltyCamo()
+    {
+        if (CamoCount <= 0)
+            return;
+
+        CamoCount--;
+        _invisibilityTimer = InvisibilityTime;
+        GameController.AudioManager.Play("Beep");
+    }
+
+    private void UpdateInvisibility()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+            UseInvisibiltyCamo();
+
+        bool wasInvisible = _invisible;
+        _invisible = _invisibilityTimer > 0;
+
+        if (wasInvisible && !_invisible)
+            GameController.AudioManager.Play("ElectricDischarge");
+
+        if (_invisible)
+            _invisibilityTimer -= Time.deltaTime;
+
+        GameController.SetInvisOverlay(_invisible);
+    }
 
     private void Start()
     {
@@ -77,11 +106,13 @@ public class PlayerController : MonoBehaviour
         UpdatePeeking();
         UpdateInteraction();
         UpdateShooting();
+        UpdateInvisibility();
         SwitchState();
     }
 
     private int _hidden = 0;
-    public bool IsHidden => _hidden > 0;
+    private bool _invisible = false;
+    public bool IsHidden => _hidden > 0 || _invisible;
     public void SetHidden(bool hidden)
     {
         _hidden += hidden ? 1 : -1;

@@ -407,6 +407,7 @@ MonoBehaviour:
   PeekTime: 0.15
   PeekOffset: {x: 1, y: -0.5, z: 0}
   Camera: {fileID: 0}
+  InvisibilityTime: 10
   CamoCount: 0
   TrapKitCount: 0
 --- !u!143 &1820135339780249294

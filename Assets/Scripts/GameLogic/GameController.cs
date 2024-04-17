@@ -25,6 +25,7 @@ public class GameController : MonoBehaviour
     public InfoScreen InfoScreen;
     public GameObject InteractionBar;
     public Image InteractionFill;
+    public GameObject InvisOverlay;
 
     public GameObject InteractionText;
 
@@ -196,5 +197,10 @@ public class GameController : MonoBehaviour
     {
         SceneManager.LoadScene("MainMenuScene");
         ShowCursor(true);
+    }
+
+    public static void SetInvisOverlay(bool active)
+    {
+        Instance.InvisOverlay.SetActive(active);
     }
 }
