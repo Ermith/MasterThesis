@@ -69,7 +69,8 @@ class MapBuilder
             ASuperTile tile;
 
             if (vertex.Top || vertex.Bottom) tile = new StairwayRoom(_superWidth, _superHeight, z, vertex.Exits, up: vertex.Top, down: vertex.Bottom, reveresed: z % 2 == 0);
-            else if (vertex.Hallway) tile = new HallwayWithRooms(_superWidth, _superHeight, z, vertex.Exits);
+            else if (vertex.Hallway && vertex.GetKeys().ToArray().Length > 0) tile = new HallwayWithRooms(_superWidth, _superHeight, z, vertex.Exits);
+            else if (vertex.Hallway) tile = new Hallway(_superWidth, _superHeight, z, vertex.Exits);
             //else tile = new FilledRoom(_superWidth, _superHeight, z, exits: vertex.Exits, subRoom: true);
             else tile = new Room(_superWidth, _superHeight, z, vertex.Exits);
 

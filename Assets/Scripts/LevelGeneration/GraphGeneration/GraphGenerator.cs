@@ -72,7 +72,7 @@ public class GridEdge : BaseEdge<GridVertex>
     public int maxX => Mathf.Max(fromX, toX);
     public int maxY => Mathf.Max(fromY, toY);
 
-    public bool Hidden;
+    public bool Hidden = false;
 
     public (int x, int y, int z) GetMid()
     {
@@ -271,37 +271,10 @@ public class GraphGenerator
             for (int i = 0; i < GenerationSettings.PatternCount; i++)
             {
                 int index = URandom.Range(0, patterns.Count);
-                GridEdge e = Graph.LongestEdge();
+                //GridEdge e = Graph.LongestEdge(false);
+                GridEdge e = Graph.GetRandomFloorEdge(allowHidden: false);
                 patterns[index].Apply(e, Graph);
             }
         }
-    }
-
-    // For Debugging
-    private void PredefinedGraph()
-    {
-        int count = 8;
-        var nodes = new GridVertex[count];
-        for (int i = 0; i < count; i++)
-        {
-            GridVertex vertex = new();
-            nodes[i] = vertex;
-            Graph.AddVertex(vertex);
-        }
-
-        Graph.AddEdge(nodes[0], nodes[1]);
-        Graph.AddEdge(nodes[0], nodes[3]);
-        Graph.AddEdge(nodes[0], nodes[6]);
-        Graph.AddEdge(nodes[1], nodes[3]);
-        Graph.AddEdge(nodes[1], nodes[5]);
-        Graph.AddEdge(nodes[1], nodes[2]);
-        Graph.AddEdge(nodes[2], nodes[5]);
-        Graph.AddEdge(nodes[2], nodes[7]);
-        Graph.AddEdge(nodes[3], nodes[6]);
-        Graph.AddEdge(nodes[3], nodes[4]);
-        Graph.AddEdge(nodes[4], nodes[6]);
-        Graph.AddEdge(nodes[4], nodes[7]);
-        Graph.AddEdge(nodes[4], nodes[5]);
-        Graph.AddEdge(nodes[6], nodes[7]);
     }
 }

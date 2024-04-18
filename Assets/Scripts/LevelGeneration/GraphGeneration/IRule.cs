@@ -618,11 +618,13 @@ public class HiddenPathPattern : Pattern
         EnemyLock enemyLock = new();
 
         // Make side path Hidden
-        HiddenDoorLock @lock1 = new(ce1.FromDirection);
-        ce1.From.AddLock(@lock1);
+        var hidden = URandom.value > 0.5f ? ce1 : ce2;
+        HiddenDoorLock fromLock = new(hidden.FromDirection);
+        HiddenDoorLock toLock = new(hidden.ToDirection);
+        hidden.From.AddLock(fromLock);        
+        hidden.To.AddLock(toLock);
+        hidden.Hidden = true;
 
-        HiddenDoorLock @lock2 = new(ce2.ToDirection);
-        ce2.To.AddLock(@lock2);
 
         // Make the main path dnageorus
 
@@ -662,7 +664,7 @@ public class HiddenPathPattern : Pattern
         ce1.To.AddKey(dangerLock.GetNewKey());
         ce1.To.AddKey(enemyLock.GetNewKey());
 
-        ce1.To.Hallway = true;
+        //ce1.To.Hallway = true;
     }
 }
 

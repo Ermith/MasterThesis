@@ -472,13 +472,16 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         RemoveEdge(e.From, e.To);
     }
 
-    public GridEdge LongestEdge()
+    public GridEdge LongestEdge(bool allowHidden = true)
     {
         GridEdge longest = null;
         int length = 0;
 
         foreach (GridEdge e in GetEdges().Cast<GridEdge>())
         {
+            if (e.Hidden && !allowHidden)
+                continue;
+
             int l = e.maxX - e.minX + e.maxY - e.minY;
             if (l > length)
             {
@@ -490,13 +493,24 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         return longest;
     }
 
-    public GridEdge GetRandomFloorEdge(int i = -1)
+    public GridEdge GetRandomFloorEdge(int i = -1, bool allowHidden = true)
     {
         var keys = FloorEdges.Keys.ToArray();
 
         if (i == -1) i = URandom.Range(0, keys.Length);
-        int index = URandom.Range(0, FloorEdges[keys[i]].Count);
-        return FloorEdges[keys[i]][index];
+        var edges = FloorEdges[keys[i]];
+        List<GridEdge> filteredEdges = new();
+        foreach (var edge in edges)
+        {
+            if (edge.Hidden && !allowHidden)
+                continue;
+
+            filteredEdges.Add(edge);
+        }
+
+
+        int index = URandom.Range(0, filteredEdges.Count);
+        return filteredEdges[index];
     }
 
     public GridEdge GetRandomInterfloorEdge()
