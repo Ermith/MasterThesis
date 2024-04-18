@@ -253,8 +253,11 @@ public class LevelGenerator : MonoBehaviour
         level.transform.position = offset;
 
         var pos = _mapBuilder.GetEndPosition() * scale + offset;
+        int victoryFloor = (int)pos.y;
         pos.y *= _floorHeight;
-        GameObject.Instantiate(VictoryTrigger).transform.position = pos;
+        var victory = GameObject.Instantiate(VictoryTrigger);
+        victory.transform.position = pos;
+        victory.transform.parent = _floors[victoryFloor].transform;
         //FindObjectOfType<LevelCamera>().SetPosition(SubTileGrid.GetLength(0), SubTileGrid.GetLength(1), scale, offset);
 
 
