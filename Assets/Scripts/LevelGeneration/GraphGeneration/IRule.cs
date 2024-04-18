@@ -512,30 +512,42 @@ public abstract class Pattern
         return true;
     }
 
-    private bool ComplexAddition(GridEdge edge, GridGraph graph, out GridEdge e1, out GridEdge e2)
+    private bool ComplexAddition(GridEdge edge, GridGraph graph, out GridEdge e1, out GridEdge e2, out GridEdge e3)
     {
         graph.RemoveGridEdge(edge);
         (GridEdge a, GridEdge b) = AddExtension(edge, graph);
 
-        if (TrySideAddition(a, graph, out e1, out e2)) return true;
-        if (TrySideAddition(b, graph, out e1, out e2)) return true;
-        if (TryCornerAddition(a, graph, out e1, out e2)) return true;
-        if (TryCornerAddition(b, graph, out e1, out e2)) return true;
+        if (TrySideAddition(a, graph, out e1, out e2)) { e3 = a;  return true; }
+        if (TrySideAddition(b, graph, out e1, out e2)) { e3 = b; return true; }
+        if (TryCornerAddition(a, graph, out e1, out e2)) { e3 = a; return true; }
+        if (TryCornerAddition(b, graph, out e1, out e2)) { e3 = b; return true; }
 
         graph.RemoveGridEdge(a);
         (a, b) = AddExtension(a, graph);
+        e3 = b;
         if (TrySideAddition(b, graph, out e1, out e2)) return true;
         if (TryCornerAddition(b, graph, out e1, out e2)) return true;
 
         return false;
     }
 
-    protected (GridEdge, GridEdge) AddCycle(GridEdge edge, GridGraph graph)
+    protected (GridEdge, GridEdge, GridEdge) AddCycle(GridEdge edge, GridGraph graph, bool reversed = false)
     {
-        GridEdge e1, e2;
-        if (TrySideAddition(edge, graph, out e1, out e2)) return (e1, e2);
-        if (TryCornerAddition(edge, graph, out e1, out e2)) return (e1, e2);
-        if (ComplexAddition(edge, graph, out e1, out e2)) return (e1, e2);
+        GridEdge e1, e2, e3 = edge;
+        if (TrySideAddition(edge, graph, out e1, out e2)) { }
+        else if (TryCornerAddition(edge, graph, out e1, out e2)) { }
+        else ComplexAddition(edge, graph, out e1, out e2, out e3);
+
+        if (reversed)
+        {
+            graph.Reverse(e1);
+            graph.Reverse(e2);
+            var tmp = e1;
+            e1 = e2;
+            e2 = tmp;
+        }
+
+        return (e1, e2, e3);
 
         throw new Exception("Unable to add cycle");
     }
@@ -581,13 +593,7 @@ public class LockedCyclePattern : Pattern
     {
         graph.RemoveGridEdge(edge);
         (GridEdge e1, GridEdge e2) = AddExtension(edge, graph);
-        (GridEdge ce1, GridEdge ce2) = AddCycle(e1, graph);
-        ce1.To.Hallway = true;
-
-        // Extend path back to the main room
-        // This is so the key is right next to the original room
-        graph.RemoveGridEdge(ce1);
-        (ce1, ce2) = AddExtension(ce1, graph);
+        (GridEdge ce1, GridEdge ce2, GridEdge _) = AddCycle(e1, graph, reversed: true);
         ce1.To.Hallway = true;
 
         // Lock the main path
@@ -595,15 +601,21 @@ public class LockedCyclePattern : Pattern
         IKey key = @lock.GetNewKey();
         e2.From.AddLock(@lock);
 
+        // Extend path back to the main room
+        // This is so the key is right next to the original room
+        graph.RemoveGridEdge(ce2);
+        (ce1, ce2) = AddExtension(ce2, graph);
+        ce1.To.Hallway = true;
+
         // Add 'Valve' back to the main room
-        WallOfLightLock @lock2 = new(ce1.FromDirection);
+        WallOfLightLock @lock2 = new(ce2.ToDirection);
         IKey key2 = @lock2.GetNewKey();
-        ce1.To.AddKey(key2);
-        ce1.From.AddLock(@lock2);
+        ce2.From.AddKey(key2);
+        ce2.To.AddLock(@lock2);
 
         // Add Key to the the side path
-        ce1.To.AddKey(key);
-        ce1.To.AddLock(new EnemyLock());
+        ce2.From.AddKey(key);
+        ce2.From.AddLock(new EnemyLock());
     }
 }
 
@@ -611,7 +623,8 @@ public class HiddenPathPattern : Pattern
 {
     public override void Apply(GridEdge edge, GridGraph graph)
     {
-        (GridEdge ce1, GridEdge ce2) = AddCycle(edge, graph);
+        (GridEdge ce1, GridEdge ce2, GridEdge ceBase) = AddCycle(edge, graph);
+        edge = ceBase;
         graph.RemoveGridEdge(edge);
         (GridEdge e1, GridEdge e2) = AddExtension(edge, graph);
 
@@ -674,7 +687,7 @@ public class DoubleLockCyclePattern : Pattern
     {
         graph.RemoveGridEdge(edge);
         (GridEdge e1, GridEdge e2) = AddExtension(edge, graph);
-        (GridEdge ce1, GridEdge ce2) = AddCycle(e1, graph);
+        (GridEdge ce1, GridEdge ce2, GridEdge _) = AddCycle(e1, graph);
 
         // Lock & Key 'A'
         var doorLock = new DoorLock(ce1.FromDirection);

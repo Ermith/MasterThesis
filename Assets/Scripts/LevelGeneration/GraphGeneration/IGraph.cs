@@ -469,6 +469,10 @@ public class GridGraph : AdjecencyGraph<GridVertex>
     {
         e.From.Exits = e.From.Exits.Without(e.FromDirection);
         e.To.Exits = e.To.Exits.Without(e.ToDirection);
+        foreach (var edges in FloorEdges.Values)
+        {
+            edges.Remove(e);
+        }
         RemoveEdge(e.From, e.To);
     }
 
@@ -517,5 +521,11 @@ public class GridGraph : AdjecencyGraph<GridVertex>
     {
         int index = URandom.Range(0, InterFloorEdges.Count);
         return InterFloorEdges[index];
+    }
+
+    public void Reverse(GridEdge e)
+    {
+        RemoveGridEdge(e);
+        AddGridEdge(e.To, e.From, e.ToDirection, e.FromDirection, e);
     }
 }

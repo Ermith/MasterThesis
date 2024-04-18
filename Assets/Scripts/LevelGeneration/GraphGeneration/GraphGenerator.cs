@@ -99,7 +99,7 @@ public class GridEdge : BaseEdge<GridVertex>
         float verticalOverlap = Mathf.Min(maxY, upperBound) - Mathf.Max(minY, lowerBound);
 
         // They are not even overlapping
-        if (verticalOverlap <= 0)
+        if (verticalOverlap < 0)
             return null;
 
         int offset = 0;
@@ -127,7 +127,7 @@ public class GridEdge : BaseEdge<GridVertex>
         int horizontalOverlap = Math.Min(maxX, rightBound) - Math.Max(minX, leftBound);
 
         // They are not even overlapping
-        if (horizontalOverlap <= 0)
+        if (horizontalOverlap < 0)
             return null;
 
         int offset = 0;
