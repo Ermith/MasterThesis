@@ -45,6 +45,8 @@ public class PlayerController : MonoBehaviour
     private Vector3 _gunPosition;
     public float InvisibilityTime;
     private float _invisibilityTimer;
+    private float _slideCooldown = 1f;
+    private float _slideCooldownTimer = 0.5f;
 
     public void UseInvisibiltyCamo()
     {
@@ -94,12 +96,16 @@ public class PlayerController : MonoBehaviour
 
         _gun.transform.parent = Camera.transform;
         _gun.transform.localPosition = _gunPosition;
+        _slideCooldownTimer = 0f;
     }
 
     private void Update()
     {
         if (GameController.IsPaused || _dead)
             return;
+        
+        if (_slideCooldownTimer > 0f)
+            _slideCooldownTimer -= Time.deltaTime;
 
         _movementState.Update(this);
         UpdateCamera();
@@ -314,7 +320,7 @@ public class PlayerController : MonoBehaviour
                 return;
             }
 
-            if (Input.GetKey(KeyCode.Space))
+            if (Input.GetKey(KeyCode.Space) && _slideCooldownTimer <= 0f)
             {
                 EnterState(_slidingState);
                 return;
@@ -332,6 +338,7 @@ public class PlayerController : MonoBehaviour
             } else
                 EnterState(_standingState);
 
+            _slideCooldownTimer = _slideCooldown;
             return;
         }
 
