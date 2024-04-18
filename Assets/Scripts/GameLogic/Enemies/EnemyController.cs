@@ -248,6 +248,15 @@ public class EnemyController : MonoBehaviour, ILockObject
         {
             _positionReached?.Invoke();
             _positionReached = null;
+            _stepTimer = 0f;
+        } else
+        {
+            _stepTimer += Time.deltaTime;
+            if (_stepTimer > StepTime)
+            {
+                GameController.AudioManager.PlayStep("Rubber", gameObject, volume: 0.5f, spacialBlend: 1f);
+                _stepTimer %= StepTime;
+            }
         }
     }
 

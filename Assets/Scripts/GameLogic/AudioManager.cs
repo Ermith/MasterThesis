@@ -120,7 +120,7 @@ public class AudioManager : MonoBehaviour
         return sound.AudioSource;
     }
 
-    public AudioSource PlayStep(string name, GameObject target, float? volume = null, float? pitch = null, bool destroyTarget = false)
+    public AudioSource PlayStep(string name, GameObject target, float? volume = null, float? pitch = null, float? spacialBlend = null, bool destroyTarget = false)
     {
         List<Sound> stepVariations = _stepDictionary[name];
         int index = URandom.Range(0, stepVariations.Count);
@@ -134,7 +134,7 @@ public class AudioManager : MonoBehaviour
         audio.clip = source.clip;
         audio.volume = volume == null ? source.volume : volume.Value;
         audio.pitch = pitch == null ? source.pitch : pitch.Value;
-        audio.spatialBlend = source.spatialBlend;
+        audio.spatialBlend = spacialBlend == null ? source.spatialBlend : spacialBlend.Value;
 
         StartCoroutine(PlayOnTargetCoroutine(audio, destroyTarget));
         return audio;
