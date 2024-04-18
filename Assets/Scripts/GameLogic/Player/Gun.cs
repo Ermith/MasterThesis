@@ -13,6 +13,8 @@ public class Gun : MonoBehaviour
     private GameObject _visual;
     private bool _aiming = false;
     private Vector3 _baseDirection;
+    private float _reloadTime = 1.5f;
+    private float _reloadTimer;
 
     // Start is called before the first frame update
     void Start()
@@ -31,6 +33,8 @@ public class Gun : MonoBehaviour
     void LateUpdate()
     {
         UpdateAiming();
+        if (_reloadTimer >= 0f)
+            _reloadTimer -= Time.deltaTime;
     }
 
     public void Aim(Vector3 direction)
@@ -53,6 +57,7 @@ public class Gun : MonoBehaviour
     {
         if (!_aiming) return;
 
+        _lineRenderer.enabled = _reloadTimer <= 0f;
         float maxDistance = 10000;
         bool hit = Physics.Raycast(_muzzle.position, transform.forward, out RaycastHit hitInfo, maxDistance);
         
@@ -65,6 +70,9 @@ public class Gun : MonoBehaviour
 
     public void Shoot()
     {
+        if (_reloadTimer > 0f) return;
+        _reloadTimer = _reloadTime;
+
         Projectile projectile = Instantiate(Projectile);
         projectile.Shoot(_muzzle.position, transform.forward, (Vector3 pos, GameObject target) =>
         {
