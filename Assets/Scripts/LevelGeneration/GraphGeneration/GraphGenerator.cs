@@ -226,60 +226,55 @@ public class GraphGenerator
 
     public void Generate()
     {
-        var f1 = Graph.AddGridVertex(0, 0, 0);
-        var f2 = Graph.AddGridVertex(0, 0, BaseRule.STEP);
+        List<Pattern> patterns = new();
+        if (GenerationSettings.PatternDoubleLock) patterns.Add(new DoubleLockCyclePattern());
+        if (GenerationSettings.PatternLockedCycle) patterns.Add(new LockedCyclePattern());
+        if (GenerationSettings.PatternHiddenShortcut) patterns.Add(new HiddenPathPattern());
 
-        _start = Graph.AddGridVertex(0, -BaseRule.STEP, 0);
-        _end = Graph.AddGridVertex(0, BaseRule.STEP, BaseRule.STEP);
+        List<Pattern> floorPatterns = new();
+        if (GenerationSettings.FloorPatternHiddenShortcut) floorPatterns.Add(new FloorHiddenPathExtensionPattern());
+        if (GenerationSettings.FloorPatternLockedExtention) floorPatterns.Add(new FloorLockedExtentionPattern());
+        if (GenerationSettings.FloorPatternLockedAddition) floorPatterns.Add(new FloorLockedAdditionPattern());
 
-        var interFloorEdge = Graph.AddInterFloorEdge(f1, f2);
-        var startEdge = Graph.AddGridEdge(_start, f1, Directions.North, Directions.South);
-        var endEdge = Graph.AddGridEdge(f2, _end, Directions.North, Directions.South);
+        List<DangerType> dangerTypes = new();
+        if (GenerationSettings.DangerCameras) dangerTypes.Add(DangerType.SecurityCameras);
+        if (GenerationSettings.DangerSoundTraps) dangerTypes.Add(DangerType.SoundTraps);
+        if (GenerationSettings.DangerDeathTraps) dangerTypes.Add(DangerType.DeathTraps);
 
-        CycleRule cycleRule = new(this);
-        ExtensionRule extensionRule = new(this);
-        AdditionRule additionRule = new(this);
-        Pattern cycle = new LockedCyclePattern();
-        Pattern hiddenPath = new HiddenPathPattern();
-        Pattern doubleLock = new DoubleLockCyclePattern();
-
-        Pattern floorLockedExtension = new FloorLockedExtentionPattern();
-        Pattern floorLockedAddition = new FloorLockedAdditionPattern();
-        Pattern floorHiddenExtension = new FloorHiddenPathExtensionPattern();
-
-        // Inter Floor Patterns
-        //floorExtension.Apply(interFloorEdge, Graph);
-        //floorLockedAddition.Apply(Graph.InterFloorEdges[Graph.InterFloorEdges.Count - 1], Graph);
-        //floorHiddenExtension.Apply(interFloorEdge, Graph);
-        floorLockedExtension.Apply(Graph.InterFloorEdges[Graph.InterFloorEdges.Count - 1], Graph);
-
-        // Single Floor Patterns
-        //doubleLock.Apply(startEdge, Graph);
-        //cycle.Apply(startEdge, Graph);
-        //hiddenPath.DangerType = DangerType.DeathTraps;
-        //hiddenPath.Apply(startEdge, Graph);
-
-        hiddenPath.Apply(Graph.GetRandomFloorEdge(0), Graph);
-        doubleLock.Apply(Graph.GetRandomFloorEdge(1), Graph);
-        cycle.Apply(Graph.GetRandomFloorEdge(2), Graph);
-
-        /*/
-        for (int i = 0; i < Graph.FloorCount; i++)
+        if (GenerationSettings.FloorPatternCount == 0)
         {
-            for (int j = 0; j < 1; j++)
-            {
-                var edge = Graph.GetRandomFloorEdge(i);
+            _start = Graph.AddGridVertex(0, 0);
+            _end = Graph.AddGridVertex(0, BaseRule.STEP);
+            Graph.AddGridEdge(_start, _end, Directions.North, Directions.South);
+        } else
+        {
+            var f1 = Graph.AddGridVertex(0, 0, 0);
+            var f2 = Graph.AddGridVertex(0, 0, BaseRule.STEP);
 
-                float random = URandom.value;
-                if (random > 0.66)
-                    cycle.Apply(edge, Graph);
-                else if (random > 0.33)
-                    hiddenPath.Apply(edge, Graph);
-                else
-                    doubleLock.Apply(edge, Graph);
+            _start = Graph.AddGridVertex(0, -BaseRule.STEP, 0);
+            _end = Graph.AddGridVertex(0, BaseRule.STEP, BaseRule.STEP);
+
+            Graph.AddInterFloorEdge(f1, f2);
+            Graph.AddGridEdge(_start, f1, Directions.North, Directions.South);
+            Graph.AddGridEdge(f2, _end, Directions.North, Directions.South);
+        }
+
+        for (int i = 0; i < GenerationSettings.FloorPatternCount; i++)
+        {
+            int index = URandom.Range(0, floorPatterns.Count);
+            GridEdge e = Graph.GetRandomInterfloorEdge();
+            floorPatterns[index].Apply(e, Graph);
+        }
+
+        for (int floor = 0; floor < Graph.FloorCount; floor++)
+        {
+            for (int i = 0; i < GenerationSettings.PatternCount; i++)
+            {
+                int index = URandom.Range(0, patterns.Count);
+                GridEdge e = Graph.LongestEdge();
+                patterns[index].Apply(e, Graph);
             }
         }
-        //*/
     }
 
     // For Debugging

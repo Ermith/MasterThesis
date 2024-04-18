@@ -38,7 +38,9 @@ public class GameController : MonoBehaviour
         Debug.Log("Game Instance");
         Instance = this;
         Time.timeScale = 1f;
-        UnityEngine.Random.InitState(-488536290);
+        if (GenerationSettings.Seed.HasValue)
+            UnityEngine.Random.InitState(GenerationSettings.Seed.Value);
+
         Debug.Log(UnityEngine.Random.seed);
         _settingsMenu = PauseCanvas.transform.Find("SettingsPanel").gameObject;
         _menu = PauseCanvas.transform.Find("MenuPanel").gameObject;

@@ -498,4 +498,10 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         int index = URandom.Range(0, FloorEdges[keys[i]].Count);
         return FloorEdges[keys[i]][index];
     }
+
+    public GridEdge GetRandomInterfloorEdge()
+    {
+        int index = URandom.Range(0, InterFloorEdges.Count);
+        return InterFloorEdges[index];
+    }
 }
