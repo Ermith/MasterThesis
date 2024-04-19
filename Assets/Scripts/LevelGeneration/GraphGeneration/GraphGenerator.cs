@@ -69,8 +69,10 @@ public class GridEdge : BaseEdge<GridVertex>
     
     public int minX => Mathf.Min(fromX, toX);
     public int minY => Mathf.Min(fromY, toY);
+    public int minZ => Mathf.Min(fromZ, toZ);
     public int maxX => Mathf.Max(fromX, toX);
     public int maxY => Mathf.Max(fromY, toY);
+    public int maxZ => Mathf.Max(fromZ, toZ);
 
     public bool Hidden = false;
 
@@ -232,9 +234,10 @@ public class GraphGenerator
         if (GenerationSettings.PatternHiddenShortcut) patterns.Add(new HiddenPathPattern());
 
         List<Pattern> floorPatterns = new();
-        if (GenerationSettings.FloorPatternHiddenShortcut) floorPatterns.Add(new FloorHiddenPathExtensionPattern());
-        if (GenerationSettings.FloorPatternLockedExtention) floorPatterns.Add(new FloorLockedExtentionPattern());
-        if (GenerationSettings.FloorPatternLockedAddition) floorPatterns.Add(new FloorLockedAdditionPattern());
+        //if (GenerationSettings.FloorPatternHiddenShortcut) floorPatterns.Add(new FloorHiddenPathExtensionPattern());
+        //if (GenerationSettings.FloorPatternLockedExtention) floorPatterns.Add(new FloorLockedExtentionPattern());
+        //if (GenerationSettings.FloorPatternLockedAddition) floorPatterns.Add(new FloorLockedAdditionPattern());
+        floorPatterns.Add(new FloorHiddenPathPattern());
 
         List<DangerType> dangerTypes = new();
         if (GenerationSettings.DangerCameras) dangerTypes.Add(DangerType.SecurityCameras);

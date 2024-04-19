@@ -111,7 +111,7 @@ public class CycleRule : BaseRule
 
             x = URandom.value > 0.5f ? a.Position.x : b.Position.x; // TODO make random choice
             //x = a.Position.x;
-            y = graph.GetNewY(minY, minX, maxX, dir.North());
+            y = graph.GetNewY(minY, minX, maxX, a.Position.z, dir.North());
             caDir = (x == a.Position.x) ? dir.Opposite() : Directions.West;
             cbDir = (x == b.Position.x) ? dir.Opposite() : Directions.East;
         }
@@ -122,7 +122,7 @@ public class CycleRule : BaseRule
             if (a.Position.y > b.Position.y)
                 (a, b) = (b, a);
 
-            x = graph.GetNewX(minX, minY, maxY, dir.East());
+            x = graph.GetNewX(minX, minY, maxY, a.Position.z, dir.East());
             y = URandom.value > 0.5f ? a.Position.y : b.Position.y; // TODO make random choice
             //y = a.Position.y;
             caDir = (y == a.Position.y) ? dir.Opposite() : Directions.South;
@@ -150,8 +150,8 @@ public class CycleRule : BaseRule
         bool up = edgeDirs.Contains(Directions.South);
 
         (int midX, int midY, int midZ) = edge.GetMid();
-        int newX = graph.GetNewX(midX, edge.minY, edge.maxY, right);
-        int newY = graph.GetNewY(midY, edge.minX, edge.maxX, up);
+        int newX = graph.GetNewX(midX, edge.minY, edge.maxY, edge.fromZ, right);
+        int newY = graph.GetNewY(midY, edge.minX, edge.maxX, edge.fromZ, up);
 
 
         bool obstructed = newX != midX || newY != midY;
@@ -337,14 +337,14 @@ public class AdditionRule : BaseRule
 
         if (dir.Horizontal())
         {
-            int x = graph.GetNewX(edge.fromX, edge.fromY, edge.fromY + 1, dir.East());
+            int x = graph.GetNewX(edge.fromX, edge.fromY, edge.fromY + 1, edge.fromZ, dir.East());
             GridVertex c = graph.AddGridVertex(x, edge.fromY);
             graph.AddGridEdge(edge.From, c, dir, dir.Opposite());
         }
 
         if (dir.Vertical())
         {
-            int y = graph.GetNewY(edge.fromY, edge.fromX, edge.fromX + 1, dir.North());
+            int y = graph.GetNewY(edge.fromY, edge.fromX, edge.fromX + 1, edge.fromZ, dir.North());
             GridVertex c = graph.AddGridVertex(edge.fromX, y);
             graph.AddGridEdge(edge.From, c, dir, dir.Opposite());
         }
@@ -397,7 +397,7 @@ public abstract class Pattern
 
             x = URandom.value > 0.5f ? a.Position.x : b.Position.x; // TODO make random choice
             //x = a.Position.x;
-            y = graph.GetNewY(minY, minX, maxX, dir.North());
+            y = graph.GetNewY(minY, minX, maxX, a.Position.z, dir.North());
             caDir = (x == a.Position.x) ? dir.Opposite() : Directions.West;
             cbDir = (x == b.Position.x) ? dir.Opposite() : Directions.East;
         }
@@ -408,7 +408,7 @@ public abstract class Pattern
             if (a.Position.y > b.Position.y)
                 (a, b) = (b, a);
 
-            x = graph.GetNewX(minX, minY, maxY, dir.East());
+            x = graph.GetNewX(minX, minY, maxY, a.Position.z, dir.East());
             y = URandom.value > 0.5f ? a.Position.y : b.Position.y; // TODO make random choice
             //y = a.Position.y;
             caDir = (y == a.Position.y) ? dir.Opposite() : Directions.South;
@@ -436,8 +436,8 @@ public abstract class Pattern
         bool up = edgeDirs.Contains(Directions.South);
 
         (int midX, int midY, int midZ) = edge.GetMid();
-        int newX = graph.GetNewX(midX, edge.minY, edge.maxY, right);
-        int newY = graph.GetNewY(midY, edge.minX, edge.maxX, up);
+        int newX = graph.GetNewX(midX, edge.minY, edge.maxY, edge.fromZ, right);
+        int newY = graph.GetNewY(midY, edge.minX, edge.maxX, edge.fromZ, up);
 
         GridEdge mockEdge = new();
         mockEdge.From = a;
@@ -517,7 +517,7 @@ public abstract class Pattern
         graph.RemoveGridEdge(edge);
         (GridEdge a, GridEdge b) = AddExtension(edge, graph);
 
-        if (TrySideAddition(a, graph, out e1, out e2)) { e3 = a;  return true; }
+        if (TrySideAddition(a, graph, out e1, out e2)) { e3 = a; return true; }
         if (TrySideAddition(b, graph, out e1, out e2)) { e3 = b; return true; }
         if (TryCornerAddition(a, graph, out e1, out e2)) { e3 = a; return true; }
         if (TryCornerAddition(b, graph, out e1, out e2)) { e3 = b; return true; }
@@ -534,9 +534,7 @@ public abstract class Pattern
     protected (GridEdge, GridEdge, GridEdge) AddCycle(GridEdge edge, GridGraph graph, bool reversed = false)
     {
         GridEdge e1, e2, e3 = edge;
-        if (TrySideAddition(edge, graph, out e1, out e2)) { }
-        else if (TryCornerAddition(edge, graph, out e1, out e2)) { }
-        else ComplexAddition(edge, graph, out e1, out e2, out e3);
+        if (TrySideAddition(edge, graph, out e1, out e2)) { } else if (TryCornerAddition(edge, graph, out e1, out e2)) { } else ComplexAddition(edge, graph, out e1, out e2, out e3);
 
         if (reversed)
         {
@@ -552,6 +550,43 @@ public abstract class Pattern
         throw new Exception("Unable to add cycle");
     }
 
+    protected (GridEdge, GridEdge, GridEdge) AddFloorCycle(GridEdge edge, GridGraph graph, bool toFirst = false, bool reversed = false)
+    {
+        GridEdge toFork, fromFork;
+        Directions dir;
+        if (toFirst)
+        {
+            toFork = AddFork(edge.To, graph, reversed: !reversed);
+            dir = reversed ? toFork.FromDirection : toFork.ToDirection;
+            fromFork = AddFork(edge.From, graph, dir, reversed);
+        } else
+        {
+            fromFork = AddFork(edge.From, graph, reversed: reversed);
+            dir = reversed ? fromFork.ToDirection : fromFork.FromDirection;
+            toFork = AddFork(edge.To, graph, dir, !reversed);
+        }
+
+        var a = reversed ? toFork.To : fromFork.To;
+        var b = reversed ? fromFork.From : toFork.From;
+
+        int x = dir.West()
+            ? Math.Max(a.Position.x, b.Position.x)
+            : Math.Min(a.Position.x, b.Position.x);
+
+        int y = dir.South()
+            ? Math.Max(a.Position.y, b.Position.y)
+            : Math.Min(a.Position.y, b.Position.y);
+
+        a.Position.x = x;
+        a.Position.y = y;
+        b.Position.x = x;
+        b.Position.y = y;
+
+        var ie = graph.AddInterFloorEdge(a, b);
+
+        return reversed ? (toFork, ie, fromFork) : (toFork, ie, fromFork);
+    }
+
     public GridEdge AddFork(GridVertex v, GridGraph graph, Directions dir = Directions.None, bool reversed = false)
     {
         if (dir.None())
@@ -561,7 +596,7 @@ public abstract class Pattern
 
         if (dir.Horizontal())
         {
-            int x = graph.GetNewX(v.Position.x, v.Position.y, v.Position.y + 1, dir.East());
+            int x = graph.GetNewX(v.Position.x, v.Position.y, v.Position.y + 1, v.Position.z, dir.East());
             GridVertex c = graph.AddGridVertex(x, v.Position.y, v.Position.z);
 
             if (reversed)
@@ -572,7 +607,7 @@ public abstract class Pattern
 
         if (dir.Vertical())
         {
-            int y = graph.GetNewY(v.Position.y, v.Position.x, v.Position.x + 1, dir.North());
+            int y = graph.GetNewY(v.Position.y, v.Position.x, v.Position.x + 1, v.Position.z, dir.North());
             GridVertex c = graph.AddGridVertex(v.Position.x, y, v.Position.z);
 
             if (reversed)
@@ -582,6 +617,16 @@ public abstract class Pattern
         }
 
         return e;
+    }
+
+    protected (GridEdge, GridEdge) AddInterFloorExtension(GridEdge edge, GridGraph graph)
+    {
+        (int midX, int midY, int midZ) = edge.GetMid();
+        GridVertex v = graph.AddGridVertex(midX, midY, midZ);
+        GridEdge e1 = graph.AddInterFloorEdge(edge.From, v);
+        GridEdge e2 = graph.AddInterFloorEdge(v, edge.To);
+
+        return (e1, e2);
     }
 
     public abstract void Apply(GridEdge edge, GridGraph graph);
@@ -634,7 +679,7 @@ public class HiddenPathPattern : Pattern
         var hidden = URandom.value > 0.5f ? ce1 : ce2;
         HiddenDoorLock fromLock = new(hidden.FromDirection);
         HiddenDoorLock toLock = new(hidden.ToDirection);
-        hidden.From.AddLock(fromLock);        
+        hidden.From.AddLock(fromLock);
         hidden.To.AddLock(toLock);
         hidden.Hidden = true;
 
@@ -832,5 +877,82 @@ public class FloorHiddenPathExtensionPattern : Pattern
         var upperFork = AddFork(e2.To, graph, reversed: true);
         var lowerFork = AddFork(e2.From, graph, dir: upperFork.ToDirection);
         graph.AddInterFloorEdge(lowerFork.To, upperFork.From);
+    }
+}
+
+public class FloorHiddenPathPattern : Pattern
+{
+    public override void Apply(GridEdge edge, GridGraph graph)
+    {
+        GridVertex oldVertex = null;
+        bool up = false;
+        bool down = false;
+
+        //*/
+        if (!edge.To.Bottom)
+        {
+            oldVertex = edge.To;
+            down = true;
+        } else if (!edge.To.Top)
+        {
+            oldVertex = edge.To;
+            up = true;
+        } else
+        //*/
+        if (!edge.From.Bottom)
+        {
+            oldVertex = edge.From;
+            down = true;
+        } else if (!edge.From.Top)
+        {
+            oldVertex = edge.From;
+            up = true;
+        }
+
+        //up = false;
+        //down = false;
+        GridEdge interFloorEdge;
+
+        GridVertex newVertex;
+        // perform addition
+        if (down || up)
+        {
+            int newZ = graph.GetNewZ(oldVertex.Position.z, oldVertex.Position.x, oldVertex.Position.y, !down);
+
+            newVertex = graph.AddGridVertex(
+            oldVertex.Position.x,
+            oldVertex.Position.y,
+            newZ);
+
+            var ie = graph.AddInterFloorEdge(oldVertex, newVertex);
+            interFloorEdge = AddFloorCycle(ie, graph, toFirst: false, reversed: true).Item2;
+        } else
+        { // Perform extension
+            graph.RemoveGridEdge(edge);
+            (GridEdge e1, GridEdge e2) = AddInterFloorExtension(edge, graph);
+            oldVertex = e2.From;
+            newVertex = e2.To;
+
+            if (oldVertex.Position.z < newVertex.Position.z) up = true;
+            else down = true;
+
+            interFloorEdge = AddFloorCycle(e2, graph, toFirst: true, reversed: true).Item2;
+        }
+
+
+        if (down) oldVertex.AddLock(new HiddenDoorLock(down: true));
+        else if (up) oldVertex.AddLock(new HiddenDoorLock(up: true));
+
+        //var a = fork.To;
+        //var b = newFork.From;
+        //graph.AddInterFloorEdge(a, b);
+
+        // TODO: Other dangers?
+        var @lock = new SecurityCameraLock();
+        interFloorEdge.From.AddLock(@lock);
+        interFloorEdge.To.AddLock(@lock);
+
+        // TODO: Add other bonus to newVertex?
+        newVertex.AddKey(@lock.GetNewKey());
     }
 }
