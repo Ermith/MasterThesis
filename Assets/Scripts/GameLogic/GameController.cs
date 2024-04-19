@@ -30,6 +30,7 @@ public class GameController : MonoBehaviour
     public GameObject InteractionText;
     private GameObject _settingsMenu;
     private GameObject _menu;
+    private GameObject _generationMenu;
 
 
     // Awake is called before the Start method
@@ -38,13 +39,15 @@ public class GameController : MonoBehaviour
         Debug.Log("Game Instance");
         Instance = this;
         Time.timeScale = 1f;
-        if (GenerationSettings.Seed.HasValue)
-            UnityEngine.Random.InitState(GenerationSettings.Seed.Value);
+        if (GenerationSettings.Seed == null)
+            GenerationSettings.Seed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
 
+        UnityEngine.Random.InitState(GenerationSettings.Seed.Value);
         Debug.Log(UnityEngine.Random.seed);
         _settingsMenu = PauseCanvas.transform.Find("SettingsPanel").gameObject;
         _menu = PauseCanvas.transform.Find("MenuPanel").gameObject;
-    }
+        _generationMenu = PauseCanvas.transform.Find("GenerationSettingsPanel").gameObject;
+}
 
     // Update is called once per frame
     void Update()
@@ -185,6 +188,13 @@ public class GameController : MonoBehaviour
         if (Instance._settingsMenu.activeSelf)
         {
             Instance._settingsMenu.SetActive(false);
+            Instance._menu.SetActive(true);
+            return;
+        }
+
+        if (Instance._generationMenu.activeSelf)
+        {
+            Instance._generationMenu.SetActive(false);
             Instance._menu.SetActive(true);
             return;
         }

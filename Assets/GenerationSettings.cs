@@ -55,7 +55,7 @@ public class GenerationSettings : MonoBehaviour
         FloorPatternHiddenShortcutToggle.isOn = FloorPatternHiddenShortcut;
         FloorPatternLockedExtentionToggle.isOn = FloorPatternLockedExtention;
         FloorPatternLockedAdditionToggle.isOn = FloorPatternLockedAddition;
-        //SeedInput.text = Seed.ToString();
+        SeedInput.text = Seed?.ToString();
         FloorCountSlider.value = FloorPatternCount;
         PatternCountSlider.value = PatternCount;
 
