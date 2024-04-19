@@ -334,7 +334,7 @@ public class PowerSourceKey : IKey
     }
 }
 
-public class TrapLock : ILock
+public class DeathTrapLock : ILock
 {
     public static GameObject Blueprint;
 

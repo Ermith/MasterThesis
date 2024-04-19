@@ -77,10 +77,10 @@ public class FilledRoom : ASuperTile
         Description.PatrolLooped = true;
 
         foreach (IKey k in Keys)
-            k.Implement(Description);
+            k?.Implement(Description);
 
         foreach (ILock l in Locks)
-            l.Implement(Description);
+            l?.Implement(Description);
 
         return Description.Enemies;
     }

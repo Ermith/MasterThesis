@@ -66,7 +66,7 @@ public class LevelGenerator : MonoBehaviour
         DoorKey.Blueprint = KeyBlueprint;
         SecurityCameraLock.Blueprint = SecurityCameraBlueprint;
         PowerSourceKey.Blueprint = PowerSourceBlueprint;
-        TrapLock.Blueprint = TrapBlueprint;
+        DeathTrapLock.Blueprint = TrapBlueprint;
         SoundTrapLock.Blueprint = SoundTrapBlueprint;
         StairwayRoom.Blueprint = StairsBlueprint;
         TrapDisarmingKit.Blueprint = TrapKitBlueprint;
@@ -212,42 +212,44 @@ public class LevelGenerator : MonoBehaviour
         var localScale = geometry.transform.localScale;
         //geometry.transform.localScale *= scale;
         geometry.transform.localScale = localScale.Multiplied(x: scale, y: 1f, z: scale);
-        foreach (EnemyParams enemy in enemies)
-        {
-            (int spawnX, int spawnZ) = enemy.Spawn;
-            Vector3 spawn = new(spawnX, (enemy.Floor + 0.1f) * _floorHeight, spawnZ);
-            spawn = spawn * scale + offset;
 
-            var enemyInstance = Instantiate(
-                EnemyBlueprint,
-                spawn,
-                Quaternion.identity,
-                level.transform);
-
-            enemyInstance.transform.parent = _floors[enemy.Floor].transform;
-
-
-            if (enemy.Behaviour == Behaviour.Patroling)
+        if (GenerationSettings.DangerEnemies)
+            foreach (EnemyParams enemy in enemies)
             {
-                List<Vector3> patrol = new();
-                foreach ((int x, int z) in enemy.Patrol)
+                (int spawnX, int spawnZ) = enemy.Spawn;
+                Vector3 spawn = new(spawnX, (enemy.Floor + 0.1f) * _floorHeight, spawnZ);
+                spawn = spawn * scale + offset;
+
+                var enemyInstance = Instantiate(
+                    EnemyBlueprint,
+                    spawn,
+                    Quaternion.identity,
+                    level.transform);
+
+                enemyInstance.transform.parent = _floors[enemy.Floor].transform;
+
+
+                if (enemy.Behaviour == Behaviour.Patroling)
                 {
-                    patrol.Add(new Vector3(x, (enemy.Floor + 0.1f) * _floorHeight, z) * scale + offset);
+                    List<Vector3> patrol = new();
+                    foreach ((int x, int z) in enemy.Patrol)
+                    {
+                        patrol.Add(new Vector3(x, (enemy.Floor + 0.1f) * _floorHeight, z) * scale + offset);
+                    }
+
+                    enemyInstance.Patrol(patrol.ToArray(), enemy.PatrolIndex, enemy.Retrace);
                 }
 
-                enemyInstance.Patrol(patrol.ToArray(), enemy.PatrolIndex, enemy.Retrace);
-            }
+                if (enemy.Behaviour == Behaviour.Guarding)
+                {
+                    Debug.Log("SPAWNING GUARD ===========================================================");
+                    enemyInstance.Guard(spawn, Vector3.right);
+                    enemyInstance.LookAt(spawn);
+                }
 
-            if (enemy.Behaviour == Behaviour.Guarding)
-            {
-                Debug.Log("SPAWNING GUARD ===========================================================");
-                enemyInstance.Guard(spawn, Vector3.right);
-                enemyInstance.LookAt(spawn);
+                if (enemy.Behaviour == Behaviour.Sleeping)
+                    enemyInstance.Sleep(spawn);
             }
-
-            if (enemy.Behaviour == Behaviour.Sleeping)
-                enemyInstance.Sleep(spawn);
-        }
 
         // Just offset it for now
         level.transform.position = offset;
@@ -293,7 +295,6 @@ public class LevelGenerator : MonoBehaviour
         wallParams.receiveShadows = true;
         wallParams.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
 
-
         if (_activeFloor.HasValue)
         {
             RenderInstanced(floorParams, FloorMesh, _floorMatrices[_activeFloor.Value]);
@@ -306,25 +307,6 @@ public class LevelGenerator : MonoBehaviour
             foreach (var wall in _wallMatrices)
                 RenderInstanced(wallParams, WallMesh, wall);
         }
-
-        /*/
-        RenderParams ps = new RenderParams(FloorMaterial);
-        var f = _fuck.Take(1023).ToArray();
-        List<Matrix4x4> buffer = new();
-
-        int i = 0;
-        while (i < _fuck.Length)
-        {
-            buffer.Clear();
-            for (int j = 0; j < 1023 && i + j < _fuck.Length; j++)
-            {
-                buffer.Add(_fuck[i + j]);
-            }
-
-            i += 1023;
-            Graphics.RenderMeshInstanced(ps, FloorMesh, 0, buffer.ToArray());
-        }
-        //*/
     }
 
     public void RenderInstanced(RenderParams rp, Mesh mesh, IEnumerable<Matrix4x4> ms)

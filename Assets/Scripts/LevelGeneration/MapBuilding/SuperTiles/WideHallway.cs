@@ -110,8 +110,8 @@ public class WideHallway : ASuperTile
         Description.PatrolPath = patrol;
         Description.PatrolLooped = true;
 
-        foreach (ILock l in Locks) l.Implement(Description);
-        foreach (IKey k in Keys) k.Implement(Description);
+        foreach (ILock l in Locks) l?.Implement(Description);
+        foreach (IKey k in Keys) k?.Implement(Description);
 
         return Description.Enemies;
     }

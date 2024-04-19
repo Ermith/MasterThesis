@@ -31,13 +31,13 @@ public class GridVertex
 
     public IEnumerable<ILock> GetLocks()
     {
-        foreach(ILock l in _locks)
+        foreach (ILock l in _locks)
             yield return l;
     }
 
     public IEnumerable<IKey> GetKeys()
     {
-        foreach(IKey k in _keys)
+        foreach (IKey k in _keys)
             yield return k;
     }
 
@@ -66,7 +66,7 @@ public class GridEdge : BaseEdge<GridVertex>
     public int toX => To.Position.x;
     public int toY => To.Position.y;
     public int toZ => To.Position.z;
-    
+
     public int minX => Mathf.Min(fromX, toX);
     public int minY => Mathf.Min(fromY, toY);
     public int minZ => Mathf.Min(fromZ, toZ);
@@ -264,8 +264,12 @@ public class GraphGenerator
         for (int i = 0; i < GenerationSettings.FloorPatternCount; i++)
         {
             int index = URandom.Range(0, floorPatterns.Count);
+            int dangerIndex = URandom.Range(0, dangerTypes.Count);
             GridEdge e = Graph.GetRandomInterfloorEdge();
-            floorPatterns[index].Apply(e, Graph);
+            var pattern = floorPatterns[index];
+            if (dangerTypes.Count > 0)
+                pattern.DangerType = dangerTypes[dangerIndex];
+            pattern.Apply(e, Graph);
         }
 
         for (int floor = 0; floor < Graph.FloorCount; floor++)
@@ -273,9 +277,13 @@ public class GraphGenerator
             for (int i = 0; i < GenerationSettings.PatternCount; i++)
             {
                 int index = URandom.Range(0, patterns.Count);
+                int dangerIndex = URandom.Range(0, dangerTypes.Count);
                 //GridEdge e = Graph.LongestEdge(false);
                 GridEdge e = Graph.GetRandomFloorEdge(floor, allowHidden: false);
-                patterns[index].Apply(e, Graph);
+                var pattern = patterns[index];
+                if (dangerTypes.Count > 0)
+                    pattern.DangerType = dangerTypes[dangerIndex];
+                pattern.Apply(e, Graph);
             }
         }
     }
