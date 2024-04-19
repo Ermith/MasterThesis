@@ -234,12 +234,9 @@ public class GraphGenerator
         if (GenerationSettings.PatternHiddenShortcut) patterns.Add(new HiddenPathPattern());
 
         List<Pattern> floorPatterns = new();
-        //if (GenerationSettings.FloorPatternHiddenShortcut) floorPatterns.Add(new FloorHiddenPathExtensionPattern());
-        //if (GenerationSettings.FloorPatternLockedExtention) floorPatterns.Add(new FloorLockedExtentionPattern());
-        //if (GenerationSettings.FloorPatternLockedAddition) floorPatterns.Add(new FloorLockedAdditionPattern());
-        //floorPatterns.Add(new FloorHiddenPathPattern());
-        //floorPatterns.Add(new FloorLockedCyclePattern());
-        floorPatterns.Add(new FloorLockedForkPattern());
+        if (GenerationSettings.FloorPatternHiddenShortcut) floorPatterns.Add(new FloorHiddenPathPattern());
+        if (GenerationSettings.FloorPatternLockedCycle) floorPatterns.Add(new FloorLockedCyclePattern());
+        if (GenerationSettings.FloorPatternLockedFork) floorPatterns.Add(new FloorLockedForkPattern());
 
         List<DangerType> dangerTypes = new();
         if (GenerationSettings.DangerCameras) dangerTypes.Add(DangerType.SecurityCameras);
@@ -277,7 +274,7 @@ public class GraphGenerator
             {
                 int index = URandom.Range(0, patterns.Count);
                 //GridEdge e = Graph.LongestEdge(false);
-                GridEdge e = Graph.GetRandomFloorEdge(allowHidden: false);
+                GridEdge e = Graph.GetRandomFloorEdge(floor, allowHidden: false);
                 patterns[index].Apply(e, Graph);
             }
         }

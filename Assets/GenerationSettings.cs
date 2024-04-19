@@ -17,8 +17,8 @@ public class GenerationSettings : MonoBehaviour
     public static bool PatternDoubleLock = true;
 
     public static bool FloorPatternHiddenShortcut = true;
-    public static bool FloorPatternLockedExtention = true;
-    public static bool FloorPatternLockedAddition = true;
+    public static bool FloorPatternLockedCycle = true;
+    public static bool FloorPatternLockedFork = true;
 
     public static int? Seed = null;
     public static int FloorPatternCount = 2;
@@ -53,8 +53,8 @@ public class GenerationSettings : MonoBehaviour
         PatternLockedCycleToggle.isOn = PatternLockedCycle;
         PatternDoubleLockToggle.isOn = PatternDoubleLock;
         FloorPatternHiddenShortcutToggle.isOn = FloorPatternHiddenShortcut;
-        FloorPatternLockedExtentionToggle.isOn = FloorPatternLockedExtention;
-        FloorPatternLockedAdditionToggle.isOn = FloorPatternLockedAddition;
+        FloorPatternLockedExtentionToggle.isOn = FloorPatternLockedCycle;
+        FloorPatternLockedAdditionToggle.isOn = FloorPatternLockedFork;
         SeedInput.text = Seed?.ToString();
         FloorCountSlider.value = FloorPatternCount;
         PatternCountSlider.value = PatternCount;
@@ -67,8 +67,8 @@ public class GenerationSettings : MonoBehaviour
         PatternLockedCycleToggle.onValueChanged.AddListener((bool val) => { PatternLockedCycle = val; });
         PatternDoubleLockToggle.onValueChanged.AddListener((bool val) => { PatternDoubleLock = val; });
         FloorPatternHiddenShortcutToggle.onValueChanged.AddListener((bool val) => { FloorPatternHiddenShortcut = val; });
-        FloorPatternLockedExtentionToggle.onValueChanged.AddListener((bool val) => { FloorPatternLockedExtention = val; });
-        FloorPatternLockedAdditionToggle.onValueChanged.AddListener((bool val) => { FloorPatternLockedAddition = val; });
+        FloorPatternLockedExtentionToggle.onValueChanged.AddListener((bool val) => { FloorPatternLockedCycle = val; });
+        FloorPatternLockedAdditionToggle.onValueChanged.AddListener((bool val) => { FloorPatternLockedFork = val; });
         FloorCountSlider.onValueChanged.AddListener((float val) => { FloorPatternCount = (int)val; });
         PatternCountSlider.onValueChanged.AddListener((float val) => { PatternCount = (int)val; });
         SeedInput.onValueChanged.AddListener((string val) =>
