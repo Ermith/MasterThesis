@@ -769,7 +769,7 @@ public class FloorHiddenPathPattern : Pattern
         GridVertex newVertex;
 
         // perform addition
-        if (down || up)
+        if ((up || down) && URandom.value > 0.5f)
         {
             int newZ = graph.GetNewZ(oldVertex.Position.z, oldVertex.Position.x, oldVertex.Position.y, !down);
 
@@ -847,7 +847,7 @@ public class FloorLockedCyclePattern : Pattern
         ILock wallOfLight;
         ILock primaryDanger = GetDangers();
 
-        if (down || up)
+        if ((up || down) && URandom.value > 0.5f)
         {
             int newZ = graph.GetNewZ(oldVertex.Position.z, oldVertex.Position.x, oldVertex.Position.y, !down);
 
@@ -925,7 +925,7 @@ public class FloorLockedForkPattern : Pattern
         ILock enemyLock = new EnemyLock();
         ILock primaryDanger = GetDangers();
 
-        if (up || down)
+        if ((up || down) && URandom.value > 0.5f)
         {
             int newZ = graph.GetNewZ(oldVertex.Position.z, oldVertex.Position.x, oldVertex.Position.y, !down);
 
