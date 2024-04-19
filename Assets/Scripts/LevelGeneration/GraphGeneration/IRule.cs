@@ -956,3 +956,147 @@ public class FloorHiddenPathPattern : Pattern
         newVertex.AddKey(@lock.GetNewKey());
     }
 }
+
+public class FloorLockedCyclePattern : Pattern
+{
+    public override void Apply(GridEdge edge, GridGraph graph)
+    {
+        GridVertex oldVertex = null;
+        bool up = false;
+        bool down = false;
+
+        //*/
+        if (!edge.To.Bottom)
+        {
+            oldVertex = edge.To;
+            down = true;
+        } else if (!edge.To.Top)
+        {
+            oldVertex = edge.To;
+            up = true;
+        } else
+        //*/
+        if (!edge.From.Bottom)
+        {
+            oldVertex = edge.From;
+            down = true;
+        } else if (!edge.From.Top)
+        {
+            oldVertex = edge.From;
+            up = true;
+        }
+
+        if (down && up) {
+            if (URandom.value > 0.5f)
+                down = false;
+            else
+                up = false;
+        }
+
+        ILock enemyLock = new EnemyLock();
+        ILock wallOfLight;
+        if (down || up)
+        {
+            int newZ = graph.GetNewZ(oldVertex.Position.z, oldVertex.Position.x, oldVertex.Position.y, !down);
+
+            var newVertex = graph.AddGridVertex(
+            oldVertex.Position.x,
+            oldVertex.Position.y,
+            newZ);
+
+            var ie = graph.AddInterFloorEdge(newVertex, oldVertex);
+            (GridEdge ce1, GridEdge ce2, GridEdge ce3) = AddFloorCycle(ie, graph, toFirst: true, reversed: true);
+
+            wallOfLight = new WallOfLightLock(upExit: down, downExit: up);
+            ie.From.AddLock(wallOfLight);
+            ie.From.AddKey(wallOfLight.GetNewKey());
+            ce3.From.AddKey(enemyLock.GetNewKey());
+        } else
+        {
+            graph.RemoveGridEdge(edge);
+            (GridEdge a, GridEdge b) = AddInterFloorExtension(edge, graph);
+            (GridEdge ce1, GridEdge ce2, GridEdge ce3) = AddFloorCycle(a, graph, toFirst: false, reversed: true);
+
+            wallOfLight = new WallOfLightLock(ce3.FromDirection);
+            ce3.From.AddLock(wallOfLight);
+            ce3.From.AddKey(wallOfLight.GetNewKey());
+            ce3.From.AddKey(enemyLock.GetNewKey());
+        }
+    }
+}
+
+public class FloorLockedForkPattern : Pattern
+{
+    public override void Apply(GridEdge edge, GridGraph graph)
+    {
+        GridVertex oldVertex = null;
+        bool up = false;
+        bool down = false;
+
+        //*/
+        if (!edge.To.Bottom)
+        {
+            oldVertex = edge.To;
+            down = true;
+        } else if (!edge.To.Top)
+        {
+            oldVertex = edge.To;
+            up = true;
+        } else
+        //*/
+        if (!edge.From.Bottom)
+        {
+            oldVertex = edge.From;
+            down = true;
+        } else if (!edge.From.Top)
+        {
+            oldVertex = edge.From;
+            up = true;
+        }
+
+        if (down && up)
+        {
+            if (URandom.value > 0.5f)
+                down = false;
+            else
+                up = false;
+        }
+
+        ILock enemyLock = new EnemyLock();
+        if (up || down)
+        {
+            int newZ = graph.GetNewZ(oldVertex.Position.z, oldVertex.Position.x, oldVertex.Position.y, !down);
+
+            var newVertex = graph.AddGridVertex(
+            oldVertex.Position.x,
+            oldVertex.Position.y,
+            newZ);
+
+            var ie = graph.AddInterFloorEdge(oldVertex, newVertex);
+            GridEdge keyFork = AddFork(newVertex, graph);
+            GridEdge bonusFork = AddFork(oldVertex, graph);
+
+            ILock @lock = new DoorLock(bonusFork.FromDirection);
+            bonusFork.From.AddLock(@lock);
+            bonusFork.To.AddKey(enemyLock.GetNewKey()); // Bonus?
+            keyFork.To.AddKey(@lock.GetNewKey());
+            keyFork.To.AddLock(enemyLock); // TODO: danger
+        } else
+        {
+            graph.RemoveGridEdge(edge);
+            (GridEdge e1, GridEdge e2) = AddInterFloorExtension(edge, graph);
+            GridEdge fork1 = AddFork(e1.To, graph);
+            GridEdge fork2 = AddFork(e1.From, graph);
+
+            ILock @lock = new DoorLock(down: e1.fromZ < e1.toZ, up: e1.fromZ > e1.toZ);
+            e1.To.AddLock(@lock);
+
+            fork2.To.AddKey(@lock.GetNewKey());
+            fork2.To.AddLock(enemyLock); // TODO: Add danger
+
+            // Add bonus? 
+            fork1.To.AddKey(enemyLock.GetNewKey());
+        }
+
+    }
+}

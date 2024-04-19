@@ -237,7 +237,9 @@ public class GraphGenerator
         //if (GenerationSettings.FloorPatternHiddenShortcut) floorPatterns.Add(new FloorHiddenPathExtensionPattern());
         //if (GenerationSettings.FloorPatternLockedExtention) floorPatterns.Add(new FloorLockedExtentionPattern());
         //if (GenerationSettings.FloorPatternLockedAddition) floorPatterns.Add(new FloorLockedAdditionPattern());
-        floorPatterns.Add(new FloorHiddenPathPattern());
+        //floorPatterns.Add(new FloorHiddenPathPattern());
+        //floorPatterns.Add(new FloorLockedCyclePattern());
+        floorPatterns.Add(new FloorLockedForkPattern());
 
         List<DangerType> dangerTypes = new();
         if (GenerationSettings.DangerCameras) dangerTypes.Add(DangerType.SecurityCameras);
