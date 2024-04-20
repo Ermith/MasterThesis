@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Unity.AI.Navigation;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class LevelGenerator : MonoBehaviour
 {
@@ -154,7 +155,6 @@ public class LevelGenerator : MonoBehaviour
         GameObject level = new("Level");
         GameObject geometry = new("Geometry");
         _geometry = geometry;
-        Vector3 offset = new(0, 0, 0);
         geometry.transform.parent = level.transform;
 
         // Roof
@@ -224,7 +224,8 @@ public class LevelGenerator : MonoBehaviour
             {
                 (int spawnX, int spawnZ) = enemy.Spawn;
                 Vector3 spawn = new(spawnX, (enemy.Floor + 0.1f) * _floorHeight, spawnZ);
-                spawn = spawn * scale + offset;
+                spawn = spawn * scale;
+                Debug.Log("ENEMY SPAWN: " + spawn.y.ToString());
 
                 var enemyInstance = Instantiate(
                     EnemyBlueprint,
@@ -240,7 +241,7 @@ public class LevelGenerator : MonoBehaviour
                     List<Vector3> patrol = new();
                     foreach ((int x, int z) in enemy.Patrol)
                     {
-                        patrol.Add(new Vector3(x, (enemy.Floor + 0.1f) * _floorHeight, z) * scale + offset);
+                        patrol.Add(new Vector3(x, (enemy.Floor + 0.1f) * _floorHeight, z) * scale);
                     }
 
                     enemyInstance.Patrol(patrol.ToArray(), enemy.PatrolIndex, enemy.Retrace);
@@ -257,10 +258,9 @@ public class LevelGenerator : MonoBehaviour
                     enemyInstance.Sleep(spawn);
             }
 
-        // Just offset it for now
-        level.transform.position = offset;
 
-        var pos = _mapBuilder.GetEndPosition() * scale + offset;
+
+        var pos = _mapBuilder.GetEndPosition() * scale;
         int victoryFloor = (int)pos.y;
         pos.y *= _floorHeight;
         var victory = GameObject.Instantiate(VictoryTrigger);
@@ -269,17 +269,19 @@ public class LevelGenerator : MonoBehaviour
         //FindObjectOfType<LevelCamera>().SetPosition(SubTileGrid.GetLength(0), SubTileGrid.GetLength(1), scale, offset);
 
 
-        var playerSpawn = _mapBuilder.GetSpawnPosition() * scale + offset;
+        var playerSpawn = _mapBuilder.GetSpawnPosition() * scale;
         playerSpawn.y *= _floorHeight;
         Debug.Log($"REPOSITIONING THE PLAYER {playerSpawn}");
         // Spawn player at the correct position
         // Needs to be 1 frame delayed because of bug, when setting position works only occasionally
         StartCoroutine(DelayedSpawn(playerSpawn));
+        //StartCoroutine(DelayedEnemySpawn(enemies, level));
 
         Map.Drawing = GraphDrawing;
         Map.CreateMap();
         _done = true;
         level.transform.parent = transform;
+
 
         GetComponent<NavMeshSurface>().BuildNavMesh();
     }
