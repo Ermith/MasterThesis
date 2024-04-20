@@ -21,8 +21,8 @@ public class GenerationSettings : MonoBehaviour
     public static bool FloorPatternLockedFork = true;
 
     public static int? Seed = null;
-    public static int FloorPatternCount = 2;
-    public static int PatternCount = 1;
+    public static int FloorPatternCount = 1;
+    public static int PatternCount = 2;
 
 
     public Toggle DangerEnemiesToggle;
