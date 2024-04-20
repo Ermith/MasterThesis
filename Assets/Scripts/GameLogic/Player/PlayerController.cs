@@ -182,8 +182,12 @@ public class PlayerController : MonoBehaviour
             ? Camera.GetGroundDirection()
             : Camera.transform.forward;
 
+        Vector3 pos = Camera.Mode == CameraModeType.TopDown
+            ? _viewPoint.position.Added(y: -1.5f)
+            : _viewPoint.position;
+
         bool hit = Physics.Raycast(
-            _viewPoint.position,
+            pos,
             direction,
             out RaycastHit hitInfo,
             maxDistance: 2f);
