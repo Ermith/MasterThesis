@@ -14,14 +14,16 @@ class MapBuilder
     private int _width, _height;
     private Vector3 _spawnPosition;
     private Vector3 _endPosition;
+    private GameObject _sideObjective;
 
-    public MapBuilder(GraphDrawing<GridVertex> graphDrawing, int superWidth, int superHeight)
+    public MapBuilder(GraphDrawing<GridVertex> graphDrawing, int superWidth, int superHeight, GameObject sideObjective)
     {
         _graphDrawing = graphDrawing;
         _superWidth = superWidth;
         _superHeight = superHeight;
         _width = _graphDrawing.MaximumX + 1;
         _height = _graphDrawing.MaximumY + 1;
+        _sideObjective = sideObjective;
     }
 
     public List<ASubTile[,]> SubTileGrid(List<ATile[,]> tileGrids)
@@ -71,12 +73,14 @@ class MapBuilder
             float random = URandom.value;
             if (vertex.Top || vertex.Bottom) tile = new StairwayRoom(_superWidth, _superHeight, z, vertex.Exits, up: vertex.Top, down: vertex.Bottom, reveresed: z % 2 == 0);
             else if (vertex.Hallway && vertex.GetKeys().ToArray().Length > 0) tile = new HallwayWithRooms(_superWidth, _superHeight, z, vertex.Exits);
-            else if (vertex.Hallway && random > 0.5f) tile = new Hallway(_superWidth, _superHeight, z, vertex.Exits);
+            else if (vertex.Hallway) tile = new Hallway(_superWidth, _superHeight, z, vertex.Exits);
             else if (vertex.Hallway) tile = new FilledRoom(_superWidth, _superHeight, z, exits: vertex.Exits, subRoom: false);
             else tile = new Room(_superWidth, _superHeight, z, vertex.Exits);
 
             tile.Locks = vertex.GetLocks().ToList();
             tile.Keys = vertex.GetKeys().ToList();
+
+            //    tile.AddObject(null);
 
             superTileGrids[z][x, y] = tile;
         }

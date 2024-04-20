@@ -26,9 +26,12 @@ public class LevelGenerator : MonoBehaviour
     public GameObject SoundTrapBlueprint;
     public GameObject RefugeBlueprint;
     public GameObject VictoryTrigger;
+    public GameObject ObjectiveBlueprint;
     public GameObject StairsBlueprint;
     public EnemyController EnemyBlueprint;
     public GameObject Player;
+
+    public static GameObject SideObjectiveBlueprint;
 
     public Map Map;
 
@@ -50,7 +53,7 @@ public class LevelGenerator : MonoBehaviour
     private GameObject _geometry;
     private GameObject[] _floors;
     private GameObject[] _walls;
-    private int? _activeFloor;
+    private int _activeFloor;
     private bool _wide = false;
 
     // Intermediate Results
@@ -72,6 +75,8 @@ public class LevelGenerator : MonoBehaviour
         StairwayRoom.Blueprint = StairsBlueprint;
         TrapDisarmingKit.Blueprint = TrapKitBlueprint;
         InvisibiltyCamo.Blueprint = CamoBlueprint;
+        SideObjective.Blueprint = this.ObjectiveBlueprint;
+        
 
         _graph = new GridGraph();
         _graphGenerator = new GraphGenerator(_graph);
@@ -86,7 +91,7 @@ public class LevelGenerator : MonoBehaviour
         Debug.Log("DRAWING THE GRAPH");
         GraphDrawing = _graphDrawer.Draw(_graphGenerator.GetStartVertex(), _graphGenerator.GetEndVertex());
 
-        _mapBuilder = new MapBuilder(GraphDrawing, SuperWidth, SuperHeight);
+        _mapBuilder = new MapBuilder(GraphDrawing, SuperWidth, SuperHeight, ObjectiveBlueprint);
         Debug.Log("CREATING SUPERTILES");
         var superTileGrids = _mapBuilder.SuperTileGrid();
 
@@ -298,17 +303,17 @@ public class LevelGenerator : MonoBehaviour
 
         if (!_wide)
         {
-            RenderInstanced(floorParams, FloorMesh, _floorMatrices[_activeFloor.Value]);
-            RenderInstanced(wallParams, WallMesh, _wallMatrices[_activeFloor.Value]);
+            RenderInstanced(floorParams, FloorMesh, _floorMatrices[_activeFloor]);
+            RenderInstanced(wallParams, WallMesh, _wallMatrices[_activeFloor]);
         } else
         {
             for (int i = 0; i < _floorMatrices.Length; ++i)
-                if (i >= _activeFloor.Value - 1 && i <= _activeFloor.Value + 1)
+                if (i >= _activeFloor - 1 && i <= _activeFloor + 1)
                     RenderInstanced(floorParams, FloorMesh, _floorMatrices[i]);
 
 
             for (int i = 0; i < _wallMatrices.Length; ++i)
-                if (i >= _activeFloor.Value - 1 && i <= _activeFloor.Value + 1)
+                if (i >= _activeFloor - 1 && i <= _activeFloor + 1)
                     RenderInstanced(wallParams, WallMesh, _wallMatrices[i]);
         }
     }

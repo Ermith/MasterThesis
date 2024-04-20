@@ -910,6 +910,7 @@ public class FloorLockedCyclePattern : Pattern
             ce1.To.AddLock(enemyLock);
             ce2.To.AddKey(primaryDanger?.GetNewKey());
             ce2.To.AddKey(enemyLock?.GetNewKey());
+            ce2.To.AddKey(new SideObjective());
         } else
         {
             graph.RemoveGridEdge(edge);
@@ -927,8 +928,9 @@ public class FloorLockedCyclePattern : Pattern
             ce3.From.AddLock(wallOfLight);
             ce3.From.AddKey(wallOfLight.GetNewKey());
             ce3.From.AddKey(enemyLock.GetNewKey());
-            ce2.From.AddKey(primaryDanger?.GetNewKey());
+            ce3.From.AddKey(new SideObjective());
 
+            ce2.From.AddKey(primaryDanger?.GetNewKey());
 
             ce1.To.AddLock(primaryDanger);
             ce1.To.AddLock(enemyLock);
@@ -1003,6 +1005,7 @@ public class FloorLockedForkPattern : Pattern
             bonusFork.From.AddLock(@lock);
             bonusFork.To.AddKey(enemyLock.GetNewKey()); // Bonus?
             bonusFork.To.AddKey(primaryDanger?.GetNewKey());
+            bonusFork.To.AddKey(new SideObjective());
             keyFork.To.AddKey(@lock.GetNewKey());
             keyFork.To.AddLock(primaryDanger);
             keyFork.To.AddLock(enemyLock);
@@ -1036,6 +1039,7 @@ public class FloorLockedForkPattern : Pattern
 
             // Add bonus? 
             bonusFork.To.AddKey(enemyLock.GetNewKey());
+            bonusFork.To.AddKey(new SideObjective());
         }
 
     }

@@ -15,7 +15,11 @@ public class GameController : MonoBehaviour
     public static AudioManager AudioManager => Instance.GetComponent<AudioManager>();
     private bool _paused = false;
     private bool _mapPaused = false;
+    private int _objectives = 0;
+    private int _objetivesFound = 0;
     public static bool IsPaused => Instance._paused || Instance._mapPaused;
+    public static int Objectives { get { return Instance._objectives; } set { Instance._objectives = value; } }
+    public static int ObjectivesFound { get { return Instance._objetivesFound; } set { Instance._objetivesFound = value; } }
 
     public Canvas PauseCanvas;
     public Canvas HUDCanvas;
@@ -47,7 +51,9 @@ public class GameController : MonoBehaviour
         _settingsMenu = PauseCanvas.transform.Find("SettingsPanel").gameObject;
         _menu = PauseCanvas.transform.Find("MenuPanel").gameObject;
         _generationMenu = PauseCanvas.transform.Find("GenerationSettingsPanel").gameObject;
-}
+        _objectives = 0;
+        _objetivesFound = 0;
+    }
 
     // Update is called once per frame
     void Update()
@@ -81,6 +87,7 @@ public class GameController : MonoBehaviour
             InfoScreen.gameObject.SetActive(true);
             InfoScreen.SetCamoCount(Player.CamoCount);
             InfoScreen.SetTrapKitCount(Player.TrapKitCount);
+            InfoScreen.SetSideObjectives(_objectives, _objetivesFound);
             InfoScreen.ClearKeys();
             foreach (IKey key in Player.Keys)
                 if (key is DoorKey doorKey)

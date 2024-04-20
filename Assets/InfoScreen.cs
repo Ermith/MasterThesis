@@ -10,6 +10,7 @@ public class InfoScreen : MonoBehaviour
     public TMP_Text CamoCount;
     public TMP_Text TrapKitCount;
     public TMP_Text Keys;
+    public TMP_Text SideObjectives;
 
     private List<DoorKey> _keys = new();
 
@@ -33,9 +34,9 @@ public class InfoScreen : MonoBehaviour
         _keys.Clear();
     }
 
-    public void Refresh()
+    public void SetSideObjectives(int count, int found)
     {
-
+        SideObjectives.text = $"Side Objectives Found:\n{found}/{count}";
     }
 
     // Start is called before the first frame update

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 using URandom = UnityEngine.Random;
@@ -196,5 +197,12 @@ public abstract class ASuperTile
         for (int i = x; i < x + width; i++)
             for (int j = y; j < y + height; j++)
                 description.TileGrid[i, j] = new WallTile();
+    }
+
+    public void AddObject(GameObject go)
+    {
+        var i = URandom.Range(0, Description.FreeTiles.Count);
+        (int x, int y) = Description.FreeTiles.ToArray()[i];
+        Description.Get(x, y).Objects.Add(() => GameObject.Instantiate(go));
     }
 }

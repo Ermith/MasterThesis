@@ -160,6 +160,31 @@ public class DoorKey : IKey
     }
 }
 
+public class SideObjective : IKey
+{
+    public static GameObject Blueprint;
+    public IList<ILock> Locks { get; } = new List<ILock>();
+
+    public bool Guarded { get; set; } = true;
+
+    public void Implement(SuperTileDescription superTile)
+    {
+        if (superTile.FreeTiles.Count == 0)
+            return;
+
+        int tileIndex = URandom.Range(0, superTile.FreeTiles.Count - 1);
+        (int x, int y) = superTile.FreeTiles.ToArray()[tileIndex];
+        var tile = superTile.Get(x, y);
+        superTile.FreeTiles.Remove((x, y));
+
+        tile.Objects.Add(() =>
+        {
+            var obj = GameObject.Instantiate(Blueprint);
+            return obj;
+        });
+    }
+}
+
 public class TrapDisarmingKit : IKey
 {
     public static GameObject Blueprint;

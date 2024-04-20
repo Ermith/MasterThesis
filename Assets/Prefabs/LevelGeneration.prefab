@@ -25,13 +25,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1254682149874413875}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 38.341614, y: -68.81504, z: 382.9936}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1254682150548217479}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &1254682149874413878
 Camera:
@@ -47,9 +47,17 @@ Camera:
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
+  m_Iso: 200
+  m_ShutterSpeed: 0.005
+  m_Aperture: 16
+  m_FocusDistance: 10
+  m_FocalLength: 50
+  m_BladeCount: 5
+  m_Curvature: {x: 2, y: 11}
+  m_BarrelClipping: 0.25
+  m_Anamorphism: 0
   m_SensorSize: {x: 36, y: 24}
   m_LensShift: {x: 0, y: 0}
-  m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -111,6 +119,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1254682150548217478}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 408.50558, y: 51.22953, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -119,7 +128,6 @@ Transform:
   - {fileID: 1254682149874413879}
   - {fileID: 1254682151865299277}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1254682151865299275
 GameObject:
@@ -145,13 +153,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1254682151865299275}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -320.5916, y: 24.235313, z: 104.10993}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1254682150548217479}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1254682151865299276
 MonoBehaviour:
@@ -181,6 +189,7 @@ MonoBehaviour:
   SoundTrapBlueprint: {fileID: 3230849238312248032, guid: 0925c4f211d89c746ad050daf913d40d, type: 3}
   RefugeBlueprint: {fileID: 6398615319085239364, guid: 73d18f8c39726974cac62fe48f483f6c, type: 3}
   VictoryTrigger: {fileID: 9216524343229251750, guid: 29ca8bb401bbb2342bcbd1c842f1d6c4, type: 3}
+  ObjectiveBlueprint: {fileID: 8614125414331960436, guid: d05532bf183edff44ae8d11de99082ab, type: 3}
   StairsBlueprint: {fileID: 8048577991084613229, guid: ea068d53c3bdda446b500fa6392a4076, type: 3}
   EnemyBlueprint: {fileID: 7240094474568271842, guid: fa0c4d815c803c042876b3b83aa0ccb4, type: 3}
   Player: {fileID: 7394506146460830983, guid: 89f309c559d25d04b9a2ef09c78af180, type: 3}
