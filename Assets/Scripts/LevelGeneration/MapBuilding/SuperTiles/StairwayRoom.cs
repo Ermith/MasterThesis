@@ -104,6 +104,28 @@ class StairwayRoom : ASuperTile
             Description.DownExit = (downX - x, 3);
         }
 
+        var corners = new (int, int)[] {
+            (0, 0),
+            (0, Height - 1),
+            (Width - 1, Height - 1),
+            (Width - 1, 0)
+        };
+
+        List<(int, int)> patrol = new();
+        for (int i = 0; i < 4; i++)
+        {
+            (int cx, int cy) = corners[i];
+            (int nextCx, int nextCy) = corners[(i + 1) % 4];
+            foreach ((int px, int py) in GetShortPath(cx, cy, nextCx, nextCy))
+            {
+                patrol.Add(ATile.FromSuperMid(x + px, y + py));
+                Description.FreeTiles.Remove((px, py));
+            }
+        }
+
+        Description.PatrolPath = patrol;
+        Description.PatrolLooped = true;
+
 
         foreach (ILock l in Locks) l?.Implement(Description);
         foreach (IKey k in Keys) k?.Implement(Description);
