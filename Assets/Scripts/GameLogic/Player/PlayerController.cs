@@ -73,7 +73,7 @@ public class PlayerController : MonoBehaviour
             _invisibilityTimer -= Time.deltaTime;
 
         _meshRenderer.material.color = IsHidden ? Color.black : Color.white;
-        GameController.SetInvisOverlay(_invisible);
+        GameController.SetInvisOverlay(IsHidden && Camera.Mode == CameraModeType.FirstPerson);
     }
 
     private void Start()

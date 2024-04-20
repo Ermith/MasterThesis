@@ -30,6 +30,7 @@ public class GameController : MonoBehaviour
     public GameObject InteractionBar;
     public Image InteractionFill;
     public GameObject InvisOverlay;
+    public GameObject Pointer;
 
     public GameObject InteractionText;
     private GameObject _settingsMenu;
@@ -98,6 +99,8 @@ public class GameController : MonoBehaviour
 
         if (Input.GetKeyUp(KeyCode.I))
             InfoScreen.gameObject.SetActive(false);
+
+        Pointer.SetActive(Player.Camera.Mode == CameraModeType.FirstPerson);
     }
 
     public static void Restart()

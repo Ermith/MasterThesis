@@ -3169,6 +3169,10 @@ PrefabInstance:
       value: GameController
       objectReference: {fileID: 0}
     - target: {fileID: 7717243770803640203, guid: 91e4c1599e945994e865b028e3a3198d, type: 3}
+      propertyPath: Pointer
+      value: 
+      objectReference: {fileID: 5444842464544679908}
+    - target: {fileID: 7717243770803640203, guid: 91e4c1599e945994e865b028e3a3198d, type: 3}
       propertyPath: HUDCanvas
       value: 
       objectReference: {fileID: 4426805442935865897}
