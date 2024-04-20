@@ -51,6 +51,7 @@ public class LevelGenerator : MonoBehaviour
     private GameObject[] _floors;
     private GameObject[] _walls;
     private int? _activeFloor;
+    private bool _wide = false;
 
     // Intermediate Results
     public GridGraph Graph { get; private set; }
@@ -295,17 +296,20 @@ public class LevelGenerator : MonoBehaviour
         wallParams.receiveShadows = true;
         wallParams.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
 
-        if (_activeFloor.HasValue)
+        if (!_wide)
         {
             RenderInstanced(floorParams, FloorMesh, _floorMatrices[_activeFloor.Value]);
             RenderInstanced(wallParams, WallMesh, _wallMatrices[_activeFloor.Value]);
         } else
         {
-            foreach (var floor in _floorMatrices)
-                RenderInstanced(floorParams, FloorMesh, floor);
+            for (int i = 0; i < _floorMatrices.Length; ++i)
+                if (i >= _activeFloor.Value - 1 && i <= _activeFloor.Value + 1)
+                    RenderInstanced(floorParams, FloorMesh, _floorMatrices[i]);
 
-            foreach (var wall in _wallMatrices)
-                RenderInstanced(wallParams, WallMesh, wall);
+
+            for (int i = 0; i < _wallMatrices.Length; ++i)
+                if (i >= _activeFloor.Value - 1 && i <= _activeFloor.Value + 1)
+                    RenderInstanced(wallParams, WallMesh, _wallMatrices[i]);
         }
     }
 
@@ -339,6 +343,7 @@ public class LevelGenerator : MonoBehaviour
     public void HighlightFloor(int floor)
     {
         _activeFloor = floor;
+        _wide = false;
         for (int i = 0; i < _floors.Length; i++)
         {
             foreach (var m in _floors[i].GetComponentsInChildren<MeshRenderer>())
@@ -346,13 +351,14 @@ public class LevelGenerator : MonoBehaviour
         }
     }
 
-    public void UnHilightFloors()
+    public void UnHilightFloors(int floor)
     {
         for (int i = 0; i < _floors.Length; i++)
         {
             foreach (var m in _floors[i].GetComponentsInChildren<MeshRenderer>())
-                m.enabled = true;
+                m.enabled = i >= floor - 1 && i <= floor + 1;
         }
-        _activeFloor = null;
+        _activeFloor = floor;
+        _wide = true;
     }
 }

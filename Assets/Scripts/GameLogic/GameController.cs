@@ -65,13 +65,14 @@ public class GameController : MonoBehaviour
             else OpenMap();
         }
 
+
+        (int x, int y, int floor) = LevelGenerator.GridCoordinates(Player.transform.position);
         if (Player.Camera.Mode == CameraModeType.TopDown)
         {
-            (int x, int y, int floor) = LevelGenerator.GridCoordinates(Player.transform.position);
             LevelGenerator.HighlightFloor(floor);
         } else
         {
-            LevelGenerator.UnHilightFloors();
+            LevelGenerator.UnHilightFloors(floor);
         }
 
 
