@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -770,7 +771,6 @@ public class FloorHiddenPathPattern : Pattern
             up = true;
         }
 
-
         GridEdge interFloorEdge;
         GridVertex newVertex;
 
@@ -786,7 +786,7 @@ public class FloorHiddenPathPattern : Pattern
 
             var ie = graph.AddInterFloorEdge(oldVertex, newVertex);
             interFloorEdge = AddFloorCycle(ie, graph, toFirst: false, reversed: true).Item2;
-
+            
             if (interFloorEdge == null)
             {
                 graph.RemoveGridEdge(ie);
@@ -810,8 +810,8 @@ public class FloorHiddenPathPattern : Pattern
             {
                 graph.RemoveGridEdge(e2);
                 (GridEdge ie1, GridEdge ie2) = AddInterFloorExtension(e2, graph);
-                newVertex = ie2.To;
-                interFloorEdge = AddFloorCycle(ie2, graph, toFirst: true, reversed: true).Item2;
+                newVertex = ie1.To;
+                interFloorEdge = AddFloorCycle(ie1, graph, toFirst: true, reversed: true).Item2;
             }
         }
 
@@ -915,11 +915,12 @@ public class FloorLockedCyclePattern : Pattern
             ce3.From.AddLock(wallOfLight);
             ce3.From.AddKey(wallOfLight.GetNewKey());
             ce3.From.AddKey(enemyLock.GetNewKey());
+            ce2.From.AddKey(primaryDanger?.GetNewKey());
+
 
             ce1.To.AddLock(primaryDanger);
             ce1.To.AddLock(enemyLock);
-            ce2.To.AddKey(primaryDanger?.GetNewKey());
-            ce2.To.AddKey(enemyLock?.GetNewKey());
+
         }
     }
 }
@@ -973,13 +974,17 @@ public class FloorLockedForkPattern : Pattern
 
             var ie = graph.AddInterFloorEdge(oldVertex, newVertex);
             GridEdge keyFork = AddFork(newVertex, graph);
-            GridEdge bonusFork = AddFork(oldVertex, graph);
+            GridEdge bonusFork; 
 
             if (keyFork == null)
             {
                 graph.RemoveGridEdge(ie);
                 (GridEdge e1, GridEdge e2) = AddInterFloorExtension(ie, graph);
-                keyFork = AddFork(e1.From, graph);
+                keyFork = AddFork(e2.To, graph);
+                bonusFork = AddFork(e2.From, graph);
+            } else
+            {
+               bonusFork = AddFork(oldVertex, graph);
             }
 
             ILock @lock = new DoorLock(bonusFork.FromDirection);
@@ -993,18 +998,25 @@ public class FloorLockedForkPattern : Pattern
         {
             graph.RemoveGridEdge(edge);
             (GridEdge e1, GridEdge e2) = AddInterFloorExtension(edge, graph);
-            GridEdge bonusFork = AddFork(e1.To, graph);
+            GridEdge bonusFork = null;
             GridEdge keyFork = AddFork(e1.From, graph);
+            GridVertex lockedStairway = e1.To;
 
             if (keyFork == null)
             {
                 graph.RemoveGridEdge(e1);
                 (e1, e2) = AddInterFloorExtension(e1, graph);
-                keyFork = AddFork(e1.To, graph);
+                keyFork = AddFork(e2.From, graph);
+                bonusFork = AddFork(e2.To, graph);
+                lockedStairway = e2.To;
+                
+            } else
+            {
+                bonusFork = AddFork(e1.To, graph);
             }
 
             ILock @lock = new DoorLock(down: e1.fromZ < e1.toZ, up: e1.fromZ > e1.toZ);
-            e1.To.AddLock(@lock);
+            lockedStairway.AddLock(@lock);
 
             keyFork.To.AddKey(@lock.GetNewKey());
             keyFork.To.AddLock(primaryDanger);
