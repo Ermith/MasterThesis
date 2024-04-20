@@ -57,7 +57,8 @@ public class WideHallway : ASuperTile
 
                 tileGrid[x + nx1, y + ny1] ??= new EdgeTile(edges1);
                 tileGrid[x + nx2, y + ny2] ??= new EdgeTile(edges2);
-                tileGrid[x + px, y + py] ??= new ColumnTile(dir.Opposite(), mid: false);
+                //tileGrid[x + px, y + py] ??= new ColumnTile(dir.Opposite(), mid: false)
+                tileGrid[x + px, y + py] ??= new EmptyTile();
             }
 
 

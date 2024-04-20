@@ -35,7 +35,7 @@ public abstract class ASuperTile
     public Directions HasDefaultDoor;
 
     public List<ILock> Locks { get; set; }
-    public List<IKey> Keys { get; set;  }
+    public List<IKey> Keys { get; set; }
 
     public Directions Exits { get; set; }
     public Dictionary<Directions, (int, int)> ExitTiles;
