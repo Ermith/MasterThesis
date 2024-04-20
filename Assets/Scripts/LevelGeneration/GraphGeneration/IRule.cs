@@ -695,6 +695,9 @@ public class LockedCyclePattern : Pattern
         // Add Key to the the side path
         ce2.From.AddKey(key);
         ce2.From.AddLock(new EnemyLock());
+
+        if (URandom.value > 0.7f)
+            ce2.From.AddKey(new SideObjective());
     }
 }
 
@@ -724,6 +727,9 @@ public class HiddenPathPattern : Pattern
         e1.To.AddLock(enemyLock);
         ce1.To.AddKey(primaryDanger?.GetNewKey());
         ce1.To.AddKey(enemyLock?.GetNewKey());
+
+        if (URandom.value > 0.7f)
+            ce1.To.AddKey(new SideObjective());
     }
 }
 
@@ -746,6 +752,9 @@ public class DoubleLockCyclePattern : Pattern
         key = doorLock.GetNewKey();
         e2.From.AddLock(doorLock);
         ce2.From.AddKey(key);
+
+        if (URandom.value > 0.7f)
+            ce2.From.AddKey(new SideObjective());
 
         // Valve
         var wallOfLight = new WallOfLightLock(ce2.FromDirection);

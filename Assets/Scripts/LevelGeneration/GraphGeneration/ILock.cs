@@ -182,6 +182,19 @@ public class SideObjective : IKey
             var obj = GameObject.Instantiate(Blueprint);
             return obj;
         });
+
+        if (Guarded)
+        {
+            (int spawnX, int spawnY) = ATile.FromSuperMid(superTile.X + x, superTile.Y + y);
+            tile.Guard = new EnemyParams
+            {
+                Behaviour = Behaviour.Guarding,
+                Spawn = (spawnX - 1, spawnY),
+                Floor = superTile.Floor
+            };
+
+            superTile.Enemies.Add(tile.Guard);
+        }
     }
 }
 
@@ -190,7 +203,7 @@ public class TrapDisarmingKit : IKey
     public static GameObject Blueprint;
 
     public IList<ILock> Locks { get; } = new List<ILock>();
-    public bool Guarded { get; set; } = true;
+    public bool Guarded { get; set; } = false;
 
     public void Implement(SuperTileDescription superTile)
     {
@@ -228,7 +241,7 @@ public class InvisibiltyCamo : IKey
     public static GameObject Blueprint;
 
     public IList<ILock> Locks { get; } = new List<ILock>();
-    public bool Guarded { get; set; } = true;
+    public bool Guarded { get; set; } = false;
 
     public void Implement(SuperTileDescription superTile)
     {
