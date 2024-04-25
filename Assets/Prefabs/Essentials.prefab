@@ -2732,7 +2732,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Hold I for Info Screen
+  m_text: Hold TAB for Info Screen
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c43c58c3303fae44e95205c98406e15a, type: 2}
   m_sharedMaterial: {fileID: 4629381242371314240, guid: c43c58c3303fae44e95205c98406e15a, type: 2}

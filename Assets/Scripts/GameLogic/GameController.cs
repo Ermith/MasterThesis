@@ -83,7 +83,7 @@ public class GameController : MonoBehaviour
         }
 
 
-        if (Input.GetKeyDown(KeyCode.I))
+        if (Input.GetKeyDown(KeyCode.Tab))
         {
             InfoScreen.gameObject.SetActive(true);
             InfoScreen.SetCamoCount(Player.CamoCount);
@@ -97,7 +97,7 @@ public class GameController : MonoBehaviour
             InfoScreen.RefreshKeys();
         }
 
-        if (Input.GetKeyUp(KeyCode.I))
+        if (Input.GetKeyUp(KeyCode.Tab))
             InfoScreen.gameObject.SetActive(false);
 
         Pointer.SetActive(Player.Camera.Mode == CameraModeType.FirstPerson);
