@@ -666,6 +666,41 @@ public abstract class Pattern
     public abstract void Apply(GridEdge edge, GridGraph graph);
 }
 
+public class LockedForkPattern : Pattern
+{
+    public override void Apply(GridEdge edge, GridGraph graph)
+    {
+        graph.RemoveGridEdge(edge);
+        (GridEdge e1, GridEdge e2) = AddExtension(edge, graph);
+
+        // Lock the main path
+        DoorLock @lock = new(e2.FromDirection);
+        IKey key = @lock.GetNewKey();
+        e2.From.AddLock(@lock);
+
+        var danger = GetDangers();
+        var fork = AddFork(e2.From, graph);
+        fork.To.AddLock(danger);
+        fork.To.AddLock(new EnemyLock());
+        fork.To.AddKey(key);
+    }
+}
+
+public class AlternatePathPattern : Pattern
+{
+    public override void Apply(GridEdge edge, GridGraph graph)
+    {
+        (GridEdge ce1, GridEdge ce2, GridEdge ceBase) = AddCycle(edge, graph);
+        graph.RemoveGridEdge(ceBase);
+        (GridEdge e1, GridEdge e2) = AddExtension(ceBase, graph);
+
+        var danger = GetDangers();
+        ce1.To.AddLock(danger);
+        ce1.To.AddLock(new EnemyLock());
+        ceBase.To.AddLock(new EnemyLock());
+    }
+}
+
 public class LockedCyclePattern : Pattern
 {
     public override void Apply(GridEdge edge, GridGraph graph)

@@ -233,6 +233,8 @@ public class GraphGenerator
         if (GenerationSettings.PatternDoubleLock) patterns.Add(new DoubleLockCyclePattern());
         if (GenerationSettings.PatternLockedCycle) patterns.Add(new LockedCyclePattern());
         if (GenerationSettings.PatternHiddenShortcut) patterns.Add(new HiddenPathPattern());
+        if (GenerationSettings.PatternLockedFork) patterns.Add(new LockedForkPattern());
+        if (GenerationSettings.PatternAlternativePath) patterns.Add(new AlternatePathPattern());
 
         List<Pattern> floorPatterns = new();
         if (GenerationSettings.FloorPatternHiddenShortcut) floorPatterns.Add(new FloorHiddenPathPattern());

@@ -15,6 +15,8 @@ public class GenerationSettings : MonoBehaviour
     public static bool PatternHiddenShortcut = true;
     public static bool PatternLockedCycle = true;
     public static bool PatternDoubleLock = true;
+    public static bool PatternLockedFork = true;
+    public static bool PatternAlternativePath = true;
 
     public static bool FloorPatternHiddenShortcut = true;
     public static bool FloorPatternLockedCycle = true;
@@ -33,10 +35,12 @@ public class GenerationSettings : MonoBehaviour
     public Toggle PatternHiddenShortcutToggle;
     public Toggle PatternLockedCycleToggle;
     public Toggle PatternDoubleLockToggle;
+    public Toggle PatternLockedForkToggle;
+    public Toggle PatternAlternativePathToggle;
 
     public Toggle FloorPatternHiddenShortcutToggle;
-    public Toggle FloorPatternLockedExtentionToggle;
-    public Toggle FloorPatternLockedAdditionToggle;
+    public Toggle FloorPatternLockedCycleToggle;
+    public Toggle FloorPatternLockedForkToggle;
 
     public TMP_InputField SeedInput;
     public Slider FloorCountSlider;
@@ -52,9 +56,11 @@ public class GenerationSettings : MonoBehaviour
         PatternHiddenShortcutToggle.isOn = PatternHiddenShortcut;
         PatternLockedCycleToggle.isOn = PatternLockedCycle;
         PatternDoubleLockToggle.isOn = PatternDoubleLock;
+        PatternLockedForkToggle.isOn = PatternLockedFork;
+        PatternAlternativePathToggle.isOn = PatternAlternativePath;
         FloorPatternHiddenShortcutToggle.isOn = FloorPatternHiddenShortcut;
-        FloorPatternLockedExtentionToggle.isOn = FloorPatternLockedCycle;
-        FloorPatternLockedAdditionToggle.isOn = FloorPatternLockedFork;
+        FloorPatternLockedCycleToggle.isOn = FloorPatternLockedCycle;
+        FloorPatternLockedForkToggle.isOn = FloorPatternLockedFork;
         SeedInput.text = Seed?.ToString();
         FloorCountSlider.value = FloorPatternCount;
         PatternCountSlider.value = PatternCount;
@@ -66,9 +72,12 @@ public class GenerationSettings : MonoBehaviour
         PatternHiddenShortcutToggle.onValueChanged.AddListener((bool val) => { PatternHiddenShortcut = val; });
         PatternLockedCycleToggle.onValueChanged.AddListener((bool val) => { PatternLockedCycle = val; });
         PatternDoubleLockToggle.onValueChanged.AddListener((bool val) => { PatternDoubleLock = val; });
+        PatternLockedForkToggle.onValueChanged.AddListener((bool val) => { PatternLockedFork = val; });
+        PatternAlternativePathToggle.onValueChanged.AddListener((bool val) => { PatternAlternativePath = val; });
+        FloorPatternHiddenShortcutToggle.isOn = FloorPatternHiddenShortcut;
         FloorPatternHiddenShortcutToggle.onValueChanged.AddListener((bool val) => { FloorPatternHiddenShortcut = val; });
-        FloorPatternLockedExtentionToggle.onValueChanged.AddListener((bool val) => { FloorPatternLockedCycle = val; });
-        FloorPatternLockedAdditionToggle.onValueChanged.AddListener((bool val) => { FloorPatternLockedFork = val; });
+        FloorPatternLockedCycleToggle.onValueChanged.AddListener((bool val) => { FloorPatternLockedCycle = val; });
+        FloorPatternLockedForkToggle.onValueChanged.AddListener((bool val) => { FloorPatternLockedFork = val; });
         FloorCountSlider.onValueChanged.AddListener((float val) => { FloorPatternCount = (int)val; });
         PatternCountSlider.onValueChanged.AddListener((float val) => { PatternCount = (int)val; });
         SeedInput.onValueChanged.AddListener((string val) =>
