@@ -90,7 +90,7 @@ public class DoorKey : IKey
     }
 }
 
-public class SideObjective : IKey
+public class SideObjectiveKey : IKey
 {
     public static GameObject Blueprint;
     public IList<ILock> Locks { get; } = new List<ILock>();
@@ -128,7 +128,7 @@ public class SideObjective : IKey
     }
 }
 
-public class TrapDisarmingKit : IKey
+public class TrapDisarmingKitKey : IKey
 {
     public static GameObject Blueprint;
 
@@ -166,7 +166,7 @@ public class TrapDisarmingKit : IKey
     }
 }
 
-public class InvisibiltyCamo : IKey
+public class InvisibiltyCamoKey : IKey
 {
     public static GameObject Blueprint;
 

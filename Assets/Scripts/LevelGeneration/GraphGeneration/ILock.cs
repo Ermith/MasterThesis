@@ -116,7 +116,7 @@ public class EnemyLock : ILock
 
     public IKey GetNewKey()
     {
-        return new InvisibiltyCamo();
+        return new InvisibiltyCamoKey();
     }
 
     public void Implement(SuperTileDescription superTile)
@@ -177,7 +177,7 @@ public class DeathTrapLock : ILock
 
     public IKey GetNewKey()
     {
-        return new TrapDisarmingKit();
+        return new TrapDisarmingKitKey();
     }
 
     public void Implement(SuperTileDescription superTile)
@@ -215,7 +215,7 @@ public class SoundTrapLock : ILock
 
     public IKey GetNewKey()
     {
-        return new TrapDisarmingKit();
+        return new TrapDisarmingKitKey();
     }
 
     public void Implement(SuperTileDescription superTile)

@@ -204,9 +204,9 @@ public class LevelGenerator : MonoBehaviour
         DeathTrapLock.Blueprint = TrapBlueprint;
         SoundTrapLock.Blueprint = SoundTrapBlueprint;
         StairwayRoom.Blueprint = StairsBlueprint;
-        TrapDisarmingKit.Blueprint = TrapKitBlueprint;
-        InvisibiltyCamo.Blueprint = CamoBlueprint;
-        SideObjective.Blueprint = ObjectiveBlueprint;
+        TrapDisarmingKitKey.Blueprint = TrapKitBlueprint;
+        InvisibiltyCamoKey.Blueprint = CamoBlueprint;
+        SideObjectiveKey.Blueprint = ObjectiveBlueprint;
 
         ASubTile.Register<WallSubTile>((ASubTile st) => Instantiate(WallBlueprint));
         ASubTile.Register<FloorSubTile>((ASubTile st) =>

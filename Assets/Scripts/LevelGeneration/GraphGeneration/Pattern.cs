@@ -385,7 +385,7 @@ public class LockedCyclePattern : Pattern
         ce2.From.AddLock(new EnemyLock());
 
         if (URandom.value > 0.7f)
-            ce2.From.AddKey(new SideObjective());
+            ce2.From.AddKey(new SideObjectiveKey());
     }
 }
 
@@ -417,7 +417,7 @@ public class HiddenPathPattern : Pattern
         ce1.To.AddKey(enemyLock?.GetNewKey());
 
         if (URandom.value > 0.7f)
-            ce1.To.AddKey(new SideObjective());
+            ce1.To.AddKey(new SideObjectiveKey());
     }
 }
 
@@ -442,7 +442,7 @@ public class DoubleLockCyclePattern : Pattern
         ce2.From.AddKey(key);
 
         if (URandom.value > 0.7f)
-            ce2.From.AddKey(new SideObjective());
+            ce2.From.AddKey(new SideObjectiveKey());
 
         // Valve
         var wallOfLight = new WallOfLightLock(ce2.FromDirection);
@@ -607,7 +607,7 @@ public class FloorLockedCyclePattern : Pattern
             ce1.To.AddLock(enemyLock);
             ce2.To.AddKey(primaryDanger?.GetNewKey());
             ce2.To.AddKey(enemyLock?.GetNewKey());
-            ce2.To.AddKey(new SideObjective());
+            ce2.To.AddKey(new SideObjectiveKey());
         } else
         {
             graph.RemoveGridEdge(edge);
@@ -625,7 +625,7 @@ public class FloorLockedCyclePattern : Pattern
             ce3.From.AddLock(wallOfLight);
             ce3.From.AddKey(wallOfLight.GetNewKey());
             ce3.From.AddKey(enemyLock.GetNewKey());
-            ce3.From.AddKey(new SideObjective());
+            ce3.From.AddKey(new SideObjectiveKey());
 
             ce2.From.AddKey(primaryDanger?.GetNewKey());
 
@@ -702,7 +702,7 @@ public class FloorLockedForkPattern : Pattern
             bonusFork.From.AddLock(@lock);
             bonusFork.To.AddKey(enemyLock.GetNewKey()); // Bonus?
             bonusFork.To.AddKey(primaryDanger?.GetNewKey());
-            bonusFork.To.AddKey(new SideObjective());
+            bonusFork.To.AddKey(new SideObjectiveKey());
             keyFork.To.AddKey(@lock.GetNewKey());
             keyFork.To.AddLock(primaryDanger);
             keyFork.To.AddLock(enemyLock);
@@ -736,7 +736,7 @@ public class FloorLockedForkPattern : Pattern
 
             // Add bonus? 
             bonusFork.To.AddKey(enemyLock.GetNewKey());
-            bonusFork.To.AddKey(new SideObjective());
+            bonusFork.To.AddKey(new SideObjectiveKey());
         }
 
     }
