@@ -354,8 +354,8 @@ public class UndirectedAdjecencyGraph<T> : AGraph<T>
 
 public class GridGraph : AdjecencyGraph<GridVertex>
 {
-    public Dictionary<int, List<GridVertex>> Floors = new();
-    public Dictionary<int, List<GridEdge>> FloorEdges = new();
+    public Dictionary<long, List<GridVertex>> Floors = new();
+    public Dictionary<long, List<GridEdge>> FloorEdges = new();
     public List<GridEdge> InterFloorEdges = new();
 
     public int FloorCount => Floors.Keys.Count;
@@ -399,7 +399,7 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         return edge;
     }
 
-    public GridVertex AddGridVertex(int x, int y, int z = 0)
+    public GridVertex AddGridVertex(long x, long y, long z = 0)
     {
         GridVertex vertex = new GridVertex();
         vertex.Position = (x, y, z);
@@ -413,15 +413,15 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         return vertex;
     }
 
-    public int GetNewX(int oldX, int minY, int maxY, int z, bool right)
+    public long GetNewX(long oldX, long minY, long maxY, long z, bool right)
     {
         if (right)
         {
-            int minOffset = BaseRule.STEP * 2;
+            long minOffset = BaseRule.STEP * 2;
             if (FloorEdges.ContainsKey(z))
                 foreach (GridEdge e in FloorEdges[z])
                 {
-                    int? offset = e.GetHorizontalOffset(minY, maxY, oldX);
+                    long? offset = e.GetHorizontalOffset(minY, maxY, oldX);
                     if (offset == null || offset <= 0) continue;
                     minOffset = Math.Min(minOffset, offset.Value);
                 }
@@ -431,7 +431,7 @@ public class GridGraph : AdjecencyGraph<GridVertex>
                 if (e.minZ > z || e.maxZ < z)
                     continue;
 
-                int? offset = e.GetHorizontalOffset(minY, maxY, oldX);
+                long? offset = e.GetHorizontalOffset(minY, maxY, oldX);
                 if (offset == null || offset <= 0) continue;
                 minOffset = Math.Min(minOffset, offset.Value);
             }
@@ -439,11 +439,11 @@ public class GridGraph : AdjecencyGraph<GridVertex>
             return oldX + minOffset / 2;
         }
 
-        int maxOffset = -BaseRule.STEP * 2;
+        long maxOffset = -BaseRule.STEP * 2;
         if (FloorEdges.ContainsKey(z))
             foreach (GridEdge e in FloorEdges[z])
             {
-                int? offset = e.GetHorizontalOffset(minY, maxY, oldX);
+                long? offset = e.GetHorizontalOffset(minY, maxY, oldX);
                 if (offset == null || offset >= 0) continue;
                 maxOffset = Math.Max(maxOffset, offset.Value);
             }
@@ -453,7 +453,7 @@ public class GridGraph : AdjecencyGraph<GridVertex>
             if (e.minZ > z || e.maxZ < z)
                 continue;
 
-            int? offset = e.GetHorizontalOffset(minY, maxY, oldX);
+            long? offset = e.GetHorizontalOffset(minY, maxY, oldX);
             if (offset == null || offset >= 0) continue;
             maxOffset = Math.Max(maxOffset, offset.Value);
         }
@@ -461,15 +461,15 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         return oldX + maxOffset / 2;
     }
 
-    public int GetNewY(int oldY, int minX, int maxX, int z, bool fwd)
+    public long GetNewY(long oldY, long minX, long maxX, long z, bool fwd)
     {
         if (fwd)
         {
-            int minOffset = BaseRule.STEP * 2;
+            long minOffset = BaseRule.STEP * 2;
             if (FloorEdges.ContainsKey(z))
                 foreach (GridEdge e in FloorEdges[z])
                 {
-                    int? offset = e.GetVerticalOffset(minX, maxX, oldY);
+                    long? offset = e.GetVerticalOffset(minX, maxX, oldY);
                     if (offset == null || offset <= 0) continue;
                     minOffset = Math.Min(minOffset, offset.Value);
                 }
@@ -479,7 +479,7 @@ public class GridGraph : AdjecencyGraph<GridVertex>
                 if (e.minZ > z || e.maxZ < z)
                     continue;
 
-                int? offset = e.GetVerticalOffset(minX, maxX, oldY);
+                long? offset = e.GetVerticalOffset(minX, maxX, oldY);
                 if (offset == null || offset <= 0) continue;
                 minOffset = Math.Min(minOffset, offset.Value);
             }
@@ -487,11 +487,11 @@ public class GridGraph : AdjecencyGraph<GridVertex>
             return oldY + minOffset / 2;
         }
 
-        int maxOffset = -BaseRule.STEP * 2;
+        long maxOffset = -BaseRule.STEP * 2;
         if (FloorEdges.ContainsKey(z))
             foreach (GridEdge e in FloorEdges[z])
             {
-                int? offset = e.GetVerticalOffset(minX, maxX, oldY);
+                long? offset = e.GetVerticalOffset(minX, maxX, oldY);
                 if (offset == null || offset >= 0) continue;
                 maxOffset = Math.Max(maxOffset, offset.Value);
             }
@@ -501,7 +501,7 @@ public class GridGraph : AdjecencyGraph<GridVertex>
             if (e.minZ > z || e.maxZ < z)
                 continue;
 
-            int? offset = e.GetVerticalOffset(minX, maxX, oldY);
+            long? offset = e.GetVerticalOffset(minX, maxX, oldY);
             if (offset == null || offset >= 0) continue;
             maxOffset = Math.Max(maxOffset, offset.Value);
         }
@@ -509,21 +509,21 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         return oldY + maxOffset / 2;
     }
 
-    public int GetNewZ(int oldZ, int x, int y, bool up)
+    public long GetNewZ(long oldZ, long x, long y, bool up)
     {
-        int closest;
+        long closest;
 
         if (up)
         {
             closest = oldZ + BaseRule.STEP;
-            foreach (int floor in FloorEdges.Keys)
+            foreach (long floor in FloorEdges.Keys)
                 if (floor > oldZ && floor < closest)
                     closest = floor;
 
         } else
         {
             closest = oldZ - BaseRule.STEP;
-            foreach (int floor in FloorEdges.Keys)
+            foreach (long floor in FloorEdges.Keys)
                 if (floor < oldZ && floor > closest)
                     closest = floor;
         }
@@ -537,7 +537,7 @@ public class GridGraph : AdjecencyGraph<GridVertex>
             var horizontal = edge.GetHorizontalLine();
             if (horizontal != null)
             {
-                (int minX, int maxX, int ey) = horizontal.Value;
+                (long minX, long maxX, long ey) = horizontal.Value;
                 if (ey == y && minX <= x && maxX >= x)
                     return oldZ + (closest - oldZ) / 2;
             }
@@ -545,7 +545,7 @@ public class GridGraph : AdjecencyGraph<GridVertex>
             var vertical = edge.GetVerticalLine();
             if (vertical != null)
             {
-                (int ex, int minY, int maxY) = vertical.Value;
+                (long ex, long minY, long maxY) = vertical.Value;
                 if (ex == x && minY <= x && maxY >= x)
                     return oldZ + (closest - oldZ) / 2;
             }
@@ -568,14 +568,14 @@ public class GridGraph : AdjecencyGraph<GridVertex>
     public GridEdge LongestEdge(bool allowHidden = true)
     {
         GridEdge longest = null;
-        int length = 0;
+        long length = 0;
 
         foreach (GridEdge e in GetEdges().Cast<GridEdge>())
         {
             if (e.Hidden && !allowHidden)
                 continue;
 
-            int l = e.maxX - e.minX + e.maxY - e.minY;
+            long l = e.maxX - e.minX + e.maxY - e.minY;
             if (l > length)
             {
                 length = l;
@@ -586,7 +586,7 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         return longest;
     }
 
-    public GridEdge GetRandomFloorEdge(int i = -1, bool allowHidden = true)
+    public GridEdge GetRandomFloorEdge(long i = -1, bool allowHidden = true)
     {
         var keys = FloorEdges.Keys.ToArray();
 

@@ -18,7 +18,7 @@ public class GridVertex
     public bool Bottom = false;
     public bool SideObjective = false;
 
-    public (int x, int y, int z) Position;
+    public (long x, long y, long z) Position;
 
     public void AddLock(ILock l)
     {
@@ -61,25 +61,25 @@ public class GridEdge : BaseEdge<GridVertex>
     public List<(Directions, IKey)> Keys;
     public List<(Directions, ILock)> Locks;
 
-    public int fromX => From.Position.x;
-    public int fromY => From.Position.y;
-    public int fromZ => From.Position.z;
-    public int toX => To.Position.x;
-    public int toY => To.Position.y;
-    public int toZ => To.Position.z;
+    public long fromX => From.Position.x;
+    public long fromY => From.Position.y;
+    public long fromZ => From.Position.z;
+    public long toX => To.Position.x;
+    public long toY => To.Position.y;
+    public long toZ => To.Position.z;
 
-    public int minX => Mathf.Min(fromX, toX);
-    public int minY => Mathf.Min(fromY, toY);
-    public int minZ => Mathf.Min(fromZ, toZ);
-    public int maxX => Mathf.Max(fromX, toX);
-    public int maxY => Mathf.Max(fromY, toY);
-    public int maxZ => Mathf.Max(fromZ, toZ);
+    public long minX => Math.Min(fromX, toX);
+    public long minY => Math.Min(fromY, toY);
+    public long minZ => Math.Min(fromZ, toZ);
+    public long maxX => Math.Max(fromX, toX);
+    public long maxY => Math.Max(fromY, toY);
+    public long maxZ => Math.Max(fromZ, toZ);
 
     public bool Hidden = false;
 
-    public (int x, int y, int z) GetMid()
+    public (long x, long y, long z) GetMid()
     {
-        int newZ = fromZ + (toZ - fromZ) / 2;
+        long newZ = fromZ + (toZ - fromZ) / 2;
 
         if (fromX == toX)
             return (fromX, fromY + (toY - fromY) / 2, newZ);
@@ -97,7 +97,7 @@ public class GridEdge : BaseEdge<GridVertex>
         return (fromX, fromY, newZ);
     }
 
-    public int? GetHorizontalOffset(int lowerBound, int upperBound, int x)
+    public long? GetHorizontalOffset(long lowerBound, long upperBound, long x)
     {
         float verticalOverlap = Mathf.Min(maxY, upperBound) - Mathf.Max(minY, lowerBound);
 
@@ -105,19 +105,19 @@ public class GridEdge : BaseEdge<GridVertex>
         if (verticalOverlap < 0)
             return null;
 
-        int offset = 0;
+        long offset = 0;
 
         // Calculate horizontal offset of the vertical segment
         //   | <---> | 
 
-        int vx = (FromDirection == Directions.West || ToDirection == Directions.West) ? minX : maxX;
+        long vx = (FromDirection == Directions.West || ToDirection == Directions.West) ? minX : maxX;
         offset += vx - x;
 
 
         // Calculate horizontal offset of the horizontal segment
         //   | <--->  --
-        int hy = (FromDirection == Directions.South || ToDirection == Directions.South) ? minY : maxY;
-        int hOffset = minX - x;
+        long hy = (FromDirection == Directions.South || ToDirection == Directions.South) ? minY : maxY;
+        long hOffset = minX - x;
         if (hy > lowerBound && hy < upperBound) // lower-upper are exclusive (not inclusive)
             if (Math.Abs(offset) > Math.Abs(hOffset)) // The closer offset
                 offset = hOffset;
@@ -125,15 +125,15 @@ public class GridEdge : BaseEdge<GridVertex>
         return offset;
     }
 
-    public int? GetVerticalOffset(int leftBound, int rightBound, int y)
+    public long? GetVerticalOffset(long leftBound, long rightBound, long y)
     {
-        int horizontalOverlap = Math.Min(maxX, rightBound) - Math.Max(minX, leftBound);
+        long horizontalOverlap = Math.Min(maxX, rightBound) - Math.Max(minX, leftBound);
 
         // They are not even overlapping
         if (horizontalOverlap < 0)
             return null;
 
-        int offset = 0;
+        long offset = 0;
 
         // Calculate vertical offset of the horizontal segment
         // -----
@@ -141,7 +141,7 @@ public class GridEdge : BaseEdge<GridVertex>
         //   |
         //   v
         // -----
-        int hy = (FromDirection == Directions.South || ToDirection == Directions.South) ? minY : maxY;
+        long hy = (FromDirection == Directions.South || ToDirection == Directions.South) ? minY : maxY;
         offset += hy - y;
 
 
@@ -152,8 +152,8 @@ public class GridEdge : BaseEdge<GridVertex>
         //   v
         //   
         //   |
-        int vx = (FromDirection == Directions.West || ToDirection == Directions.West) ? minX : maxX;
-        int vOffset = minY - y;
+        long vx = (FromDirection == Directions.West || ToDirection == Directions.West) ? minX : maxX;
+        long vOffset = minY - y;
         if (vx > leftBound && vx < rightBound) // left-right are exclusive (not inclusive)
             if (Math.Abs(offset) > Math.Abs(vOffset)) // The closer offset
                 offset = vOffset;
@@ -161,12 +161,12 @@ public class GridEdge : BaseEdge<GridVertex>
         return offset;
     }
 
-    public (int, int, int)? GetVerticalLine()
+    public (long, long, long)? GetVerticalLine()
     {
         if (fromX == toX)
             return (fromX, minY, maxY);
 
-        (int midX, int midY, int midZ) = GetMid();
+        (long midX, long midY, long midZ) = GetMid();
 
         if (fromX == midX)
             return (
@@ -182,12 +182,12 @@ public class GridEdge : BaseEdge<GridVertex>
         return null;
     }
 
-    public (int, int, int)? GetHorizontalLine()
+    public (long, long, long)? GetHorizontalLine()
     {
         if (fromY == toY)
             return (minX, maxX, toY);
 
-        (int midX, int midY, int midZ) = GetMid();
+        (long midX, long midY, long midZ) = GetMid();
 
         if (fromY == midY)
             return (
@@ -275,7 +275,7 @@ public class GraphGenerator
             pattern.Apply(e, Graph);
         }
 
-        for (int floor = 0; floor < Graph.FloorCount; floor++)
+        for (long floor = 0; floor < Graph.FloorCount; floor++)
         {
             for (int i = 0; i < GenerationSettings.PatternCount; i++)
             {

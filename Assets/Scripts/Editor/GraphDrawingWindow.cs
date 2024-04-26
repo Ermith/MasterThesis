@@ -86,16 +86,6 @@ public class GraphDrawingWindow : EditorWindow
         int spacing = 50;
         int radius = (int)(20 * scale);
 
-        foreach ((int xFrom, int xTo, int y) in drawParams.HorizontalLines)
-            Handles.DrawLine(
-                new Vector3(xFrom, y) * spacing * scale + offset,
-                new Vector3(xTo, y) * spacing * scale + offset);
-
-        foreach ((int x, int yFrom, int yTo) in drawParams.VerticalLines)
-            Handles.DrawLine(
-                new Vector3(x, yFrom) * spacing * scale + offset,
-                new Vector3(x, yTo) * spacing * scale + offset);
-
         foreach ((var _, (int x, int y, int _)) in drawParams.VertexPositions)
             Handles.DrawSolidDisc(
                 new Vector3(x, y) * spacing * scale + offset,
@@ -105,16 +95,6 @@ public class GraphDrawingWindow : EditorWindow
     {
         int spacing = 50;
         int radius = (int)(20 * scale);
-
-        foreach ((int xFrom, int xTo, int y) in drawParams.HorizontalLines)
-            Handles.DrawLine(
-                new Vector3(xFrom, y) * spacing * scale + offset,
-                new Vector3(xTo, y) * spacing * scale + offset);
-
-        foreach ((int x, int yFrom, int yTo) in drawParams.VerticalLines)
-            Handles.DrawLine(
-                new Vector3(x, yFrom) * spacing * scale + offset,
-                new Vector3(x, yTo) * spacing * scale + offset);
 
         foreach ((GridVertex vertex, (int x, int y, int _)) in drawParams.VertexPositions)
         {
