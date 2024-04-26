@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using URandom = UnityEngine.Random;
 
@@ -41,6 +42,25 @@ public class GenerationSettings : MonoBehaviour
     public Toggle FloorPatternHiddenShortcutToggle;
     public Toggle FloorPatternLockedCycleToggle;
     public Toggle FloorPatternLockedForkToggle;
+
+
+    public Sprite DangerEnemiesSprite;
+    public Sprite DangerCamerasSprite;
+    public Sprite DangerDeathTrapsSprite;
+    public Sprite DangerSoundTrapsSprite;
+
+    public Sprite PatternHiddenShortcutSprite;
+    public Sprite PatternLockedCycleSprite;
+    public Sprite PatternDoubleLockSprite;
+    public Sprite PatternLockedForkSprite;
+    public Sprite PatternAlternativePathSprite;
+
+    public Sprite FloorPatternHiddenShortcutSprite;
+    public Sprite FloorPatternLockedCycleSprite;
+    public Sprite FloorPatternLockedForkSprite;
+
+    public RectTransform DangerEnemiesArea;
+
 
     public TMP_InputField SeedInput;
     public Slider FloorCountSlider;
@@ -87,11 +107,5 @@ public class GenerationSettings : MonoBehaviour
             else
                 Seed = int.Parse(val);
         });
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 }
