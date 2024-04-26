@@ -67,10 +67,9 @@ public class LevelGenerator : MonoBehaviour
     {
         RegisterBlueprints();
 
+        Debug.Log("GENERATING GRAPH");
         _graph = new GridGraph();
         _graphGenerator = new GridGraphGenerator(_graph);
-
-        Debug.Log("GENERATING GRAPH");
         _graphGenerator.Generate();
         KeyVertexMapping = _graphGenerator.KeyMapping;
         LockVertexMapping = _graphGenerator.LockMapping;
@@ -95,16 +94,19 @@ public class LevelGenerator : MonoBehaviour
         Debug.Log("Spawning Enemies");
         SpawnEnemies(enemies);
 
+        Debug.Log("Spawning Player");
         var playerSpawn = _mapBuilder.GetSpawnPosition();
         playerSpawn.y *= _floorHeight;
         // Spawn player at the correct position
         // Needs to be 1 frame delayed because of a bug, when setting position works only occasionally
         StartCoroutine(DelayedSpawn(playerSpawn));
 
+        Debug.Log("Creating a Map");
         Map.Drawing = GraphDrawing;
         Map.CreateMap();
         level.transform.parent = transform;
 
+        Debug.Log("Building Navmesh");
         GetComponent<NavMeshSurface>().BuildNavMesh();
     }
 
