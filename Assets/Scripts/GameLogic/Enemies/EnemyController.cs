@@ -254,7 +254,7 @@ public class EnemyController : MonoBehaviour, ILockObject
             _stepTimer += Time.deltaTime;
             if (_stepTimer > StepTime)
             {
-                GameController.AudioManager.PlayStep("Rubber", gameObject, volume: 0.5f, spacialBlend: 1f);
+                GameController.AudioManager.PlayStep("Rubber", gameObject, volume: 0.5f, spacialBlend: 1f, destroyTarget:true);
                 _stepTimer %= StepTime;
             }
         }
