@@ -4,7 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using URandom = UnityEngine.Random;
 
-public class GraphGenerator
+public class GridGraphGenerator
 {
     public GridGraph Graph { get; private set; }
     public Dictionary<ILock, GridVertex> LockMapping = new();
@@ -12,7 +12,7 @@ public class GraphGenerator
     private GridVertex _start;
     private GridVertex _end;
 
-    public GraphGenerator(GridGraph graph)
+    public GridGraphGenerator(GridGraph graph)
     {
         Graph = graph;
     }
