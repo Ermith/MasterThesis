@@ -53,7 +53,6 @@ public class LevelGenerator : MonoBehaviour
     private List<Matrix4x4>[] _wallMatrices;
     private GameObject _geometry;
     private GameObject[] _floors;
-    private GameObject[] _walls;
     private int _activeFloor;
     private bool _wide = false;
 
@@ -76,7 +75,7 @@ public class LevelGenerator : MonoBehaviour
         StairwayRoom.Blueprint = StairsBlueprint;
         TrapDisarmingKit.Blueprint = TrapKitBlueprint;
         InvisibiltyCamo.Blueprint = CamoBlueprint;
-        SideObjective.Blueprint = this.ObjectiveBlueprint;
+        SideObjective.Blueprint = ObjectiveBlueprint;
         
 
         _graph = new GridGraph();
@@ -92,7 +91,7 @@ public class LevelGenerator : MonoBehaviour
         Debug.Log("DRAWING THE GRAPH");
         GraphDrawing = _graphDrawer.Draw(_graphGenerator.GetStartVertex(), _graphGenerator.GetEndVertex());
 
-        _mapBuilder = new MapBuilder(GraphDrawing, SuperWidth, SuperHeight, ObjectiveBlueprint);
+        _mapBuilder = new MapBuilder(GraphDrawing, SuperWidth, SuperHeight);
         Debug.Log("CREATING SUPERTILES");
         var superTileGrids = _mapBuilder.SuperTileGrid();
 
@@ -105,8 +104,6 @@ public class LevelGenerator : MonoBehaviour
         ASubTile.Register<WallSubTile>((ASubTile st) => Instantiate(WallBlueprint));
         ASubTile.Register<FloorSubTile>((ASubTile st) =>
         {
-
-            //return new GameObject();
             return Instantiate(FloorBlueprint);
         });
         ASubTile.Register<DoorSubTile>((ASubTile st) =>
@@ -214,18 +211,12 @@ public class LevelGenerator : MonoBehaviour
         }
 
         Debug.Log("Spawning Enemies");
-        float scale = 1f;
-        var localScale = geometry.transform.localScale;
-        //geometry.transform.localScale *= scale;
-        geometry.transform.localScale = localScale.Multiplied(x: scale, y: 1f, z: scale);
 
         if (GenerationSettings.DangerEnemies)
             foreach (EnemyParams enemy in enemies)
             {
                 (int spawnX, int spawnZ) = enemy.Spawn;
                 Vector3 spawn = new(spawnX, (enemy.Floor + 0.1f) * _floorHeight, spawnZ);
-                spawn = spawn * scale;
-                Debug.Log("ENEMY SPAWN: " + spawn.y.ToString());
 
                 var enemyInstance = Instantiate(
                     EnemyBlueprint,
@@ -241,7 +232,7 @@ public class LevelGenerator : MonoBehaviour
                     List<Vector3> patrol = new();
                     foreach ((int x, int z) in enemy.Patrol)
                     {
-                        patrol.Add(new Vector3(x, (enemy.Floor + 0.1f) * _floorHeight, z) * scale);
+                        patrol.Add(new Vector3(x, (enemy.Floor + 0.1f) * _floorHeight, z));
                     }
 
                     enemyInstance.Patrol(patrol.ToArray(), enemy.PatrolIndex, enemy.Retrace);
@@ -249,7 +240,6 @@ public class LevelGenerator : MonoBehaviour
 
                 if (enemy.Behaviour == Behaviour.Guarding)
                 {
-                    Debug.Log("SPAWNING GUARD ===========================================================");
                     enemyInstance.Guard(spawn, Vector3.right);
                     enemyInstance.LookAt(spawn);
                 }
@@ -260,28 +250,23 @@ public class LevelGenerator : MonoBehaviour
 
 
 
-        var pos = _mapBuilder.GetEndPosition() * scale;
+        var pos = _mapBuilder.GetEndPosition();
         int victoryFloor = (int)pos.y;
         pos.y *= _floorHeight;
         var victory = GameObject.Instantiate(VictoryTrigger);
         victory.transform.position = pos;
         victory.transform.parent = _floors[victoryFloor].transform;
-        //FindObjectOfType<LevelCamera>().SetPosition(SubTileGrid.GetLength(0), SubTileGrid.GetLength(1), scale, offset);
 
 
-        var playerSpawn = _mapBuilder.GetSpawnPosition() * scale;
+        var playerSpawn = _mapBuilder.GetSpawnPosition();
         playerSpawn.y *= _floorHeight;
-        Debug.Log($"REPOSITIONING THE PLAYER {playerSpawn}");
         // Spawn player at the correct position
-        // Needs to be 1 frame delayed because of bug, when setting position works only occasionally
+        // Needs to be 1 frame delayed because of a bug, when setting position works only occasionally
         StartCoroutine(DelayedSpawn(playerSpawn));
-        //StartCoroutine(DelayedEnemySpawn(enemies, level));
 
         Map.Drawing = GraphDrawing;
         Map.CreateMap();
-        _done = true;
         level.transform.parent = transform;
-
 
         GetComponent<NavMeshSurface>().BuildNavMesh();
     }
@@ -289,6 +274,8 @@ public class LevelGenerator : MonoBehaviour
     private IEnumerator DelayedSpawn(Vector3 spawnPosition)
     {
         yield return null;
+
+        Debug.Log($"REPOSITIONING THE PLAYER {spawnPosition}");
         Player.transform.position = spawnPosition;
     }
 

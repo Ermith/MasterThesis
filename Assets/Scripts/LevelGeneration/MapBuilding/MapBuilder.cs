@@ -12,18 +12,14 @@ class MapBuilder
     private GraphDrawing<GridVertex> _graphDrawing;
     private int _superWidth, _superHeight;
     private int _width, _height;
-    private Vector3 _spawnPosition;
-    private Vector3 _endPosition;
-    private GameObject _sideObjective;
 
-    public MapBuilder(GraphDrawing<GridVertex> graphDrawing, int superWidth, int superHeight, GameObject sideObjective)
+    public MapBuilder(GraphDrawing<GridVertex> graphDrawing, int superWidth, int superHeight)
     {
         _graphDrawing = graphDrawing;
         _superWidth = superWidth;
         _superHeight = superHeight;
         _width = _graphDrawing.MaximumX + 1;
         _height = _graphDrawing.MaximumY + 1;
-        _sideObjective = sideObjective;
     }
 
     public List<ASubTile[,]> SubTileGrid(List<ATile[,]> tileGrids)
@@ -78,8 +74,6 @@ class MapBuilder
 
             tile.Locks = vertex.GetLocks().ToList();
             tile.Keys = vertex.GetKeys().ToList();
-
-            //    tile.AddObject(null);
 
             superTileGrids[z][x, y] = tile;
         }
