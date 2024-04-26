@@ -100,7 +100,7 @@ public class GameController : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.Tab))
             InfoScreen.gameObject.SetActive(false);
 
-        Pointer.SetActive(Player.Camera.Mode == CameraModeType.FirstPerson);
+        Pointer.SetActive(Player.Camera.Mode == CameraModeType.FirstPerson && !_paused && !_mapPaused);
     }
 
     public static void Restart()
