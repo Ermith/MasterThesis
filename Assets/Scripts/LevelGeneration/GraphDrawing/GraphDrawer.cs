@@ -1,12 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-using GraphPlanarityTesting.PlanarityTesting.BoyerMyrvold;
-using Planarity = GraphPlanarityTesting.Graphs.DataStructures;
-using Unity.VisualScripting;
-using TMPro;
 
 public struct GraphDrawing<T>
 {
