@@ -348,9 +348,9 @@ public class AlternatePathPattern : Pattern
         (GridEdge e1, GridEdge e2) = AddExtension(ceBase, graph);
 
         var danger = GetDangers();
-        ce1.To.AddLock(danger);
         ce1.To.AddLock(new EnemyLock());
-        ceBase.To.AddLock(new EnemyLock());
+        e1.To.AddLock(danger);
+        e1.To.AddLock(new EnemyLock());
     }
 }
 
@@ -360,7 +360,7 @@ public class LockedCyclePattern : Pattern
     {
         graph.RemoveGridEdge(edge);
         (GridEdge e1, GridEdge e2) = AddExtension(edge, graph);
-        (GridEdge ce1, GridEdge ce2, GridEdge _) = AddCycle(e1, graph, reversed: true, closer: false);
+        (GridEdge ce1, GridEdge ce2, GridEdge _) = AddCycle(e1, graph, reversed: true, closer: true);
         ce1.To.Hallway = true;
 
         // Lock the main path
@@ -370,9 +370,9 @@ public class LockedCyclePattern : Pattern
 
         // Extend path back to the main room
         // This is so the key is right next to the original room
-        graph.RemoveGridEdge(ce2);
-        (ce1, ce2) = AddExtension(ce2, graph);
-        ce1.To.Hallway = true;
+        //graph.RemoveGridEdge(ce2);
+        //(ce1, ce2) = AddExtension(ce2, graph);
+        //ce1.To.Hallway = true;
 
         // Add 'Valve' back to the main room
         WallOfLightLock @lock2 = new(ce2.ToDirection);
