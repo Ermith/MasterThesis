@@ -10,38 +10,6 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using URandom = UnityEngine.Random;
 
-public interface IRule
-{
-    public bool IsPossible();
-    public void Apply(GridEdge edge, GridGraph graph, ILock l = null);
-}
-
-public abstract class BaseRule : IRule
-{
-    public const long STEP = 1<<57;
-    private GraphGenerator _generator;
-    public BaseRule(GraphGenerator generator)
-    {
-        _generator = generator;
-    }
-
-    public abstract void Apply(GridEdge edge, GridGraph graph, ILock l = null);
-
-    public abstract bool IsPossible();
-
-    internal void RegisterLock(ILock l, GridVertex vertex)
-    {
-        vertex.AddLock(l);
-        _generator.RegisterLock(l, vertex);
-    }
-
-    internal void RegisterKey(IKey k, GridVertex vertex)
-    {
-        vertex.AddKey(k);
-        _generator.RegisterKey(k, vertex);
-    }
-}
-
 public enum DangerType
 {
     None,
