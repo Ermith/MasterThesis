@@ -31,6 +31,8 @@ public class PlayerController : MonoBehaviour
     public float PeekTime = 0.15f;
     public Vector3 PeekOffset = new Vector3(1, -0.5f, 0);
 
+    public float InvisibilityTime;
+
     public CameraController Camera;
     #endregion
 
@@ -43,42 +45,6 @@ public class PlayerController : MonoBehaviour
     private MeshRenderer _meshRenderer;
     public Animation Animation => _animation;
     private Vector3 _gunPosition;
-
-    // Invisibility
-    public float InvisibilityTime;
-    private float _invisibilityTimer;
-
-    // Sliding
-    private float _slideCooldown = 1f;
-    private float _slideCooldownTimer = 0.5f;
-
-    public void UseInvisibiltyCamo()
-    {
-        if (CamoCount <= 0)
-            return;
-
-        CamoCount--;
-        _invisibilityTimer = InvisibilityTime;
-        GameController.AudioManager.Play("Beep");
-    }
-
-    private void UpdateInvisibility()
-    {
-        if (Input.GetKeyDown(KeyCode.R))
-            UseInvisibiltyCamo();
-
-        bool wasInvisible = _invisible;
-        _invisible = _invisibilityTimer > 0;
-
-        if (wasInvisible && !_invisible)
-            GameController.AudioManager.Play("ElectricDischarge");
-
-        if (_invisible)
-            _invisibilityTimer -= Time.deltaTime;
-
-        _meshRenderer.material.color = IsHidden ? Color.black : Color.white;
-        GameController.SetInvisOverlay(IsHidden && Camera.Mode == CameraModeType.FirstPerson);
-    }
 
     private void Start()
     {
@@ -121,6 +87,10 @@ public class PlayerController : MonoBehaviour
         SwitchState();
     }
 
+    #region Hiding and Invisibility
+    // Invisibility
+    private float _invisibilityTimer;
+
     private int _hidden = 0;
     private bool _invisible = false;
     public bool IsHidden => _hidden > 0 || _invisible;
@@ -130,17 +100,35 @@ public class PlayerController : MonoBehaviour
         _meshRenderer.material.color = IsHidden ? Color.black : Color.white;
     }
 
-    private bool _dead = false;
-    public void Die()
+    public void UseInvisibiltyCamo()
     {
-        if (_dead) return;
+        if (CamoCount <= 0)
+            return;
 
-        _dead = true;
-        GameController.AudioManager.Play("DeathGrunt");
-        var clip = Animation.GetClip("DeathAnimation");
-        Animation.Play("DeathAnimation");
-        GameController.ExecuteAfter(GameController.NewGame, clip.length);
+        CamoCount--;
+        _invisibilityTimer = InvisibilityTime;
+        GameController.AudioManager.Play("Beep");
     }
+
+    private void UpdateInvisibility()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+            UseInvisibiltyCamo();
+
+        bool wasInvisible = _invisible;
+        _invisible = _invisibilityTimer > 0;
+
+        if (wasInvisible && !_invisible)
+            GameController.AudioManager.Play("ElectricDischarge");
+
+        if (_invisible)
+            _invisibilityTimer -= Time.deltaTime;
+
+        _meshRenderer.material.color = IsHidden ? Color.black : Color.white;
+        GameController.SetInvisOverlay(IsHidden && Camera.Mode == CameraModeType.FirstPerson);
+    }
+
+    #endregion
 
     #region Update Functions
     /// <summary>
@@ -296,6 +284,9 @@ public class PlayerController : MonoBehaviour
     private RunningState _runningState;
     private SlidingState _slidingState;
     private Vector3 _previousMovement;
+    // Sliding
+    private float _slideCooldown = 1f;
+    private float _slideCooldownTimer = 0.5f;
 
     /// <summary>
     /// This is basically a finite state machine, states being <see cref="IMovementState"/>.
@@ -530,4 +521,17 @@ public class PlayerController : MonoBehaviour
     private bool PeekEndRequest() =>
         Input.GetKeyUp(KeyCode.E) || Input.GetKeyUp(KeyCode.Q);
     #endregion
+
+
+    private bool _dead = false;
+    public void Die()
+    {
+        if (_dead) return;
+
+        _dead = true;
+        GameController.AudioManager.Play("DeathGrunt");
+        var clip = Animation.GetClip("DeathAnimation");
+        Animation.Play("DeathAnimation");
+        GameController.ExecuteAfter(GameController.NewGame, clip.length);
+    }
 }
