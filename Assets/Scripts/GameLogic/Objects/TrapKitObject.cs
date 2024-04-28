@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Gives the player <see cref="TrapDisarmingKitKey"/> when picked up by moving through this object.
+/// </summary>
 public class TrapKitObject : SmartCollider, IKeyObject
 {
     public IKey MyKey { get; set; }

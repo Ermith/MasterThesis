@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Colliding with this object makes the player hidden.
+/// </summary>
 public class HidingSpace : SmartCollider
 {
     private void Start()

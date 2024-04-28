@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Key object that can be interacted with. Contains <see cref="IKey"/>.
+/// Unlocks all instances of <see cref="ILockObject"/> that the <see cref="IKey"/> is a key to.
+/// </summary>
 public class PowerSource : MonoBehaviour, IInteractableObject, IKeyObject
 {
     public IKey MyKey { get; set; }
@@ -10,6 +14,12 @@ public class PowerSource : MonoBehaviour, IInteractableObject, IKeyObject
 
     public InteractionType InteractionType => InteractionType.Single;
 
+    /// <summary>
+    /// Single interaction unlocks all instances of <see cref="ILockObject"/> that the <see cref="IKey"/> is a key to.
+    /// Becomes unusable afterwards.
+    /// </summary>
+    /// <param name="player"></param>
+    /// <returns></returns>
     public float Interact(PlayerController player)
     {
         if (!CanInteract) return -1;

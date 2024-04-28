@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
+/// <summary>
+/// Dynamic stairs mesh and collider. Responds to changes in editor.
+/// </summary>
 [RequireComponent (typeof (MeshFilter), typeof (MeshRenderer), typeof(MeshCollider)), ExecuteInEditMode]
 public class Stairs : MonoBehaviour
 {
     private Mesh _mesh;
-    private MeshCollider _collider;
 
     [Range(1, 100)]
     public int Steps;
@@ -27,6 +29,9 @@ public class Stairs : MonoBehaviour
         Rebuild();
     }
 
+    /// <summary>
+    /// Builds the mesh based on properties.
+    /// </summary>
     private void Rebuild()
     {
         List<Vector3> vertices = new();
@@ -103,14 +108,6 @@ public class Stairs : MonoBehaviour
         GetComponent<MeshCollider>().sharedMesh = _mesh;
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="TL">Top Left</param>
-    /// <param name="TR">Top Right</param>
-    /// <param name="BL">Bottom Left</param>
-    /// <param name="BR">Bottom Right</param>
-    /// <param name=""></param>
     private void AddQuad(Vector3 TL, Vector3 TR, Vector3 BL, Vector3 BR, List<Vector3> vertices, List<int> indices, bool reverseWinding = false)
     {
         int offset = vertices.Count;

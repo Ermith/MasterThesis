@@ -4,22 +4,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+/// <summary>
+/// Can be opened or closed by interaction. Can be locked by a <see cref="DoorLock"/>. Is unlocked if the player has appropriate <see cref="DoorKey"/>.
+/// </summary>
 public class Door : MonoBehaviour, IInteractableObject, ILockObject
 {
-    public float Duration = 0.5f;
-    public bool ChangeColor = true;
-
     private Transform _hinge;
-
     private Coroutine _clopenCoroutine;
-
     private bool _open = false;
 
-    public ILock Lock { get; set; }
+    public float Duration = 0.5f;
+    public bool ChangeColor = true;
+    [HideInInspector] public ILock Lock { get; set; }
 
-    public bool CanInteract => true;
+    [HideInInspector] public bool CanInteract => true;
 
-    public InteractionType InteractionType => InteractionType.Single;
+    [HideInInspector] public InteractionType InteractionType => InteractionType.Single;
 
     void Start()
     {
@@ -36,12 +36,15 @@ public class Door : MonoBehaviour, IInteractableObject, ILockObject
 
     }
 
+    /// <summary>
+    /// Opens or closes the door. If the door is locked, it is instantly unlocked if the player has appropriate <see cref="DoorKey"/>.
+    /// </summary>
+    /// <param name="player"></param>
+    /// <returns></returns>
     public float Interact(PlayerController player)
     {
         if (Lock != null)
         {
-            Debug.Log("");
-
             if (player.HasKeyForLock(Lock))
                 Unlock();
             else
@@ -58,7 +61,10 @@ public class Door : MonoBehaviour, IInteractableObject, ILockObject
         return -1;
     }
 
-    [ContextMenu("Open Door")]
+    /// <summary>
+    /// Starts open door animation based on the Duration property.
+    /// </summary>
+    /// <param name="forward">Which way to open?</param>
     public void Open(bool forward)
     {
         if (_clopenCoroutine != null)
@@ -70,6 +76,9 @@ public class Door : MonoBehaviour, IInteractableObject, ILockObject
         _open = true;
     }
 
+    /// <summary>
+    /// Starts closing door animation based on the Duration property.
+    /// </summary>
     [ContextMenu("Close Door")]
     public void Close()
     {
@@ -83,6 +92,13 @@ public class Door : MonoBehaviour, IInteractableObject, ILockObject
         _open = false;
     }
 
+    /// <summary>
+    /// Coroutine for opening and closing the door animations.
+    /// </summary>
+    /// <param name="timeSpan"></param>
+    /// <param name="endAngle"></param>
+    /// <param name="easing"></param>
+    /// <returns></returns>
     IEnumerator ClopenCoroutine(float timeSpan, float endAngle, Func<float, float> easing)
     {
         float timer = 0;
@@ -106,6 +122,9 @@ public class Door : MonoBehaviour, IInteractableObject, ILockObject
         return _open ? "Close Door" : "Open Door";
     }
 
+    /// <summary>
+    /// Removes the lock and changes color.
+    /// </summary>
     public void Unlock()
     {
         Lock = null;

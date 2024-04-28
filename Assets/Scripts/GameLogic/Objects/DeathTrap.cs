@@ -2,28 +2,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Kills the player if he moves through this object. Can be disabled by interaction.
+/// Interaction time reduced to 0 if the player has <see cref="TrapDisarmingKitKey"/>. Consumes it on use.
+/// </summary>
 public class DeathTrap : SmartCollider, ILockObject, IInteractableObject
 {
-    public ILock Lock { get; set; }
+    [HideInInspector] public ILock Lock { get; set; }
 
-    public bool CanInteract => true;
+    [HideInInspector] public bool CanInteract => true;
 
-    public InteractionType InteractionType => InteractionType.Continuous;
+    [HideInInspector] public InteractionType InteractionType => InteractionType.Continuous;
 
     public float InteractionTime = 1f;
     private float _interactionTimer;
     private bool _lastInteract = false;
 
+    /// <summary>
+    /// Disables the trap. Takes time unless the player has <see cref="TrapDisarmingKitKey"/>. The kit is consumed.
+    /// </summary>
+    /// <param name="player"></param>
+    /// <returns></returns>
     public float Interact(PlayerController player)
     {
         if (_interactionTimer >= InteractionTime)
             GameController.AudioManager.Play("Click");
 
-
-
-        Debug.Log(_interactionTimer);
         _interactionTimer -= Time.deltaTime;
-        Debug.Log(_interactionTimer);
 
         if (player.TrapKitCount > 0)
         {
@@ -44,6 +49,9 @@ public class DeathTrap : SmartCollider, ILockObject, IInteractableObject
         return "Disarm";
     }
 
+    /// <summary>
+    /// Disables the game object.
+    /// </summary>
     public void Unlock()
     {
         GameController.AudioManager.Play("Cut");
@@ -62,9 +70,7 @@ public class DeathTrap : SmartCollider, ILockObject, IInteractableObject
 
     private void LateUpdate()
     {
-        if (_lastInteract)
-        {
-        } else
+        if (!_lastInteract)
         {
             _interactionTimer = InteractionTime;
         }
