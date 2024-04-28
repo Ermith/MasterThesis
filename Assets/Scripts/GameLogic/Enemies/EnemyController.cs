@@ -13,35 +13,27 @@ public enum Behaviour
     Guarding,
 }
 
+/// <summary>
+/// AI handling guards. Uses NavmeshAgent to move around. Responds to sounds and visual comformation of the player.
+/// </summary>
 [RequireComponent(typeof(Sight), typeof(Audition), typeof(CharacterController))]
 public class EnemyController : MonoBehaviour, ILockObject
 {
-    Sight _sight;
-    Audition _audition;
-    CharacterController _characterController;
-    Vector3? _moveTo = null;
-    float _turnRate = 4f;
-    Vector3? _lookDirection = null;
-    Vector3[] _patrolPositions = null;
-    const float EPSILON_RADIUS = 0.75f;
-    float _lastMovement = float.MaxValue;
-    List<Vector3> _movementBuffer = new();
+    // Component references
+    private Sight _sight;
+    private Audition _audition;
+    private CharacterController _characterController;
+    private NavMeshAgent _navMeshAgent;
 
-    // patrol
+    // Patrol
     int _patrolIndex = 0;
-    int _patrolStep = 1;
-    bool _chasing = false;
-    bool _patrolRetrace;
-    Action _positionReached = null;
+    private int _patrolStep = 1;
+    private bool _chasing = false;
+    private bool _patrolRetrace;
+    private Action _positionReached = null;
+    private Vector3[] _patrolPath = null;
 
-    Vector3 _lookFrom;
-    Vector3 _lookTo;
-    float _rotationTime;
-
-    public ILock Lock { get; set; }
-    public Behaviour Behaviour { get; set; }
-    public Vector3 DefaultPosition = Vector3.zero;
-    public Vector3 DefaultDirection = Vector3.forward;
+    // Adjustable in inspector
     public float GuardViewDistance = 5f;
     public float DefaultViewDistance = 20f;
     public float FrustrationTime = 1f;
@@ -49,11 +41,20 @@ public class EnemyController : MonoBehaviour, ILockObject
     public float StepTime = 0.6f;
     public float NormalSpeed = 3f;
     public float ChasingSpeed = 5f;
+    public float TurnRate = 4f;
 
-
+    // Movement and Behavior
     private float _frustrationTimer;
     private float _investigationTimer;
     private float _stepTimer;
+    private Vector3? _lookDirection = null;
+    private float _lastMovement = float.MaxValue;
+    private Vector3 _lastPosition = Vector3.zero;
+    private PlayerController _player = null;
+    [HideInInspector] public ILock Lock { get; set; }
+    [HideInInspector] public Behaviour Behaviour { get; set; }
+    [HideInInspector] public Vector3 DefaultPosition = Vector3.zero;
+    [HideInInspector] public Vector3 DefaultDirection = Vector3.forward;
 
     // Start is called before the first frame update
     void Start()
@@ -61,6 +62,9 @@ public class EnemyController : MonoBehaviour, ILockObject
         _characterController = GetComponent<CharacterController>();
         _sight = GetComponent<Sight>();
         _audition = GetComponent<Audition>();
+        _navMeshAgent = GetComponent<NavMeshAgent>();
+        _player = FindObjectOfType<PlayerController>();
+
         _audition.SoundResponse += SoundResponse;
         _sight.Range = DefaultViewDistance;
 
@@ -68,10 +72,16 @@ public class EnemyController : MonoBehaviour, ILockObject
         _characterController.SimpleMove(Vector3.zero);
     }
 
+    /// <summary>
+    /// Goes to sound source and stands there for InvestigationTime duration./>
+    /// </summary>
+    /// <param name="sourceTarget"></param>
+    /// <param name="sourcePosition"></param>
     private void SoundResponse(GameObject sourceTarget, Vector3 sourcePosition)
     {
         _chasing = true;
         _sight.Range = DefaultViewDistance;
+        _frustrationTimer = FrustrationTime;
         LookAt(sourcePosition);
         MoveTo(sourcePosition, () =>
         {
@@ -86,58 +96,71 @@ public class EnemyController : MonoBehaviour, ILockObject
         ResolveBehaviour();
         ResolveRotation();
         ResolveMovement();
-
-        var player = FindObjectOfType<PlayerController>();
-        _sight.VisionConeHilighted = false;
-        if (!player.IsHidden && _sight.CanSee(player.transform))
-        {
-            _chasing = true;
-            LookAt(player.transform.position);
-            MoveTo(player.transform.position, () =>
-            {
-                _chasing = false;
-                _investigationTimer = InvestigationTime;
-            });
-            _sight.VisionConeHilighted = true;
-            _sight.Range = DefaultViewDistance;
-
-            if ((player.transform.position - transform.position).magnitude < 2f)
-                player.Die();
-        }
+        CheckPlayerInSight();
     }
 
+    /// <summary>
+    /// Sets desired direction. Turns there with TurnRate over time.
+    /// </summary>
+    /// <param name="direction"></param>
     public void LookInDirection(Vector3 direction)
     {
         _lookDirection = direction;
     }
 
+    /// <summary>
+    /// Sets direction looking at given position. Turns there with TurnRate over time.
+    /// </summary>
+    /// <param name="position"></param>
     public void LookAt(Vector3 position)
     {
         Vector3 direction = (position - transform.position).normalized;
         LookInDirection(direction);
     }
 
-    public void MoveTo(Vector3 position, Action callback = null)
+    /// <summary>
+    /// Sets desired destination into NavMeshAgent.
+    /// </summary>
+    /// <param name="destination"></param>
+    /// <param name="callback">Called once when destination reached.</param>
+    public void MoveTo(Vector3 destination, Action callback = null)
     {
-        GetComponent<NavMeshAgent>().destination = position;
+        _navMeshAgent.destination = destination;
         _positionReached = callback;
         return;
     }
 
-    public void Patrol(Vector3[] positions, int index = 0, bool retrace = true)
+    /// <summary>
+    /// Sets patrol path and sets behavior to Patrolling.
+    /// </summary>
+    /// <param name="patrolPath"></param>
+    /// <param name="startIndex"></param>
+    /// <param name="retrace">Patrol back and forth or in a cycle?</param>
+    public void Patrol(Vector3[] patrolPath, int startIndex = 0, bool retrace = true)
     {
-        _patrolPositions = positions;
-        _patrolIndex = index;
+        _patrolPath = patrolPath;
+        _patrolIndex = startIndex;
         _patrolRetrace = retrace;
         Behaviour = Behaviour.Patroling;
     }
 
+    /// <summary>
+    /// Sets default position to the given position.
+    /// Whenever the guard isn't doing anything, returns to default position and reduces sight range to 0.
+    /// </summary>
+    /// <param name="position"></param>
     public void Sleep(Vector3 position)
     {
         DefaultPosition = position;
         Behaviour = Behaviour.Sleeping;
     }
 
+    /// <summary>
+    /// Sets default position and direction of looking.
+    /// Whenever the guard isn't doing anything, returns to default position, turns in default direction and reduces sight range to GuardViewDistance.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="direction"></param>
     public void Guard(Vector3 position, Vector3 direction)
     {
         DefaultPosition = position;
@@ -151,7 +174,10 @@ public class EnemyController : MonoBehaviour, ILockObject
         //});
     }
 
-    public void ResolveBehaviour()
+    /// <summary>
+    /// Resolves behaviour based on Behaviour property. However, chasing and investigation takes priority.
+    /// </summary>
+    private void ResolveBehaviour()
     {
         if (_investigationTimer > 0)
         {
@@ -175,6 +201,9 @@ public class EnemyController : MonoBehaviour, ILockObject
             ResolveSleep();
     }
 
+    /// <summary>
+    /// Returns to default position, turns in default direction and reduces sight range to GuardViewDistance.
+    /// </summary>
     private void ResolveGuard()
     {
         if ((transform.position - DefaultPosition).magnitude < 1f)
@@ -191,6 +220,9 @@ public class EnemyController : MonoBehaviour, ILockObject
         });
     }
 
+    /// <summary>
+    /// Returns to default position and reduces sight range to 0.
+    /// </summary>
     private void ResolveSleep()
     {
         MoveTo(DefaultPosition,
@@ -200,15 +232,18 @@ public class EnemyController : MonoBehaviour, ILockObject
             });
     }
 
+    /// <summary>
+    /// Moves along the patrol path.
+    /// </summary>
     private void ResolvePatrol()
     {
-        if (_patrolPositions == null || _patrolPositions.Length < 1 || _chasing)
+        if (_patrolPath == null || _patrolPath.Length < 1 || _chasing)
             return;
 
-        Vector3 position = _patrolPositions[_patrolIndex];
+        Vector3 position = _patrolPath[_patrolIndex];
         MoveTo(position, () =>
         {
-            int count = _patrolPositions.Length;
+            int count = _patrolPath.Length;
 
             if (!_patrolRetrace)
             {
@@ -226,6 +261,9 @@ public class EnemyController : MonoBehaviour, ILockObject
         });
     }
 
+    /// <summary>
+    /// Rotates in _lookDirection based on TurnRate.
+    /// </summary>
     private void ResolveRotation()
     {
         if (_lookDirection == null) return;
@@ -233,16 +271,19 @@ public class EnemyController : MonoBehaviour, ILockObject
         Vector3 dir = _lookDirection.Value;
         dir.y = 0f;
         dir.Normalize();
-        transform.forward = Vector3.RotateTowards(transform.forward, dir, _turnRate * Time.deltaTime, 0);
-        //transform.forward = Vector3.Lerp(transform.forward, dir, _turnRate * Time.deltaTime);
+        transform.forward = Vector3.RotateTowards(transform.forward, dir, TurnRate * Time.deltaTime, 0);
+
         if (Vector3.Angle(transform.forward, dir) <= float.Epsilon)
             _lookDirection = null;
     }
 
+    /// <summary>
+    /// Changes movement speed based on if chasing. If destination reached, calles the callback. Also plays step sounds.
+    /// </summary>
     private void ResolveMovement()
     {
-        GetComponent<NavMeshAgent>().speed = _chasing ? ChasingSpeed : NormalSpeed;
-        Vector3 d = GetComponent<NavMeshAgent>().destination;
+        _navMeshAgent.speed = _chasing ? ChasingSpeed : NormalSpeed;
+        Vector3 d = _navMeshAgent.destination;
 
         if ((transform.position - d).magnitude < 0.5f)
         {
@@ -258,8 +299,14 @@ public class EnemyController : MonoBehaviour, ILockObject
                 _stepTimer %= StepTime;
             }
         }
+
+        _lastMovement = (transform.position - _lastPosition).magnitude;
+        _lastPosition = transform.position;
     }
 
+    /// <summary>
+    /// Stops chasing if reached frustration timer by not being able to move.
+    /// </summary>
     private void ResolveChase()
     {
         if (_lastMovement < 0.0001f)
@@ -272,11 +319,41 @@ public class EnemyController : MonoBehaviour, ILockObject
         }
     }
 
+    /// <summary>
+    /// If player is in sight, sets behaviour to chasing the player. Kills the player if too close and sees him.
+    /// </summary>
+    private void CheckPlayerInSight()
+    {
+        _sight.VisionConeHilighted = false;
+        if (!_player.IsHidden && _sight.CanSee(_player.transform))
+        {
+            _chasing = true;
+            _frustrationTimer = FrustrationTime;
+            LookAt(_player.transform.position);
+            MoveTo(_player.transform.position, () =>
+            {
+                _chasing = false;
+                _investigationTimer = InvestigationTime;
+            });
+            _sight.VisionConeHilighted = true;
+            _sight.Range = DefaultViewDistance;
+
+            if ((_player.transform.position - transform.position).magnitude < 2f)
+                _player.Die();
+        }
+    }
+
+    /// <summary>
+    /// Kills the guard.
+    /// </summary>
     public void Unlock()
     {
         Die();
     }
 
+    /// <summary>
+    /// Destroys object.
+    /// </summary>
     public void Die()
     {
         gameObject.SetActive(false);

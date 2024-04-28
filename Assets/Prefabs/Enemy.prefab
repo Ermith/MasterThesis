@@ -132,8 +132,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b253b57b89f055a4b8291caa146b1bf2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DefaultPosition: {x: 0, y: 0, z: 0}
-  DefaultDirection: {x: 0, y: 0, z: 1}
   GuardViewDistance: 3
   DefaultViewDistance: 15
   FrustrationTime: 1
@@ -141,6 +139,9 @@ MonoBehaviour:
   StepTime: 0.6
   NormalSpeed: 2.5
   ChasingSpeed: 5
+  TurnRate: 4
+  DefaultPosition: {x: 0, y: 0, z: 0}
+  DefaultDirection: {x: 0, y: 0, z: 1}
 --- !u!114 &7240094474568271847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -206,7 +207,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 7240094474568271841}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 2
+  m_Radius: 1
   m_Speed: 4
   m_Acceleration: 20
   avoidancePriority: 50
