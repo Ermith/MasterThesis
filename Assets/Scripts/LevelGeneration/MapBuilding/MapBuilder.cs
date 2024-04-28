@@ -69,7 +69,7 @@ class MapBuilder
             float random = URandom.value;
             if (vertex.Top || vertex.Bottom) tile = new StairwayRoom(_superWidth, _superHeight, z, vertex.Exits, up: vertex.Top, down: vertex.Bottom, reveresed: z % 2 == 0);
             else if (vertex.Hallway && vertex.GetKeys().ToArray().Length > 0) tile = new HallwayWithRooms(_superWidth, _superHeight, z, vertex.Exits);
-            else if (URandom.value > 0.5f) tile = new FilledRoom(_superWidth, _superHeight, z, exits: vertex.Exits, subRoom: true);
+            else if (URandom.value > 0.5f) tile = new RecursiveRoom(_superWidth, _superHeight, z, exits: vertex.Exits);
             else tile = new Room(_superWidth, _superHeight, z, vertex.Exits);
 
             tile.Locks = vertex.GetLocks().ToList();
@@ -126,7 +126,7 @@ class MapBuilder
                 else if (random > 0.33f)
                     tile = new WideHallway(_superWidth, _superHeight, firstPosition.z, exits);
                 else
-                    tile = new FilledRoom(_superHeight, _superHeight, firstPosition.z, exits: exits, refuges: true);
+                    tile = new Roundabout(_superHeight, _superHeight, firstPosition.z, exits: exits);
 
                 if (URandom.value > 0.5f)
                     tile.Locks.Add(new EnemyLock());

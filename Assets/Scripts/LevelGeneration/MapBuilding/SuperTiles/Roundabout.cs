@@ -4,16 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-public class FilledRoom : ASuperTile
+class Roundabout : ASuperTile
 {
-    bool _subRoom = false;
-    int _floor = 0;
-    bool _refuges = false;
-
-    public FilledRoom(int width, int height, int floor, bool subRoom = false, Directions exits = Directions.None, bool refuges = false) : base(width, height, floor, exits)
+    public Roundabout(int width, int height, int floor, Directions exits = Directions.None) : base(width, height, floor, exits)
     {
-        _subRoom = subRoom;
-        _refuges = refuges;
     }
 
     public override List<EnemyParams> BuildTiles(int x, int y, ATile[,] tileGrid)
@@ -42,29 +36,19 @@ public class FilledRoom : ASuperTile
             }
         }
 
-        if (_subRoom)
-            BuildSubRoom(
-                x + 1, y + 1,
-                1, 1,
-                Width - 2, Height - 2,
-                Description,
-                DirectionsExtensions.GetAll(),
-                internalRoom: true);
-        else
-            BuildWall(
-                x + 1, y + 1,
-                Width - 2, Height - 2,
-                Description);
+        BuildWall(
+            x + 1, y + 1,
+            Width - 2, Height - 2,
+            Description);
 
-        if (_refuges)
-            foreach ((int ex, int ey) in EdgeLocations(Width - 2, Height - 2))
-            {
-                if ((ex + ey) % 2 == 0)
-                    continue;
+        foreach ((int ex, int ey) in EdgeLocations(Width - 2, Height - 2))
+        {
+            if ((ex + ey) % 2 == 0)
+                continue;
 
-                var dirs = EdgeDirectinons(ex, ey, Width - 2, Height - 2).Opposite();
-                tileGrid[x + 1 + ex, y + 1 + ey] = new RefugeEdgeTile(dirs, dirs, thickness: ATile.WIDTH);
-            }
+            var dirs = EdgeDirectinons(ex, ey, Width - 2, Height - 2).Opposite();
+            tileGrid[x + 1 + ex, y + 1 + ey] = new RefugeEdgeTile(dirs, dirs, thickness: ATile.WIDTH);
+        }
 
         var corners = new (int, int)[] {
             (0, 0),
