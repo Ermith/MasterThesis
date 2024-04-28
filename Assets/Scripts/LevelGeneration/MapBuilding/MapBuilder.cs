@@ -80,10 +80,10 @@ class MapBuilder
 
         foreach ((IEdge<GridVertex> e, List<(int x, int y, int z)> positions) in _graphDrawing.EdgePositions)
         {
-            // Interfloor connection
             var firstPosition = positions[0];
             var lastPosition = positions[positions.Count - 1];
 
+            // Interfloor connection
             if (firstPosition.z != lastPosition.z)
             {
                 floorTransitions.Add((firstPosition.x, firstPosition.y, firstPosition.z, lastPosition.z));
@@ -126,7 +126,7 @@ class MapBuilder
                 else if (random > 0.33f)
                     tile = new WideHallway(_superWidth, _superHeight, firstPosition.z, exits);
                 else
-                    tile = new FilledRoom(_superHeight, _superHeight, firstPosition.z, exits: exits);
+                    tile = new FilledRoom(_superHeight, _superHeight, firstPosition.z, exits: exits, refuges: true);
 
                 if (URandom.value > 0.5f)
                     tile.Locks.Add(new EnemyLock());
