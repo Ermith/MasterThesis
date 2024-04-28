@@ -80,6 +80,11 @@ public class CameraController : MonoBehaviour
             ).normalized;
     }
 
+    public Vector3 GetGroundRotation()
+    {
+        return Quaternion.LookRotation(GetGroundDirection()).eulerAngles;
+    }
+
     public void SwitchMode(CameraModeType cameraMode)
     {
         switch (cameraMode)
