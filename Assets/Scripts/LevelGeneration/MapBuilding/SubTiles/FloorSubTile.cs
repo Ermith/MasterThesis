@@ -7,4 +7,8 @@ using UnityEngine;
 
 public class FloorSubTile : ASubTile
 {
+    protected override GameObject SpawnObject()
+    {
+        return BlueprintManager.Spawn<FloorSubTile>();
+    }
 }

@@ -15,8 +15,6 @@ public interface IKey : IRoomFeature
 
 public class PowerSourceKey : IKey
 {
-    public static GameObject Blueprint;
-
     public bool Guarded { get; set; } = true;
 
     public IList<ILock> Locks { get; } = new List<ILock>();
@@ -32,7 +30,7 @@ public class PowerSourceKey : IKey
 
         tile.Objects.Add(() =>
         {
-            var gameObject = GameObject.Instantiate(Blueprint);
+            var gameObject = BlueprintManager.Spawn<PowerSourceKey>();
             gameObject.GetComponent<IKeyObject>().MyKey = this;
             return gameObject;
         });
@@ -54,8 +52,6 @@ public class PowerSourceKey : IKey
 
 public class DoorKey : IKey
 {
-    public static GameObject Blueprint;
-
     public IList<ILock> Locks { get; } = new List<ILock>();
     public bool Guarded { get; set; } = true;
 
@@ -70,7 +66,7 @@ public class DoorKey : IKey
         superTile.FreeTiles.Remove((x, y));
         tile.Objects.Add(() =>
         {
-            var obj = GameObject.Instantiate(Blueprint);
+            var obj = BlueprintManager.Spawn<DoorKey>();
             obj.GetComponent<IKeyObject>().MyKey = this;
             return obj;
         });
@@ -92,7 +88,6 @@ public class DoorKey : IKey
 
 public class SideObjectiveKey : IKey
 {
-    public static GameObject Blueprint;
     public IList<ILock> Locks { get; } = new List<ILock>();
 
     public bool Guarded { get; set; } = true;
@@ -109,7 +104,7 @@ public class SideObjectiveKey : IKey
 
         tile.Objects.Add(() =>
         {
-            var obj = GameObject.Instantiate(Blueprint);
+            var obj = BlueprintManager.Spawn<SideObjectiveKey>();
             return obj;
         });
 
@@ -130,8 +125,6 @@ public class SideObjectiveKey : IKey
 
 public class TrapDisarmingKitKey : IKey
 {
-    public static GameObject Blueprint;
-
     public IList<ILock> Locks { get; } = new List<ILock>();
     public bool Guarded { get; set; } = false;
 
@@ -146,7 +139,7 @@ public class TrapDisarmingKitKey : IKey
         superTile.FreeTiles.Remove((x, y));
         tile.Objects.Add(() =>
         {
-            var obj = GameObject.Instantiate(Blueprint);
+            var obj = BlueprintManager.Spawn<TrapDisarmingKitKey>();
             obj.GetComponent<IKeyObject>().MyKey = this;
             return obj;
         });
@@ -168,8 +161,6 @@ public class TrapDisarmingKitKey : IKey
 
 public class InvisibiltyCamoKey : IKey
 {
-    public static GameObject Blueprint;
-
     public IList<ILock> Locks { get; } = new List<ILock>();
     public bool Guarded { get; set; } = false;
 
@@ -184,7 +175,7 @@ public class InvisibiltyCamoKey : IKey
         superTile.FreeTiles.Remove((x, y));
         tile.Objects.Add(() =>
         {
-            var obj = GameObject.Instantiate(Blueprint);
+            var obj = BlueprintManager.Spawn<InvisibiltyCamoKey>();
             obj.GetComponent<IKeyObject>().MyKey = this;
             return obj;
         });

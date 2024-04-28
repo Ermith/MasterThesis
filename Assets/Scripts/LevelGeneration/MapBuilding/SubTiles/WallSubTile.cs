@@ -6,4 +6,9 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public class WallSubTile : ASubTile
-{ }
+{
+    protected override GameObject SpawnObject()
+    {
+        return BlueprintManager.Spawn<WallSubTile>();
+    }
+}

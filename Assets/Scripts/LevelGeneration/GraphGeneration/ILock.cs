@@ -140,8 +140,6 @@ public class EnemyLock : ILock
 
 public class SecurityCameraLock : ILock
 {
-    public static GameObject Blueprint;
-
     public IList<ILockObject> Instances { get; } = new List<ILockObject>();
 
     public IKey GetNewKey()
@@ -158,7 +156,7 @@ public class SecurityCameraLock : ILock
             var exit = superTile.Get(x, y);
             exit.Objects.Add(() =>
             {
-                var obj = GameObject.Instantiate(Blueprint);
+                var obj = BlueprintManager.Spawn<SecurityCameraLock>();
                 var sc = obj.GetComponent<SecurityCameraController>();
                 sc.SetOrientation(dir.Opposite());
                 sc.Lock = this;
@@ -171,8 +169,6 @@ public class SecurityCameraLock : ILock
 
 public class DeathTrapLock : ILock
 {
-    public static GameObject Blueprint;
-
     public IList<ILockObject> Instances { get; } = new List<ILockObject>();
 
     public IKey GetNewKey()
@@ -193,7 +189,7 @@ public class DeathTrapLock : ILock
             //superTile.FreeTiles.Remove((x, y));
             tile.Objects.Add(() =>
             {
-                var obj = GameObject.Instantiate(Blueprint);
+                var obj = BlueprintManager.Spawn<DeathTrapLock>();
                 var lo = obj.GetComponentsInChildren<ILockObject>();
 
                 foreach (var l in lo)
@@ -209,8 +205,6 @@ public class DeathTrapLock : ILock
 
 public class SoundTrapLock : ILock
 {
-    public static GameObject Blueprint;
-
     public IList<ILockObject> Instances { get; } = new List<ILockObject>();
 
     public IKey GetNewKey()
@@ -231,7 +225,7 @@ public class SoundTrapLock : ILock
             //superTile.FreeTiles.Remove((x, y));
             tile.Objects.Add(() =>
             {
-                var obj = GameObject.Instantiate(Blueprint);
+                var obj = BlueprintManager.Spawn<SoundTrapLock>();
                 var lo = obj.GetComponentsInChildren<ILockObject>();
 
                 foreach (var l in lo)

@@ -198,63 +198,29 @@ public class LevelGenerator : MonoBehaviour
 
     private void RegisterBlueprints()
     {
-        DoorKey.Blueprint = KeyBlueprint;
-        SecurityCameraLock.Blueprint = SecurityCameraBlueprint;
-        PowerSourceKey.Blueprint = PowerSourceBlueprint;
-        DeathTrapLock.Blueprint = TrapBlueprint;
-        SoundTrapLock.Blueprint = SoundTrapBlueprint;
-        StairwayRoom.Blueprint = StairsBlueprint;
-        TrapDisarmingKitKey.Blueprint = TrapKitBlueprint;
-        InvisibiltyCamoKey.Blueprint = CamoBlueprint;
-        SideObjectiveKey.Blueprint = ObjectiveBlueprint;
+        // Keys
+        BlueprintManager.Register<DoorKey>(() => Instantiate(KeyBlueprint));
+        BlueprintManager.Register<PowerSourceKey>(() => Instantiate(PowerSourceBlueprint));
+        BlueprintManager.Register<TrapDisarmingKitKey>(() => Instantiate(TrapKitBlueprint));
+        BlueprintManager.Register<InvisibiltyCamoKey>(() => Instantiate(CamoBlueprint));
+        BlueprintManager.Register<SideObjectiveKey>(() => Instantiate(ObjectiveBlueprint));
 
-        ASubTile.Register<WallSubTile>((ASubTile st) => Instantiate(WallBlueprint));
-        ASubTile.Register<FloorSubTile>((ASubTile st) =>
-        {
-            return Instantiate(FloorBlueprint);
-        });
-        ASubTile.Register<DoorSubTile>((ASubTile st) =>
-        {
-            var door = st as DoorSubTile;
-            GameObject doorTileObject = Instantiate(DoorBlueprint);
-            var doorObject = doorTileObject.GetComponentInChildren<Door>();
-            doorObject.Lock = door.DoorLock;
-            doorObject.Lock?.Instances.Add(doorObject);
-            doorObject.transform.forward = door.Orientation.ToVector3();
-            doorObject.ChangeColor = true;
-            doorObject.name = door.Name;
-            return doorTileObject;
-        });
+        // Locks
+        BlueprintManager.Register<SecurityCameraLock>(() => Instantiate(SecurityCameraBlueprint));
+        BlueprintManager.Register<DeathTrapLock>(() => Instantiate(TrapBlueprint));
+        BlueprintManager.Register<SoundTrapLock>(() => Instantiate(SoundTrapBlueprint));
 
-        ASubTile.Register<WallOfLightSubTile>((ASubTile st) =>
-        {
-            var wallOfLight = st as WallOfLightSubTile;
-            GameObject wallOfLightTileObject = Instantiate(WallOfLightBlueprint);
-            var wallOfLightObject = wallOfLightTileObject.GetComponentInChildren<WallOfLight>();
-            wallOfLightObject.Lock = wallOfLight.Lock;
-            wallOfLightObject.Lock?.Instances.Add(wallOfLightObject);
-            wallOfLightObject.transform.forward = wallOfLight.Orientation.ToVector3();
-            return wallOfLightTileObject;
-        });
+        // Subtiles
+        BlueprintManager.Register<DoorSubTile>(() => Instantiate(DoorBlueprint));
+        BlueprintManager.Register<FloorSubTile>(() => Instantiate(FloorBlueprint));
+        BlueprintManager.Register<HiddenDoorSubTile>(() => Instantiate(HiddenDoorBlueprint));
+        BlueprintManager.Register<NoneSubTile>(() => new GameObject());
+        BlueprintManager.Register<RefugeSubTile>(() => Instantiate(RefugeBlueprint));
+        BlueprintManager.Register<WallOfLightSubTile>(() => Instantiate(WallOfLightBlueprint));
+        BlueprintManager.Register<WallSubTile>(() => Instantiate(WallBlueprint));
 
-        ASubTile.Register<HiddenDoorSubTile>((ASubTile st) =>
-        {
-            var door = st as HiddenDoorSubTile;
-            GameObject doorTileObject = Instantiate(HiddenDoorBlueprint);
-            var doorObject = doorTileObject.GetComponentInChildren<Door>();
-            doorObject.transform.forward = door.Orientation.ToVector3();
-            return doorTileObject;
-        });
-
-        ASubTile.Register<RefugeSubTile>((ASubTile st) =>
-        {
-            var halfRefuge = st as RefugeSubTile;
-            GameObject obj = Instantiate(RefugeBlueprint);
-            obj.transform.forward = halfRefuge.Orientation.ToVector3();
-            return obj;
-        });
-
-        ASubTile.Register<NoneSubTile>((ASubTile st) => { return new GameObject(); });
+        // Stairs
+        BlueprintManager.Register<StairwayRoom>(() => Instantiate(StairsBlueprint));
     }
 
     private GameObject SpawnObjects(List<ASubTile[,]> subTileGrids)
@@ -299,7 +265,7 @@ public class LevelGenerator : MonoBehaviour
 
                     //grid[col, row] ??= new FloorSubTile();
 
-                    GameObject obj = grid[col, row].SpawnObject(col, row, floor * _floorHeight);
+                    GameObject obj = grid[col, row].Spawn(col, row, floor * _floorHeight);
                     obj.transform.position = obj.transform.position.Added(y: 0.1f * floor);
 
                     if (grid[col, row] is FloorSubTile)

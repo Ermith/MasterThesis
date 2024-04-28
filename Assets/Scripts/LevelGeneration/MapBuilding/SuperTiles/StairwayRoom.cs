@@ -7,7 +7,6 @@ using UnityEngine;
 
 class StairwayRoom : ASuperTile
 {
-    public static GameObject Blueprint;
     private bool _reversed;
     private bool _upExit;
     private bool _downExit;
@@ -72,7 +71,7 @@ class StairwayRoom : ASuperTile
             door.RoomName = GetName();
             tileGrid[upX, y + 1] = door;
             tileGrid[upX, y + 2].Objects.Add(() => {
-                var obj = GameObject.Instantiate(Blueprint);
+                var obj = BlueprintManager.Spawn<StairwayRoom>();
                 obj.transform.forward = Vector3.forward;
                 return obj;
             });

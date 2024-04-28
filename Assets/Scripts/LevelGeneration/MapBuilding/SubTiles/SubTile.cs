@@ -11,17 +11,13 @@ using UnityEngine.EventSystems;
 
 public abstract class ASubTile
 {
-    private static Dictionary<Type, Func<ASubTile, GameObject>> _spawnFunctions = new();
-
     public List<Func<GameObject>> Objects = new();
-    public static void Register<T>(Func<ASubTile, GameObject> spawnFunction) where T : ASubTile
-    {
-        _spawnFunctions[typeof(T)] = spawnFunction;
-    }
 
-    public virtual GameObject SpawnObject(int x, int y, int z)
+    protected abstract GameObject SpawnObject();
+
+    public virtual GameObject Spawn(int x, int y, int z)
     {
-        var tileObj = _spawnFunctions[GetType()](this);
+        var tileObj = SpawnObject();
         Vector3 pos = new(x, z, y);
         tileObj.transform.position = pos;
         tileObj.name = GetType().Name;
