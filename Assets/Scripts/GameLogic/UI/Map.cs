@@ -6,6 +6,9 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
+/// <summary>
+/// Controls map UI and objects. Displays a map of the given level.
+/// </summary>
 public class Map : MonoBehaviour
 {
     public GraphDrawing<GridVertex> Drawing;
@@ -33,6 +36,10 @@ public class Map : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Creates a game object containing LinRenderers as a visual grid.
+    /// </summary>
+    /// <returns></returns>
     private GameObject CreateGrid()
     {
         GameObject go = new GameObject("Grid");
@@ -66,12 +73,16 @@ public class Map : MonoBehaviour
         return go;
     }
 
+    /// <summary>
+    /// Creates the visual for the entire map. The map is divided into multiple floors.
+    /// </summary>
     public void CreateMap()
     {
         MapVisual = new GameObject("MapVisual");
         MapVisual.transform.parent = transform;
         MapVisual.transform.localPosition = Vector3.zero;
 
+        // Create objects representing floors.
         for (int i = 0; i < Drawing.MaximumZ + 1; i++)
         {
             var floor = new GameObject($"Floor {i}");
@@ -86,6 +97,7 @@ public class Map : MonoBehaviour
 
         _mapTiles = new MapTile[Drawing.MaximumZ + 1, Drawing.MaximumX + 1, Drawing.MaximumY + 1];
 
+        // Ceeates objects for each vertex reprezenting a floor.
         foreach ((GridVertex v, (int x, int y, int z)) in Drawing.VertexPositions)
         {
             var obj = GameObject.Instantiate<MapTile>(Room, _floors[z].transform);
@@ -96,6 +108,7 @@ public class Map : MonoBehaviour
             _mapTiles[z, x, y] = obj;
         }
 
+        // Edges are drawn through LineRenderers.
         foreach ((IEdge<GridVertex> edge, List<(int, int, int)> positions) in Drawing.EdgePositions)
         {
             var e = edge as GridEdge;
@@ -121,12 +134,20 @@ public class Map : MonoBehaviour
         _highlightTile = GameObject.Instantiate(HighlightTile);
     }
 
+    /// <summary>
+    /// Starts animation to change the highlighted floor.
+    /// </summary>
+    /// <param name="i"></param>
     public void ChangeFloor(int i)
     {
         StartCoroutine(ChangeFloorCoroutine(i, Duration));
     }
 
-    public void IncreaseFloor(bool up)
+    /// <summary>
+    /// Changes floor one step up or down. Uses <see cref="ChangeFloor(int)"/>
+    /// </summary>
+    /// <param name="up"></param>
+    public void ChangeFloor(bool up)
     {
         GameController.AudioManager.Play("Blick", volume: 0.3f);
         int step = up ? 1 : -1;
@@ -138,10 +159,10 @@ public class Map : MonoBehaviour
     public void Update()
     {
         if (Input.GetKeyDown(KeyCode.UpArrow))
-            IncreaseFloor(true);
+            ChangeFloor(true);
 
         if (Input.GetKeyDown(KeyCode.DownArrow))
-            IncreaseFloor(false);
+            ChangeFloor(false);
 
 
         var zoom = Camera.orthographicSize;
@@ -169,12 +190,15 @@ public class Map : MonoBehaviour
         pos.x = Mathf.Clamp(pos.x, 0, Drawing.MaximumX + 1);
         pos.z = Mathf.Clamp(pos.z, 0, Drawing.MaximumY + 1);
 
-
-
-
         CameraPoint.localPosition = pos;
     }
 
+    /// <summary>
+    /// Performs the animation for changing the highlighted floor.
+    /// </summary>
+    /// <param name="i"></param>
+    /// <param name="duration"></param>
+    /// <returns></returns>
     private IEnumerator ChangeFloorCoroutine(int i, float duration)
     {
         float timer = 0;
@@ -192,6 +216,10 @@ public class Map : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Sets the current floor inactive and sets the new floor active. Updates UI text.
+    /// </summary>
+    /// <param name="i"></param>
     private void SetVisibleFloor(int i)
     {
         _floors[_currentFloor].SetActive(false);
@@ -200,6 +228,12 @@ public class Map : MonoBehaviour
         Text.text = $"{i + 1}/{_floors.Count}";
     }
 
+    /// <summary>
+    /// Changes floor based on coordinates, see <see cref="ChangeFloor(int)"/>. Moves the _highlightTile to the position based on coordinates.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="floor"></param>
     public void Highlight(int x, int y, int floor)
     {
         _highlightTile.transform.parent = _floors[floor].transform;
@@ -208,6 +242,10 @@ public class Map : MonoBehaviour
         ChangeFloor(floor);
     }
 
+    /// <summary>
+    /// Updates UI representing player's orientation.
+    /// </summary>
+    /// <param name="rotation"></param>
     public void OrientCompass(Vector3 rotation)
     {
         var angles = Compass.transform.eulerAngles;

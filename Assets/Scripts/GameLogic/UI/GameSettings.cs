@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Contains static settings for the game. Namely Volume and Mouse Sensitivity. Also controls the Game Settings Panel.
+/// </summary>
 public class GameSettings : MonoBehaviour
 {
     public static float Volume = 0.8f;

@@ -5,6 +5,9 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// Controls InfoScreen UI Panel. Displayes player information about keys and side objectives.
+/// </summary>
 public class InfoScreen : MonoBehaviour
 {
     public TMP_Text CamoCount;
@@ -34,6 +37,11 @@ public class InfoScreen : MonoBehaviour
         _keys.Clear();
     }
 
+    /// <summary>
+    /// Updates text displaying number of side objectives found.
+    /// </summary>
+    /// <param name="count"></param>
+    /// <param name="found"></param>
     public void SetSideObjectives(int count, int found)
     {
         SideObjectives.text = $"Side Objectives Found:\n{found}/{count}";
@@ -51,6 +59,9 @@ public class InfoScreen : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Refreshes text that displays door keys.
+    /// </summary>
     public void RefreshKeys()
     {
         StringBuilder sb = new();

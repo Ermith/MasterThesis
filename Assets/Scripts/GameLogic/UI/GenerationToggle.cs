@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+/// <summary>
+/// Toggle with text attatched. Changes targeted image's sprite.
+/// </summary>
 public class GenerationToggle : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public Sprite Sprite;

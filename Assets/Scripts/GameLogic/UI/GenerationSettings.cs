@@ -6,6 +6,9 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using URandom = UnityEngine.Random;
 
+/// <summary>
+/// Controls the Generation Settings UI Panel. Contains static settings for level generation.
+/// </summary>
 public class GenerationSettings : MonoBehaviour
 {
     public static bool DangerEnemies = true;

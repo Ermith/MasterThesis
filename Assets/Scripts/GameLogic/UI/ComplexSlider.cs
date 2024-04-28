@@ -4,6 +4,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// UI slider with text attattched.
+/// </summary>
 public class ComplexSlider : MonoBehaviour
 {
     public TMP_Text Text;

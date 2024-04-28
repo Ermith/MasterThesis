@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// A tile in a map representing a room in a level.
+/// </summary>
 public class MapTile : MonoBehaviour
 {
     public TMP_Text TileName;
@@ -43,6 +46,10 @@ public class MapTile : MonoBehaviour
         TileName.text = name;
     }
 
+    /// <summary>
+    /// Changes color.
+    /// </summary>
+    /// <param name="highlighted"></param>
     public void Highlight(bool highlighted)
     {
         GetComponentInChildren<MeshRenderer>().material.color = highlighted ? HighLightColor : _originalColor;
