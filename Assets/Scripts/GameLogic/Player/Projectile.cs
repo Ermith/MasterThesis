@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Simple projectile that moves towards set position in set duration. Performs callback on reaching destination.
+/// </summary>
 public class Projectile : MonoBehaviour
 {
     private float _maxDistance = 100;
@@ -30,6 +33,12 @@ public class Projectile : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Sets the parameters to fly towards direction. Performs callback on reaching destination..
+    /// </summary>
+    /// <param name="from"></param>
+    /// <param name="dir"></param>
+    /// <param name="onHit"></param>
     public void Shoot(Vector3 from, Vector3 dir, Action<Vector3, GameObject> onHit)
     {
         if (_active) return;

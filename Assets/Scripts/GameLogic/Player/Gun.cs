@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Player's gun that shoots given projectiles that cause loud sound on hit.
+/// </summary>
 [RequireComponent(typeof(LineRenderer))]
 public class Gun : MonoBehaviour
 {
@@ -37,6 +40,10 @@ public class Gun : MonoBehaviour
             _reloadTimer -= Time.deltaTime;
     }
 
+    /// <summary>
+    /// Sets the gun visible and activates the laser sight (line renderer).
+    /// </summary>
+    /// <param name="direction"></param>
     public void Aim(Vector3 direction)
     {
         _aiming = true;
@@ -45,6 +52,9 @@ public class Gun : MonoBehaviour
         transform.forward = direction;
     }
 
+    /// <summary>
+    /// Hides the gun and deactivates the laser sight (line renderer).
+    /// </summary>
     public void StopAim()
     {
         _aiming = false;
@@ -53,6 +63,9 @@ public class Gun : MonoBehaviour
         transform.forward = _baseDirection;
     }
 
+    /// <summary>
+    /// Ray cast to where the line renderer should end.
+    /// </summary>
     private void UpdateAiming()
     {
         if (!_aiming) return;
@@ -68,6 +81,9 @@ public class Gun : MonoBehaviour
         );
     }
 
+    /// <summary>
+    /// Releases the projectile. Initiates reload timer. Projectile causes loud noise on hit.
+    /// </summary>
     public void Shoot()
     {
         if (_reloadTimer > 0f) return;

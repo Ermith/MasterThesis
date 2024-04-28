@@ -59,6 +59,12 @@ public class CameraController : MonoBehaviour
     #endregion
 
     #region PUBLIC_INTERFACE
+    /// <summary>
+    /// Instantly rotates the camera by rotation given.
+    /// </summary>
+    /// <param name="horizontal">Horizontal change in rotation.</param>
+    /// <param name="vertical">Vertical change in rotation.</param>
+    /// <param name="speed">Multiplier.</param>
     public void Rotate(float horizontal, float vertical, float speed = 1)
     {
         if (!_verticalRotationEnabled) vertical = 0f;
@@ -71,6 +77,10 @@ public class CameraController : MonoBehaviour
         SetRotation(polar, inclanation);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>Normalized direction without 'y' coordinate.</returns>
     public Vector3 GetGroundDirection()
     {
         return new Vector3(
@@ -80,11 +90,19 @@ public class CameraController : MonoBehaviour
             ).normalized;
     }
 
+    /// <summary>
+    /// <see cref="GetGroundDirection"/> but converted to euler angles.
+    /// </summary>
+    /// <returns></returns>
     public Vector3 GetGroundRotation()
     {
         return Quaternion.LookRotation(GetGroundDirection()).eulerAngles;
     }
 
+    /// <summary>
+    /// Sets the parameters to another camera mode. The change is not instant, it is an animation.
+    /// </summary>
+    /// <param name="cameraMode"></param>
     public void SwitchMode(CameraModeType cameraMode)
     {
         switch (cameraMode)
@@ -123,6 +141,9 @@ public class CameraController : MonoBehaviour
         Mode = cameraMode;
     }
 
+    /// <summary>
+    /// Camera starts bobbing. Based on BobPeriod
+    /// </summary>
     public void BobStart()
     {
         if (_bobState == BobState.None)
@@ -134,6 +155,9 @@ public class CameraController : MonoBehaviour
         _bobTime = 0f;
     }
 
+    /// <summary>
+    /// Stops bobbing. Camera returns to default position over time.
+    /// </summary>
     public void BobEnd()
     {
         _bobState = BobState.None;
@@ -141,6 +165,11 @@ public class CameraController : MonoBehaviour
 
     public bool Bobbing() => _bobState != BobState.None;
 
+    /// <summary>
+    /// Sets the custom rotation offset. Is not instant, takes duration to get there.
+    /// </summary>
+    /// <param name="duration"></param>
+    /// <param name="eulers"></param>
     public void CustomRotationStart(float duration, Vector3 eulers)
     {
         _customRotationDuration = duration;
@@ -149,6 +178,9 @@ public class CameraController : MonoBehaviour
         _toEulers = eulers;
     }
 
+    /// <summary>
+    /// Sets the custom rotation offset to 0. Is not instant, takes time to return to default.
+    /// </summary>
     public void CustomRotationEnd()
     {
         _fromEulers = _rotationOffset;
@@ -157,6 +189,12 @@ public class CameraController : MonoBehaviour
         _customRotationTime = 0f;
     }
 
+
+    /// <summary>
+    /// Sets the custom position offset. Is not instant, takes duration to get there. Is calculated after distance and is based on rotation.
+    /// </summary>
+    /// <param name="duration"></param>
+    /// <param name="eulers"></param>
     public void CustomOffsetStart(float duration, Vector3 offset, bool local)
     {
         _customOffsetDuration = duration;
@@ -166,6 +204,9 @@ public class CameraController : MonoBehaviour
         _isLocalOffset = local;
     }
 
+    /// <summary>
+    /// Sets the custom position offset to 0. Is not instant, takes time to return to default.
+    /// </summary>
     public void CustomOffsetEnd()
     {
         _fromOffset = _offset;
@@ -185,6 +226,13 @@ public class CameraController : MonoBehaviour
             a * Mathf.Sin(polar));
     }
 
+    /// <summary>
+    /// Sets the internal state.
+    /// </summary>
+    /// <param name="distance"></param>
+    /// <param name="horizontalRotation"></param>
+    /// <param name="verticalRotation"></param>
+    /// <param name="damping"></param>
     private void SetParams(
         float distance,
         bool horizontalRotation,
@@ -198,6 +246,9 @@ public class CameraController : MonoBehaviour
         _damping = damping;
     }
 
+    /// <summary>
+    /// Computes camera offset based on bobbing. LeftStep -> Rise -> RightStep -> Rise -> LeftStep ...
+    /// </summary>
     private void CameraBob()
     {
         BobStep = false;
@@ -324,6 +375,12 @@ public class CameraController : MonoBehaviour
         ResolveCollision();
     }
 
+    /// <summary>
+    /// Performs an animation to reach the distance from target. This is responsible for the animations on changing camera mode.
+    /// </summary>
+    /// <param name="distance"></param>
+    /// <param name="time"></param>
+    /// <returns></returns>
     private IEnumerator DistanceCoroutine(float distance, float time)
     {
         float start = _distance;
@@ -342,6 +399,9 @@ public class CameraController : MonoBehaviour
         _coroutine = null;
     }
 
+    /// <summary>
+    /// For 3rd person camera so it does not phase through objects.
+    /// </summary>
     private void ResolveCollision()
     {
         if (Mode == CameraModeType.TopDown)

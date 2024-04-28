@@ -1,20 +1,37 @@
 ﻿using System;
 using UnityEngine;
 
-
+/// <summary>
+/// Movement state for the player. Determines whether certain actions are possible. Determines movement.
+/// </summary>
 interface IMovementState
 {
     bool CanShoot { get; }
     bool CanPeek { get; }
     bool CanInteract { get; }
+    /// <summary>
+    /// If true, the state should not be exited.
+    /// </summary>
     bool Locked { get; }
+    /// <summary>
+    /// If true, player does not rotate with the camera.
+    /// </summary>
     bool FreeLook { get; }
     void Enter(PlayerController player);
     void Exit(PlayerController player);
     void Update(PlayerController player);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="desiredMovement"></param>
+    /// <param name="previousMovement"></param>
+    /// <returns>Change in position the player should move.</returns>
     Vector3 GetMovement(Vector3 desiredMovement, Vector3 previousMovement);
 }
 
+/// <summary>
+/// Default state when not moving.
+/// </summary>
 class StandingState : IMovementState
 {
     public StandingState()
@@ -48,6 +65,9 @@ class StandingState : IMovementState
     }
 }
 
+/// <summary>
+/// Slow and quiet movement.
+/// </summary>
 class WalkingState : IMovementState
 {
     private float _movementSpeed;
@@ -111,6 +131,9 @@ class WalkingState : IMovementState
     }
 }
 
+/// <summary>
+/// Fast and loud movement. Can transition into sliding.
+/// </summary>
 class RunningState : IMovementState
 {
     private float _movementSpeed;
@@ -174,6 +197,9 @@ class RunningState : IMovementState
     }
 }
 
+/// <summary>
+/// Fast and quiet movement locked in one direction. Is locked for a duration. Can be entered from running.
+/// </summary>
 class SlidingState : IMovementState
 {
     private float _duration;
@@ -215,7 +241,6 @@ class SlidingState : IMovementState
 
     public void Exit(PlayerController player)
     {
-        Debug.Log("EXIT");
         player.Camera.CustomRotationEnd();
         player.Camera.CustomOffsetEnd();
     }

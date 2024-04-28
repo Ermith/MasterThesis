@@ -43,8 +43,12 @@ public class PlayerController : MonoBehaviour
     private MeshRenderer _meshRenderer;
     public Animation Animation => _animation;
     private Vector3 _gunPosition;
+
+    // Invisibility
     public float InvisibilityTime;
     private float _invisibilityTimer;
+
+    // Sliding
     private float _slideCooldown = 1f;
     private float _slideCooldownTimer = 0.5f;
 
@@ -139,6 +143,9 @@ public class PlayerController : MonoBehaviour
     }
 
     #region Update Functions
+    /// <summary>
+    /// Rotates camera based on mouse movement. Also changes camera mode based on keys pressed.
+    /// </summary>
     private void UpdateCamera()
     {
         if (Input.GetKeyDown(KeyCode.F1))
@@ -170,6 +177,10 @@ public class PlayerController : MonoBehaviour
         Camera.Rotate(yaw, pitch, GameSettings.MouseSensitivity);
     }
 
+    /// <summary>
+    /// Ray cast if an interactable object is in sight. Interaction by pressing or holding the Interact button.
+    /// Displays interaction prompts.
+    /// </summary>
     private void UpdateInteraction()
     {
         if (!_movementState.CanInteract)
@@ -228,6 +239,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Aims, Stops Aiming or Shoots the gun.
+    /// </summary>
     private void UpdateShooting()
     {
 
@@ -251,6 +265,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Movement is based on the <see cref="IMovementState"/>.
+    /// </summary>
     private void UpdateMovement()
     {
         Vector2 inputDir = GetInputDir();
@@ -280,6 +297,9 @@ public class PlayerController : MonoBehaviour
     private SlidingState _slidingState;
     private Vector3 _previousMovement;
 
+    /// <summary>
+    /// This is basically a finite state machine, states being <see cref="IMovementState"/>.
+    /// </summary>
     private void SwitchState()
     {
         if (_movementState.Locked)
@@ -303,7 +323,6 @@ public class PlayerController : MonoBehaviour
 
             if (Input.GetKey(KeyCode.LeftShift))
             {
-                Debug.Log("RUNNING");
                 EnterState(_runningState);
                 return;
             }
@@ -355,6 +374,11 @@ public class PlayerController : MonoBehaviour
         _movementState = state;
     }
 
+    /// <summary>
+    /// Keys D,A sets x axis to +-1.
+    /// Keys W,S sets y axis to +-1
+    /// </summary>
+    /// <returns></returns>
     public Vector2 GetInputDir()
     {
         // Movement
@@ -366,6 +390,10 @@ public class PlayerController : MonoBehaviour
         return inputDir.normalized;
     }
 
+    /// <summary>
+    /// Is the player pressing keys to move? Also returns false if opposing keys are pressed and resulting speed would be 0.
+    /// </summary>
+    /// <returns></returns>
     public bool IsMovementRequest()
     {
         int horizontal = 0;
@@ -412,6 +440,10 @@ public class PlayerController : MonoBehaviour
     private float _peekDuration;
     private float _peekTimer;
 
+    /// <summary>
+    /// Adds rotation offset to the camera and position offset to the _viewPoint to peek around corners. Does not happen instantly, there is an animation.
+    /// </summary>
+    /// <param name="offset"></param>
     private void PeekStart(Vector3 offset)
     {
         float angle = offset.x < 0 ? PeekAngle : -PeekAngle;
@@ -423,6 +455,9 @@ public class PlayerController : MonoBehaviour
         _peekDuration = PeekTime;
     }
 
+    /// <summary>
+    /// Sets peeking parameters to 0. Does not return instantly, there is an animation.
+    /// </summary>
     private void PeekEnd()
     {
         if (_peekingTo == Vector3.zero) return;
@@ -434,6 +469,9 @@ public class PlayerController : MonoBehaviour
         _peekDuration = _peekDuration - _peekTimer;
     }
 
+    /// <summary>
+    /// Responds to peeking keys. Also performs the animation for peeking.
+    /// </summary>
     private void UpdatePeeking()
     {
         if (!_movementState.CanPeek || PeekEndRequest() || Camera.Mode == CameraModeType.TopDown)
@@ -466,6 +504,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Gets offset for peeking if keys are pressed.
+    /// </summary>
+    /// <returns></returns>
     private Vector3? PeekStartRequest()
     {
         Vector3 offset = Vector3.zero;
@@ -481,6 +523,10 @@ public class PlayerController : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    /// Happens on release a peeking key.
+    /// </summary>
+    /// <returns></returns>
     private bool PeekEndRequest() =>
         Input.GetKeyUp(KeyCode.E) || Input.GetKeyUp(KeyCode.Q);
     #endregion
