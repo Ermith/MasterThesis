@@ -78,7 +78,6 @@ class StairwayRoom : ASuperTile
             });
 
             Description.UpExit = (upX - x, 1);
-            Description.FreeTiles.Add((upX - x, Height - 2));
         }
 
         if (_downExit)
