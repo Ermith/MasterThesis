@@ -22,6 +22,7 @@ public class SideObjectiveBox : MonoBehaviour, IInteractableObject
         if (_interactionTimer <= 0)
         {
             GameController.ObjectivesFound++;
+            GameController.AudioManager.Play("Cut", position:transform.position);
             Destroy(gameObject);
         }
 
