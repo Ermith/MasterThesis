@@ -63,30 +63,31 @@ public class GridGraphGenerator
             Graph.AddGridEdge(f2, _end, Directions.North, Directions.South);
         }
 
-        for (int i = 0; i < GenerationSettings.FloorPatternCount; i++)
-        {
-            int index = URandom.Range(0, floorPatterns.Count);
-            int dangerIndex = URandom.Range(0, dangerTypes.Count);
-            GridEdge e = Graph.GetRandomInterfloorEdge();
-            var pattern = floorPatterns[index];
-            if (dangerTypes.Count > 0)
-                pattern.DangerType = dangerTypes[dangerIndex];
-            pattern.Apply(e, Graph);
-        }
-
-        for (long floor = 0; floor < Graph.FloorCount; floor++)
-        {
-            for (int i = 0; i < GenerationSettings.PatternCount; i++)
+        if (floorPatterns.Count > 0)
+            for (int i = 0; i < GenerationSettings.FloorPatternCount; i++)
             {
-                int index = URandom.Range(0, patterns.Count);
+                int index = URandom.Range(0, floorPatterns.Count);
                 int dangerIndex = URandom.Range(0, dangerTypes.Count);
-                //GridEdge e = Graph.LongestEdge(false);
-                GridEdge e = Graph.GetRandomFloorEdge(floor, allowHidden: false);
-                var pattern = patterns[index];
+                GridEdge e = Graph.GetRandomInterfloorEdge();
+                var pattern = floorPatterns[index];
                 if (dangerTypes.Count > 0)
                     pattern.DangerType = dangerTypes[dangerIndex];
                 pattern.Apply(e, Graph);
             }
-        }
+
+        if (patterns.Count > 0)
+            for (long floor = 0; floor < Graph.FloorCount; floor++)
+            {
+                for (int i = 0; i < GenerationSettings.PatternCount; i++)
+                {
+                    int index = URandom.Range(0, patterns.Count);
+                    int dangerIndex = URandom.Range(0, dangerTypes.Count);
+                    GridEdge e = Graph.GetRandomFloorEdge(floor, allowHidden: false);
+                    var pattern = patterns[index];
+                    if (dangerTypes.Count > 0)
+                        pattern.DangerType = dangerTypes[dangerIndex];
+                    pattern.Apply(e, Graph);
+                }
+            }
     }
 }
