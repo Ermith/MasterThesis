@@ -19,6 +19,7 @@ public enum Behaviour
 [RequireComponent(typeof(Sight), typeof(Audition), typeof(CharacterController))]
 public class EnemyController : MonoBehaviour, ILockObject
 {
+    #region Properties
     // Component references
     private Sight _sight;
     private Audition _audition;
@@ -55,6 +56,7 @@ public class EnemyController : MonoBehaviour, ILockObject
     [HideInInspector] public Behaviour Behaviour { get; set; }
     [HideInInspector] public Vector3 DefaultPosition = Vector3.zero;
     [HideInInspector] public Vector3 DefaultDirection = Vector3.forward;
+    #endregion
 
     // Start is called before the first frame update
     void Start()
@@ -99,6 +101,7 @@ public class EnemyController : MonoBehaviour, ILockObject
         CheckPlayerInSight();
     }
 
+    #region Public Functions
     /// <summary>
     /// Sets desired direction. Turns there with TurnRate over time.
     /// </summary>
@@ -173,6 +176,10 @@ public class EnemyController : MonoBehaviour, ILockObject
         //    _sight.Range = GuardViewDistance;
         //});
     }
+
+    #endregion
+
+    #region Behaviors
 
     /// <summary>
     /// Resolves behaviour based on Behaviour property. However, chasing and investigation takes priority.
@@ -318,6 +325,8 @@ public class EnemyController : MonoBehaviour, ILockObject
             _frustrationTimer = FrustrationTime;
         }
     }
+
+    #endregion
 
     /// <summary>
     /// If player is in sight, sets behaviour to chasing the player. Kills the player if too close and sees him.

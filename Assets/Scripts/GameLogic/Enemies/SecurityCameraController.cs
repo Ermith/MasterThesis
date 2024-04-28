@@ -2,36 +2,46 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Security cameras have sight and rotate left and right as the base behaviour.
+/// If they see the player, they will stop turning and play a loud sound that alerts guards.
+/// If looking at the player for too long, they will shoot him.
+/// </summary>
+[RequireComponent(typeof(Sight))]
 public class SecurityCameraController : MonoBehaviour, ILockObject
 {
+    [HideInInspector] public ILock Lock { get; set; }
     private Directions lookDirection = Directions.None;
-    Sight _sight;
-    PlayerController _player;
-    bool _seen = false;
-    float _timer = 0;
-    float _duration = 2;
-
-    public ILock Lock { get; set; }
-    public float SoundRange = 22f;
-    public float TurnDegree = 80;
-    public float TurnPeriod = 3f;
-    public Transform TurnPoint;
-
+    private Sight _sight;
+    private PlayerController _player;
+    private bool _seen = false;
+    private float _shootTimer = 0;
     private float _turnTimer;
     private Vector3 _defaultRotation;
     private bool _right = false;
 
+    public float SoundRange = 22f;
+    public float TurnDegree = 80;
+    public float TurnPeriod = 3f;
+    public float ShootDuration = 2;
+    public Transform TurnPoint;
+
+    /// <summary>
+    /// Sets default look direction. 
+    /// </summary>
+    /// <param name="dirs"></param>
     public void SetOrientation(Directions dirs)
     {
         transform.localRotation = Quaternion.LookRotation(dirs.ToVector3(), Vector3.up);
         _defaultRotation = TurnPoint.eulerAngles;
     }
 
+    /// <summary>
+    /// Disables this script and hides the view cone.
+    /// </summary>
     public void Unlock()
     {
-        Debug.Log("Security Camera Disabled");
         GetComponentInChildren<MeshRenderer>().material.color = Color.black;
-        //_sight.enabled = false;
         _sight.VisionConeVisible = false;
         enabled = false;
     }
@@ -50,7 +60,6 @@ public class SecurityCameraController : MonoBehaviour, ILockObject
     {
         _sight = GetComponentInChildren<Sight>();
         _player = FindObjectOfType<PlayerController>();
-
     }
 
     // Update is called once per frame
@@ -68,17 +77,17 @@ public class SecurityCameraController : MonoBehaviour, ILockObject
         // Leave Sight Line
         if (_seen && !see)
         {
-            _timer = 0f;
+            _shootTimer = 0f;
         }
 
         if (see)
         {
-            _timer += Time.deltaTime;
-            if (_timer > _duration)
+            _shootTimer += Time.deltaTime;
+            if (_shootTimer > ShootDuration)
             {
                 GameController.AudioManager.PlayOnTarget("Gunshot", gameObject);
-                _player.GetComponent<PlayerController>().Die();
-                _timer %= _duration;
+                _player.Die();
+                _shootTimer %= ShootDuration;
             }
         } else // turning
         {

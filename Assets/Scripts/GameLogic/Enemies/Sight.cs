@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
+/// <summary>
+/// Gives ability to check if something is within a view cone. Also renders the view cone.
+/// </summary>
 public class Sight : MonoBehaviour
 {
     private MeshFilter _meshFilter;
@@ -37,18 +40,14 @@ public class Sight : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        //if (!VisionConeVisible)
-            //gameObject.SetActive(false);
-
-        
-        //_meshRenderer.enabled = VisionConeVisible;
-
         _meshFilter.mesh = VisionConeVisible ? _mesh : _emptyMesh;
         if (VisionConeVisible)
             RenderVisionCone();
-        
     }
 
+    /// <summary>
+    /// Calculates the vision cone _mesh based on objects it intersects.
+    /// </summary>
     private void RenderVisionCone()
     {
         var triangles = new int[(Segments - 1) * 3];
@@ -91,6 +90,11 @@ public class Sight : MonoBehaviour
         _meshRenderer.material.color = VisionConeHilighted ? _highlightColor : _baseColor;
     }
 
+    /// <summary>
+    /// Simple raycast and range check.
+    /// </summary>
+    /// <param name="target"></param>
+    /// <returns></returns>
     public bool CanSee(Transform target)
     {
         Vector3 relative = target.position - transform.position;
