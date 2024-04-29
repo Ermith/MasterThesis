@@ -8,6 +8,14 @@ As for the release, simply unzip and run `.exe` file.
 
 ## The Game
 
+When starting the game, press `New Game`, as in the image below.
+
+![](img/menu.png)
+
+Then, set generation parameters you desire and press `Start`.
+
+![](img/generation_menu.png)
+
 ### Controls:
 
 > - **Movement** - W A S D + mouse  
