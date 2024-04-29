@@ -13,18 +13,18 @@ Patterns are implemented in [GraphGeneration/Pattern.cs](./GraphGeneration/Patte
 
 Floor Patterns implemented:
 
-[](../../../img/algo_floor_patterns.png)
+![](../../../img/algo_floor_patterns.png)
 
 Patterns implemented:
 
-[](../../../img/algo_patterns.png)
+![](../../../img/algo_patterns.png)
 
 
 ## Graph Drawing
 
 [GridGraphDrawer](./GraphDrawing/GraphDrawer.cs) is responsible for this step. It is dependant on the graph generation and more specifically the [GridGraph](./GraphGeneration/GridGraph.cs). The concept behind drawing the graph into a grid is simple: 
 
-[](../../../img/algo_idea.png)
+![](../../../img/algo_idea.png)
 
 The grid graph retains the topological information for this to be possible.
 
@@ -34,8 +34,8 @@ The grid graph retains the topological information for this to be possible.
 
 The following image depicts this process: 
 
-[](../../../img/algo_map_building.png)
+![](../../../img/algo_map_building.png)
 
 These are the room layouts we implemented: 
 
-[](../../../img/algo_layouts.png)
+![](../../../img/algo_layouts.png)
