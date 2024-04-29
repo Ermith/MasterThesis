@@ -1,33 +1,33 @@
 # MasterThesis
 
-This project consists of a small game with generic stealth mechanics and a level generation for it. This project was made in Unity. Thera are two main parts. The **game** part and the **level generation** part.
+This project consists of a small game with generic stealth mechanics and a level generation for it. This project was made in Unity. There are two main parts. The **game** part and the **level generation** part.
 
 To use this project, simply open as any other Unity project, open the `MainMenuScene` and press play. You can install Unity at: https://unity.com/
 
-As for the release, simply unzipe and click `.exe` file.
+As for the release, simply unzip and run `.exe` file.
 
 ## The Game
 
 ### Controls:
 
-> **Movement** - W A S D + mouse  
-> **Sprint** - hold Shift  
-> **Slude** - Space while running  
-> **Aim** - Right Mouse Button  
-> **Shoot** - Left Mous Button while aiming  
-> **Use Invisibility Camo** - R  
-> **Peek around corners** - E/Q  
-> **Interact** - F
-> 
-> **First Person Camera** - F1  
-> **Top-Down Camera** - F2  
-> **Third Person Camera** - F3  
-> 
-> **Open Map** - M  
-> **Move in Map** - W A S D  
-> **Zoom in Map** - Numpad +/-  
-> **Pause/Unpause** - Esc  
-> **Info Screen** - Tab
+- **Movement** - W A S D + mouse  
+- **Sprint** - hold Shift  
+- **Slide** - Space while running  
+- **Aim** - Right Mouse Button  
+- **Shoot** - Left Mous Button while aiming  
+- **Use Invisibility Camo** - R  
+- **Peek around corners** - E/Q  
+- **Interact** - F
+ 
+- **First Person Camera** - F1  
+- **Top-Down Camera** - F2  
+- **Third Person Camera** - F3  
+ 
+- **Open Map** - M  
+- **Move in Map** - W A S D  
+- **Zoom in Map** - Numpad +/-  
+- **Pause/Unpause** - Esc  
+- **Info Screen** - Tab
 
 ### Sounds Used:
 > - Slide: https://freesound.org/people/pfranzen/sounds/423216/
@@ -62,5 +62,5 @@ As for the release, simply unzipe and click `.exe` file.
 
 The generation itself is based on a cyclic generation algorithm by Short and Admas. While this book provides the basis for an algorithm that exactly generates interconnected levels with lock \& key puzzles, there are a lot of unspecified parts where we needed to complete the design for our purposes. Most notably, extending the concept into 3D space (multiple floors).
 
-This figure highlights the structure of our level generation algorithm.
+### This figure highlights the structure of our level generation algorithm:
 ![](./img/game_generation_structure.png)
