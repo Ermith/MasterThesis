@@ -64,7 +64,7 @@ Then, set generation parameters you desire and press `Start`.
 > - **Trap Disarming Kits** - Walk through to pick it up. Grants ability to disarm traps instantly.  
 > - **Invisibility Camo** - Makes you invisible for a certain duration.
 
-For more information, open `Assets/Scripts/GameLogic` folder.
+For more information, open [Assets/Scripts/GameLogic](./Assets/Scripts/GameLogic) folder.
 
 ## The Level Generation
 
@@ -74,4 +74,4 @@ The generation itself is based on a cyclic generation algorithm by Short and Adm
 ![](./img/game_generation_structure.png)
 
 
-For more information, open `Assets/Scripts/LevelGeneration` folder.
+For more information, open [Assets/Scripts/LevelGeneration](./Assets/Scripts/LevelGeneration) folder.
