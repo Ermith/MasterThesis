@@ -13,6 +13,9 @@ public interface IKey : IRoomFeature
     bool Guarded { get; set; }
 }
 
+/// <summary>
+/// A power box used for <see cref="WallOfLightLock"/> and <see cref="SecurityCameraLock"/>.
+/// </summary>
 public class PowerSourceKey : IKey
 {
     public bool Guarded { get; set; } = true;
@@ -50,6 +53,9 @@ public class PowerSourceKey : IKey
     }
 }
 
+/// <summary>
+/// A key to open <see cref="DoorLock"/>.
+/// </summary>
 public class DoorKey : IKey
 {
     public IList<ILock> Locks { get; } = new List<ILock>();
@@ -86,6 +92,9 @@ public class DoorKey : IKey
     }
 }
 
+/// <summary>
+/// Does not complement any lock. Simply spawns a side objective.
+/// </summary>
 public class SideObjectiveKey : IKey
 {
     public IList<ILock> Locks { get; } = new List<ILock>();
@@ -123,6 +132,9 @@ public class SideObjectiveKey : IKey
     }
 }
 
+/// <summary>
+/// Used for disarming <see cref="DeathTrapLock"/> and <see cref="SoundTrapLock"/>.
+/// </summary>
 public class TrapDisarmingKitKey : IKey
 {
     public IList<ILock> Locks { get; } = new List<ILock>();
@@ -159,6 +171,9 @@ public class TrapDisarmingKitKey : IKey
     }
 }
 
+/// <summary>
+/// Is key to <see cref="EnemyLock"/>. Makes the player invisible to the <see cref="Sight"/> component.
+/// </summary>
 public class InvisibiltyCamoKey : IKey
 {
     public IList<ILock> Locks { get; } = new List<ILock>();

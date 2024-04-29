@@ -7,6 +7,11 @@ using UnityEngine;
 
 using URandom = UnityEngine.Random;
 
+/// <summary>
+/// Vertex containing grid topological information.
+/// Also contains information to be transformed into <see cref="ASuperTile"/>.
+/// <see cref="ILock"/> and <see cref="IKey"/> objects can be attatched to this vertex.
+/// </summary>
 public class GridVertex
 {
     static char c = 'A';
@@ -15,6 +20,9 @@ public class GridVertex
     private List<ILock> _locks = new();
     private List<IKey> _keys = new();
 
+    /// <summary>
+    /// Which sides have a doorway to exit.
+    /// </summary>
     public Directions Exits;
     public bool Hallway = false;
     public bool Top = false;
@@ -52,10 +60,14 @@ public class GridVertex
 
     public override string ToString()
     {
+        // For debug purpouses.
         return $"{_c}";
     }
 }
 
+/// <summary>
+/// Edge connecting two of <see cref="GridVertex"/>.
+/// </summary>
 public class GridEdge : BaseEdge<GridVertex>
 {
     public Directions FromDirection;
@@ -64,45 +76,56 @@ public class GridEdge : BaseEdge<GridVertex>
     public List<(Directions, IKey)> Keys;
     public List<(Directions, ILock)> Locks;
 
-    public long fromX => From.Position.x;
-    public long fromY => From.Position.y;
-    public long fromZ => From.Position.z;
-    public long toX => To.Position.x;
-    public long toY => To.Position.y;
-    public long toZ => To.Position.z;
+    public long FromX => From.Position.x;
+    public long FromY => From.Position.y;
+    public long FromZ => From.Position.z;
+    public long ToX => To.Position.x;
+    public long ToY => To.Position.y;
+    public long ToZ => To.Position.z;
 
-    public long minX => Math.Min(fromX, toX);
-    public long minY => Math.Min(fromY, toY);
-    public long minZ => Math.Min(fromZ, toZ);
-    public long maxX => Math.Max(fromX, toX);
-    public long maxY => Math.Max(fromY, toY);
-    public long maxZ => Math.Max(fromZ, toZ);
+    public long MinX => Math.Min(FromX, ToX);
+    public long MinY => Math.Min(FromY, ToY);
+    public long MinZ => Math.Min(FromZ, ToZ);
+    public long MaxX => Math.Max(FromX, ToX);
+    public long MaxY => Math.Max(FromY, ToY);
+    public long MaxZ => Math.Max(FromZ, ToZ);
 
     public bool Hidden = false;
 
     public (long x, long y, long z) GetMid()
     {
-        long newZ = fromZ + (toZ - fromZ) / 2;
+        long newZ = FromZ + (ToZ - FromZ) / 2;
 
-        if (fromX == toX)
-            return (fromX, fromY + (toY - fromY) / 2, newZ);
+        // Is horizontal
+        if (FromX == ToX)
+            return (FromX, FromY + (ToY - FromY) / 2, newZ);
 
-        if (fromY == toY)
-            return (fromX + (toX - fromX) / 2, fromY, newZ);
+        // Is vertical
+        if (FromY == ToY)
+            return (FromX + (ToX - FromX) / 2, FromY, newZ);
 
+        // Is corner edge, starting from horizontal.
         if (FromDirection.Horizontal())
-            return (toX, fromY, newZ);
+            return (ToX, FromY, newZ);
 
+        // Is corner edge, startin from vertical
         if (FromDirection.Vertical())
-            return (fromX, toY, newZ);
+            return (FromX, ToY, newZ);
 
         // Should not happen
-        return (fromX, fromY, newZ);
+        return (FromX, FromY, newZ);
     }
 
+    /// <summary>
+    /// Gets a new horizontal offset for addition of a new vertex. Calculates based on the closest distance from this edge.
+    /// </summary>
+    /// <param name="lowerBound"></param>
+    /// <param name="upperBound"></param>
+    /// <param name="x"></param>
+    /// <returns></returns>
     public long? GetHorizontalOffset(long lowerBound, long upperBound, long x)
     {
-        float verticalOverlap = Mathf.Min(maxY, upperBound) - Mathf.Max(minY, lowerBound);
+        float verticalOverlap = Mathf.Min(MaxY, upperBound) - Mathf.Max(MinY, lowerBound);
 
         // They are not even overlapping
         if (verticalOverlap < 0)
@@ -113,14 +136,14 @@ public class GridEdge : BaseEdge<GridVertex>
         // Calculate horizontal offset of the vertical segment
         //   | <---> | 
 
-        long vx = (FromDirection == Directions.West || ToDirection == Directions.West) ? minX : maxX;
+        long vx = (FromDirection == Directions.West || ToDirection == Directions.West) ? MinX : MaxX;
         offset += vx - x;
 
 
         // Calculate horizontal offset of the horizontal segment
         //   | <--->  --
-        long hy = (FromDirection == Directions.South || ToDirection == Directions.South) ? minY : maxY;
-        long hOffset = minX - x;
+        long hy = (FromDirection == Directions.South || ToDirection == Directions.South) ? MinY : MaxY;
+        long hOffset = MinX - x;
         if (hy > lowerBound && hy < upperBound) // lower-upper are exclusive (not inclusive)
             if (Math.Abs(offset) > Math.Abs(hOffset)) // The closer offset
                 offset = hOffset;
@@ -128,9 +151,16 @@ public class GridEdge : BaseEdge<GridVertex>
         return offset;
     }
 
+    /// <summary>
+    /// Gets a new vertical offset for addition of a new vertex. Calculates based on the closest distance from this edge.
+    /// </summary>
+    /// <param name="lowerBound"></param>
+    /// <param name="upperBound"></param>
+    /// <param name="x"></param>
+    /// <returns></returns>
     public long? GetVerticalOffset(long leftBound, long rightBound, long y)
     {
-        long horizontalOverlap = Math.Min(maxX, rightBound) - Math.Max(minX, leftBound);
+        long horizontalOverlap = Math.Min(MaxX, rightBound) - Math.Max(MinX, leftBound);
 
         // They are not even overlapping
         if (horizontalOverlap < 0)
@@ -144,7 +174,7 @@ public class GridEdge : BaseEdge<GridVertex>
         //   |
         //   v
         // -----
-        long hy = (FromDirection == Directions.South || ToDirection == Directions.South) ? minY : maxY;
+        long hy = (FromDirection == Directions.South || ToDirection == Directions.South) ? MinY : MaxY;
         offset += hy - y;
 
 
@@ -155,8 +185,8 @@ public class GridEdge : BaseEdge<GridVertex>
         //   v
         //   
         //   |
-        long vx = (FromDirection == Directions.West || ToDirection == Directions.West) ? minX : maxX;
-        long vOffset = minY - y;
+        long vx = (FromDirection == Directions.West || ToDirection == Directions.West) ? MinX : MaxX;
+        long vOffset = MinY - y;
         if (vx > leftBound && vx < rightBound) // left-right are exclusive (not inclusive)
             if (Math.Abs(offset) > Math.Abs(vOffset)) // The closer offset
                 offset = vOffset;
@@ -164,60 +194,93 @@ public class GridEdge : BaseEdge<GridVertex>
         return offset;
     }
 
+    /// <summary>
+    /// Gets vertical part of the edge, even if it is a corner edge.
+    /// </summary>
+    /// <returns>X, MinY, MaxY</returns>
     public (long, long, long)? GetVerticalLine()
     {
-        if (fromX == toX)
-            return (fromX, minY, maxY);
+        if (FromX == ToX)
+            return (FromX, MinY, MaxY);
 
         (long midX, long midY, long midZ) = GetMid();
 
-        if (fromX == midX)
+        if (FromX == midX)
             return (
-                fromX,
-                Math.Min(fromY, midY),
-                Math.Max(fromY, midY));
+                FromX,
+                Math.Min(FromY, midY),
+                Math.Max(FromY, midY));
 
-        if (midX == toX)
+        if (midX == ToX)
             return (midX,
-                Math.Min(midY, toY),
-                Math.Max(midY, toY));
+                Math.Min(midY, ToY),
+                Math.Max(midY, ToY));
 
         return null;
     }
 
+    /// <summary>
+    /// Gets horizontal part of the edge, even if it is a corner edge.
+    /// </summary>
+    /// <returns>MinX, MaxX, Y</returns>
     public (long, long, long)? GetHorizontalLine()
     {
-        if (fromY == toY)
-            return (minX, maxX, toY);
+        if (FromY == ToY)
+            return (MinX, MaxX, ToY);
 
         (long midX, long midY, long midZ) = GetMid();
 
-        if (fromY == midY)
+        if (FromY == midY)
             return (
-                Math.Min(fromX, midX),
-                Math.Max(fromX, midX),
+                Math.Min(FromX, midX),
+                Math.Max(FromX, midX),
                 midY);
 
-        if (midY == toY)
+        if (midY == ToY)
             return (
-                Math.Min(midX, toX),
-                Math.Max(midX, toX),
-                toY);
+                Math.Min(midX, ToX),
+                Math.Max(midX, ToX),
+                ToY);
 
         return null;
     }
 }
 
+/// <summary>
+/// Directed Adjecency Graph that contains topological information for drasing this graph into a grid.
+/// Contains special functions to maintain this topological information.
+/// </summary>
 public class GridGraph : AdjecencyGraph<GridVertex>
 {
+    /// <summary>
+    /// Base offset for addition of a new vertex.
+    /// </summary>
     public const long STEP = 1 << 57;
 
+    /// <summary>
+    /// Vertices by floor.
+    /// </summary>
     public Dictionary<long, List<GridVertex>> Floors = new();
+    /// <summary>
+    /// Edges by floor.
+    /// </summary>
     public Dictionary<long, List<GridEdge>> FloorEdges = new();
+    /// <summary>
+    /// Edges connecting two floors.
+    /// </summary>
     public List<GridEdge> InterFloorEdges = new();
 
     public int FloorCount => Floors.Keys.Count;
 
+    /// <summary>
+    /// Adds an edge to the graph and attatches it to the exits of connected vertices.
+    /// </summary>
+    /// <param name="from"></param>
+    /// <param name="to"></param>
+    /// <param name="fromExit"></param>
+    /// <param name="toExit"></param>
+    /// <param name="edge"></param>
+    /// <returns></returns>
     public GridEdge AddGridEdge(GridVertex from, GridVertex to, Directions fromExit, Directions toExit, GridEdge edge = null)
     {
         if (from.Exits.Contains(fromExit) || to.Exits.Contains(toExit))
@@ -243,6 +306,13 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         return edge;
     }
 
+    /// <summary>
+    /// Adds an edge that connects two floors. Attatches itself to the top and the bottom exit of the given vertices.
+    /// </summary>
+    /// <param name="from"></param>
+    /// <param name="to"></param>
+    /// <param name="edge"></param>
+    /// <returns></returns>
     public GridEdge AddInterFloorEdge(GridVertex from, GridVertex to, GridEdge edge = null)
     {
         edge ??= new();
@@ -257,6 +327,13 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         return edge;
     }
 
+    /// <summary>
+    /// Creates and adds a grid vertex.
+    /// </summary>
+    /// <param name="x">Width</param>
+    /// <param name="y">Length</param>
+    /// <param name="z">Floor</param>
+    /// <returns>Created GridVertex.</returns>
     public GridVertex AddGridVertex(long x, long y, long z = 0)
     {
         GridVertex vertex = new GridVertex();
@@ -271,6 +348,15 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         return vertex;
     }
 
+    /// <summary>
+    /// Gets a new X coordinate for adding a new vertex in horizontal direction.
+    /// </summary>
+    /// <param name="oldX"></param>
+    /// <param name="minY">Range that can obscure this addition.</param>
+    /// <param name="maxY">Range that can obscure this addition.</param>
+    /// <param name="z">Floor.</param>
+    /// <param name="right"></param>
+    /// <returns></returns>
     public long GetNewX(long oldX, long minY, long maxY, long z, bool right)
     {
         if (right)
@@ -286,7 +372,7 @@ public class GridGraph : AdjecencyGraph<GridVertex>
 
             foreach (GridEdge e in InterFloorEdges)
             {
-                if (e.minZ > z || e.maxZ < z)
+                if (e.MinZ > z || e.MaxZ < z)
                     continue;
 
                 long? offset = e.GetHorizontalOffset(minY, maxY, oldX);
@@ -308,7 +394,7 @@ public class GridGraph : AdjecencyGraph<GridVertex>
 
         foreach (GridEdge e in InterFloorEdges)
         {
-            if (e.minZ > z || e.maxZ < z)
+            if (e.MinZ > z || e.MaxZ < z)
                 continue;
 
             long? offset = e.GetHorizontalOffset(minY, maxY, oldX);
@@ -319,6 +405,16 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         return oldX + maxOffset / 2;
     }
 
+
+    /// <summary>
+    /// Gets a new Y coordinate for adding a new vertex in vertical direction.
+    /// </summary>
+    /// <param name="oldY"></param>
+    /// <param name="minX">Range that can obscure this addition.</param>
+    /// <param name="maxX">Range that can obscure this addition.</param>
+    /// <param name="z">Floor.</param>
+    /// <param name="fwd">Forwards or backwards.</param>
+    /// <returns></returns>
     public long GetNewY(long oldY, long minX, long maxX, long z, bool fwd)
     {
         if (fwd)
@@ -334,7 +430,7 @@ public class GridGraph : AdjecencyGraph<GridVertex>
 
             foreach (GridEdge e in InterFloorEdges)
             {
-                if (e.minZ > z || e.maxZ < z)
+                if (e.MinZ > z || e.MaxZ < z)
                     continue;
 
                 long? offset = e.GetVerticalOffset(minX, maxX, oldY);
@@ -356,7 +452,7 @@ public class GridGraph : AdjecencyGraph<GridVertex>
 
         foreach (GridEdge e in InterFloorEdges)
         {
-            if (e.minZ > z || e.maxZ < z)
+            if (e.MinZ > z || e.MaxZ < z)
                 continue;
 
             long? offset = e.GetVerticalOffset(minX, maxX, oldY);
@@ -367,6 +463,14 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         return oldY + maxOffset / 2;
     }
 
+    /// <summary>
+    /// Gets a new Y coordinate for adding a new vertex and a new floor..
+    /// </summary>
+    /// <param name="oldZ"></param>
+    /// <param name="x">Range that can obscure this addition.</param>
+    /// <param name="y">Range that can obscure this addition.</param>
+    /// <param name="up">Forwards or backwards.</param>
+    /// <returns></returns>
     public long GetNewZ(long oldZ, long x, long y, bool up)
     {
         long closest;
@@ -412,6 +516,10 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         return closest;
     }
 
+    /// <summary>
+    /// Removes the edge and detatches itself from the end vertices exits.
+    /// </summary>
+    /// <param name="e"></param>
     public void RemoveGridEdge(GridEdge e)
     {
         e.From.Exits = e.From.Exits.Without(e.FromDirection);
@@ -423,7 +531,7 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         RemoveEdge(e.From, e.To);
     }
 
-    public GridEdge LongestEdge(bool allowHidden = true)
+    public GridEdge GetLongestEdge(bool allowHidden = true)
     {
         GridEdge longest = null;
         long length = 0;
@@ -433,7 +541,7 @@ public class GridGraph : AdjecencyGraph<GridVertex>
             if (e.Hidden && !allowHidden)
                 continue;
 
-            long l = e.maxX - e.minX + e.maxY - e.minY;
+            long l = e.MaxX - e.MinX + e.MaxY - e.MinY;
             if (l > length)
             {
                 length = l;
@@ -464,12 +572,20 @@ public class GridGraph : AdjecencyGraph<GridVertex>
         return filteredEdges[index];
     }
 
+    /// <summary>
+    /// Edge connecting two floors.
+    /// </summary>
+    /// <returns></returns>
     public GridEdge GetRandomInterfloorEdge()
     {
         int index = URandom.Range(0, InterFloorEdges.Count);
         return InterFloorEdges[index];
     }
 
+    /// <summary>
+    /// Switches To and From vertices in the edge.
+    /// </summary>
+    /// <param name="e"></param>
     public void Reverse(GridEdge e)
     {
         RemoveGridEdge(e);

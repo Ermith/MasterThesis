@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// Representing a graph drawn into a grid of size [MaximumX, MaximumY, MaximumZ].
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public struct GraphDrawing<T>
 {
     public Dictionary<T, (int, int, int)> VertexPositions;
@@ -12,6 +16,9 @@ public struct GraphDrawing<T>
     public T EndPosition;
 }
 
+/// <summary>
+/// Relies on <see cref="GridGraph"/>. Transforms the topological information into a <see cref="GraphDrawing{T}"/>.
+/// </summary>
 public class GraphGridDrawer
 {
     IGraph<GridVertex> _graph;
@@ -20,6 +27,12 @@ public class GraphGridDrawer
         _graph = graph;
     }
 
+    /// <summary>
+    /// Trnasforms <see cref="GridGraph"/> into a <see cref="GraphDrawing{GridVertex}"/>.
+    /// </summary>
+    /// <param name="startVertex"></param>
+    /// <param name="endVertex"></param>
+    /// <returns></returns>
     public GraphDrawing<GridVertex> Draw(GridVertex startVertex, GridVertex endVertex)
     {
         Dictionary<GridVertex, (int, int, int)> vertexPositions = new();
@@ -52,14 +65,13 @@ public class GraphGridDrawer
 
             var positions = new List<(int, int, int)>();
             
-            positions.Add((xx.IndexOf(e.fromX), yy.IndexOf(e.fromY), zz.IndexOf(e.fromZ)));
+            positions.Add((xx.IndexOf(e.FromX), yy.IndexOf(e.FromY), zz.IndexOf(e.FromZ)));
 
-            if (e.fromX != e.toX && e.fromY != e.toY)
-                positions.Add((xx.IndexOf(midX), yy.IndexOf(midY), zz.IndexOf(e.fromZ)));
+            if (e.FromX != e.ToX && e.FromY != e.ToY)
+                positions.Add((xx.IndexOf(midX), yy.IndexOf(midY), zz.IndexOf(e.FromZ)));
 
-            positions.Add((xx.IndexOf(e.toX), yy.IndexOf(e.toY), zz.IndexOf(e.toZ)));
+            positions.Add((xx.IndexOf(e.ToX), yy.IndexOf(e.ToY), zz.IndexOf(e.ToZ)));
             
-
             edgePositions[e] = positions;
         }
 

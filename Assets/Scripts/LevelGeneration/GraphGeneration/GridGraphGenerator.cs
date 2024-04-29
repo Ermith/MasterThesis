@@ -4,6 +4,10 @@ using Unity.VisualScripting;
 using UnityEngine;
 using URandom = UnityEngine.Random;
 
+/// <summary>
+/// Class for generation of <see cref="GridGraph"/> using <see cref="Pattern"/> classes.
+/// Generates based on <see cref="GridGraphGenerator"/>.
+/// </summary>
 public class GridGraphGenerator
 {
     public GridGraph Graph { get; private set; }
@@ -26,6 +30,9 @@ public class GridGraphGenerator
     public GridVertex GetStartVertex() => _start;
     public GridVertex GetEndVertex() => _end;
 
+    /// <summary>
+    /// Generates a <see cref="GridGraph"/> based on <see cref="GridGraphGenerator"/> using <see cref="Pattern"/> classes.
+    /// </summary>
     public void Generate()
     {
         List<Pattern> patterns = new();
@@ -46,12 +53,12 @@ public class GridGraphGenerator
         if (GenerationSettings.DangerDeathTraps) dangerTypes.Add(DangerType.DeathTraps);
 
         if (GenerationSettings.FloorPatternCount == 0)
-        {
+        { // Start with a graph with a single edge
             _start = Graph.AddGridVertex(0, 0);
             _end = Graph.AddGridVertex(0, GridGraph.STEP);
             Graph.AddGridEdge(_start, _end, Directions.North, Directions.South);
         } else
-        {
+        { // Start with a graph that has two floors.
             var f1 = Graph.AddGridVertex(0, 0, 0);
             var f2 = Graph.AddGridVertex(0, 0, GridGraph.STEP);
 

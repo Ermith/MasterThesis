@@ -4,6 +4,10 @@ using System.Linq;
 using UnityEngine;
 using URandom = UnityEngine.Random;
 
+/// <summary>
+/// Class for holding results in Deapth First Search algorithm.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public class DFSParams<T>
 {
     public int EnterTimeCurrent = 0;
@@ -15,6 +19,10 @@ public class DFSParams<T>
     public List<T> Preorder = new();
 }
 
+/// <summary>
+/// Connecting two vertices.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public interface IEdge<T>
 {
     public T From { get; set; }
@@ -25,6 +33,10 @@ public interface IEdge<T>
     public bool IsUndirected(T from, T to);
 }
 
+/// <summary>
+/// <see cref="IEdge{T}"/>, but implements some basic methods.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public class BaseEdge<T> : IEdge<T>
 {
     public T From { get; set; }
@@ -41,6 +53,11 @@ public class BaseEdge<T> : IEdge<T>
         return Is(from, to) || Is(to, from);
     }
 
+    /// <summary>
+    /// Gets the other vertex
+    /// </summary>
+    /// <param name="vertex"></param>
+    /// <returns></returns>
     public T Neighbor(T vertex)
     {
         if (vertex.Equals(From)) return To;
@@ -49,6 +66,11 @@ public class BaseEdge<T> : IEdge<T>
     }
 }
 
+/// <summary>
+/// Interface that contains functions you would expect of a simple graph.
+/// Also Deapth First Search and STNumbering.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public interface IGraph<T>
 {
     public int VertexCount { get; }
@@ -66,6 +88,11 @@ public interface IGraph<T>
     public DFSParams<T> DepthFirstSearch(T start);
 }
 
+/// <summary>
+/// Abstract class that implements some of <see cref="IGraph{T}"/> functions.
+/// Namely Deapth First Search and STNumbering.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public abstract class AGraph<T> : IGraph<T>
 {
     public abstract int VertexCount { get; }
@@ -119,11 +146,6 @@ public abstract class AGraph<T> : IGraph<T>
 
     public Dictionary<T, int> STNumbering(T start, T target)
     {
-        //var edge = GetEdge(start, target);
-        //if (edge == null) AddEdge(start, target);
-        //var p = DepthFirstSearch(target);
-        //if (edge == null) RemoveEdge(start, target);
-
         UndirectedAdjecencyGraph<T> graph = new();
         foreach (T vertex in GetVertices())
             graph.AddVertex(vertex);
@@ -179,6 +201,10 @@ public abstract class AGraph<T> : IGraph<T>
     }
 }
 
+/// <summary>
+/// Directed graph implementation of <see cref="AGraph{T}"/>.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public class AdjecencyGraph<T> : AGraph<T>
 {
     private Dictionary<T, List<T>> _adjecencyList = new();
@@ -269,6 +295,10 @@ public class AdjecencyGraph<T> : AGraph<T>
     }
 }
 
+/// <summary>
+/// Undirected graph implementation of <see cref="AGraph{T}"/>.
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public class UndirectedAdjecencyGraph<T> : AGraph<T>
 {
     List<T> _vertices = new();

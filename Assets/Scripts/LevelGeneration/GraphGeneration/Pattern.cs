@@ -100,8 +100,8 @@ public abstract class Pattern
         bool up = edgeDirs.Contains(Directions.South);
 
         (long midX, long midY, long midZ) = edge.GetMid();
-        long newX = graph.GetNewX(midX, edge.minY, edge.maxY, edge.fromZ, right);
-        long newY = graph.GetNewY(midY, edge.minX, edge.maxX, edge.fromZ, up);
+        long newX = graph.GetNewX(midX, edge.MinY, edge.MaxY, edge.FromZ, right);
+        long newY = graph.GetNewY(midY, edge.MinX, edge.MaxX, edge.FromZ, up);
 
         GridEdge mockEdge = new();
         mockEdge.From = a;
@@ -129,7 +129,7 @@ public abstract class Pattern
         GridVertex a = edge.From;
         GridVertex b = edge.To;
         var sidePathDir = Directions.None;
-        if (edge.fromX == edge.toX)
+        if (edge.FromX == edge.ToX)
         {
             if (!edge.From.Exits.East() && !edge.To.Exits.East())
                 sidePathDir = Directions.East;
@@ -138,7 +138,7 @@ public abstract class Pattern
                 sidePathDir = Directions.West;
         }
 
-        if (edge.fromY == edge.toY)
+        if (edge.FromY == edge.ToY)
         {
             if (!edge.From.Exits.North() && !edge.To.Exits.North())
                 sidePathDir = Directions.North;
@@ -727,7 +727,7 @@ public class FloorLockedForkPattern : Pattern
                 bonusFork = AddFork(e1.To, graph);
             }
 
-            ILock @lock = new DoorLock(down: e1.fromZ < e1.toZ, up: e1.fromZ > e1.toZ);
+            ILock @lock = new DoorLock(down: e1.FromZ < e1.ToZ, up: e1.FromZ > e1.ToZ);
             lockedStairway.AddLock(@lock);
 
             keyFork.To.AddKey(@lock.GetNewKey());

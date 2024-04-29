@@ -14,7 +14,9 @@ public interface ILock : IRoomFeature
     public IList<ILockObject> Instances { get; }
 }
 
-
+/// <summary>
+/// Locks doors in a supertile based in directions given. <see cref="DoorKey"/> unlocks them.
+/// </summary>
 public class DoorLock : ILock
 {
     private Directions _exits;
@@ -62,6 +64,9 @@ public class DoorLock : ILock
     }
 }
 
+/// <summary>
+/// Spawns walls of light at supertile exits based on directions given. <see cref="PowerSourceKey"/> unlocks them.
+/// </summary>
 public class WallOfLightLock : ILock
 {
     private Directions _exits;
@@ -110,6 +115,9 @@ public class WallOfLightLock : ILock
     }
 }
 
+/// <summary>
+/// Spawns a patrolling enemy to a supertile. Key to this is <see cref="InvisibiltyCamoKey"/>.
+/// </summary>
 public class EnemyLock : ILock
 {
     public IList<ILockObject> Instances { get; } = new List<ILockObject>();
@@ -138,6 +146,9 @@ public class EnemyLock : ILock
     }
 }
 
+/// <summary>
+/// Spawns security cameras at the exits of a supertile. <see cref="PowerSourceKey"/> disables them.
+/// </summary>
 public class SecurityCameraLock : ILock
 {
     public IList<ILockObject> Instances { get; } = new List<ILockObject>();
@@ -167,6 +178,10 @@ public class SecurityCameraLock : ILock
     }
 }
 
+/// <summary>
+/// Spawns Death Traps on free tiles of a given supertile.
+/// <see cref="TrapDisarmingKitKey"/> can be used to disable them instantly instead of a long interaction.
+/// </summary>
 public class DeathTrapLock : ILock
 {
     public IList<ILockObject> Instances { get; } = new List<ILockObject>();
@@ -203,6 +218,10 @@ public class DeathTrapLock : ILock
     }
 }
 
+/// <summary>
+/// Spawns Sound Traps on free tiles of a given supertile.
+/// <see cref="TrapDisarmingKitKey"/> can be used to disable them instantly instead of a long interaction.
+/// </summary>
 public class SoundTrapLock : ILock
 {
     public IList<ILockObject> Instances { get; } = new List<ILockObject>();
@@ -239,6 +258,9 @@ public class SoundTrapLock : ILock
     }
 }
 
+/// <summary>
+/// Spawns doors that look like walls in a supertile based on exits given. Does not have a key.
+/// </summary>
 public class HiddenDoorLock : ILock
 {
     private Directions _exits;
