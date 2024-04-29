@@ -7,6 +7,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 using URandom = UnityEngine.Random;
 
+/// <summary>
+/// Uses <see cref="GraphDrawing{T}"/> to create tile grids..
+/// </summary>
 class MapBuilder
 {
     private GraphDrawing<GridVertex> _graphDrawing;
@@ -22,6 +25,11 @@ class MapBuilder
         _height = _graphDrawing.MaximumY + 1;
     }
 
+    /// <summary>
+    /// Deconstructs tiles into subtiles.
+    /// </summary>
+    /// <param name="tileGrids"></param>
+    /// <returns>Subtile grids split by floors.</returns>
     public List<ASubTile[,]> SubTileGrid(List<ATile[,]> tileGrids)
     {
         int width = _width * _superWidth;
@@ -44,17 +52,10 @@ class MapBuilder
         return subGrids;
     }
 
-    private Tile TryGetTile<Tile>(int x, int y, Tile[,] grid)
-    {
-        int width = grid.GetLength(0);
-        int height = grid.GetLength(1);
-
-        if (x < 0 || y < 0) return default;
-        if (x >= width || y >= height) return default;
-
-        return grid[x, y];
-    }
-
+    /// <summary>
+    /// Creates a SuperTileGrid from <see cref="GraphDrawing{T}"/>.
+    /// </summary>
+    /// <returns>Supertile grids devided by floors.</returns>
     public List<ASuperTile[,]> SuperTileGrid()
     {
         var floorTransitions = new List<(int x, int y, int zFrom, int zTo)>();
@@ -62,13 +63,16 @@ class MapBuilder
         for (int i = 0; i < _graphDrawing.MaximumZ + 1; i++)
             superTileGrids.Add(new ASuperTile[_width, _height]);
 
+        // Spawn by vertices
         foreach ((var vertex, (int x, int y, int z)) in _graphDrawing.VertexPositions)
         {
+            // Choose a specific layout by parameters or by random value
             ASuperTile tile;
-
-            float random = URandom.value;
+            // Stairway room switches up and down exits whether they are left and right based on floor.
             if (vertex.Top || vertex.Bottom) tile = new StairwayRoom(_superWidth, _superHeight, z, vertex.Exits, up: vertex.Top, down: vertex.Bottom, reveresed: z % 2 == 0);
-            else if (vertex.Hallway && vertex.GetKeys().ToArray().Length > 0) tile = new HallwayWithRooms(_superWidth, _superHeight, z, vertex.Exits);
+            // Vertex can be marked as hallway, but we still need rooms to place the keys in.
+            else if (vertex.Hallway) tile = new HallwayWithRooms(_superWidth, _superHeight, z, vertex.Exits);
+            // Finally, choose random.
             else if (URandom.value > 0.5f) tile = new RecursiveRoom(_superWidth, _superHeight, z, exits: vertex.Exits);
             else tile = new Room(_superWidth, _superHeight, z, vertex.Exits);
 
@@ -78,6 +82,7 @@ class MapBuilder
             superTileGrids[z][x, y] = tile;
         }
 
+        // Spawn by edges
         foreach ((IEdge<GridVertex> e, List<(int x, int y, int z)> positions) in _graphDrawing.EdgePositions)
         {
             var firstPosition = positions[0];
@@ -119,6 +124,7 @@ class MapBuilder
                 if (nextY < toY) exits |= Directions.South;
                 if (nextY > toY) exits |= Directions.North;
 
+                // Choose a random layout
                 ASuperTile tile;
                 float random = URandom.value;
                 if (random > 0.66f)
@@ -135,6 +141,7 @@ class MapBuilder
             }
         }
 
+        // If edge connecting two floors spans multiple floors, spawn stairway on each floor.
         foreach ((int x, int y, int zFrom, int zTo) in floorTransitions)
         {
             int zMin = Math.Min(zFrom, zTo);
@@ -163,6 +170,7 @@ class MapBuilder
             return grid[x, y] is Hallway;
         };
 
+        // Spawn doors in rooms in a way, so there are no unnecessary double doors.
         foreach ((var vertex, (int x, int y, int z)) in _graphDrawing.VertexPositions)
         {
             if (isHallway(x, y, Directions.North, superTileGrids[z]) || y % 2 == 0)

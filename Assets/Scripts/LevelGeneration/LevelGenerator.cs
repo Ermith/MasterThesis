@@ -9,10 +9,15 @@ using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+/// <summary>
+/// The class responsible for whole generation process on Start() function. 
+/// </summary>
 public class LevelGenerator : MonoBehaviour
 {
     public int SuperWidth = 3;
     public int SuperHeight = 3;
+
+    // Blueprints
     public GameObject WallBlueprint;
     public GameObject FloorBlueprint;
     public GameObject DoorBlueprint;
@@ -30,21 +35,20 @@ public class LevelGenerator : MonoBehaviour
     public GameObject ObjectiveBlueprint;
     public GameObject StairsBlueprint;
     public EnemyController EnemyBlueprint;
+
     public GameObject Player;
-
-    public static GameObject SideObjectiveBlueprint;
-
     public Map Map;
 
+    // Rendering
     public Material FloorMaterial;
     public Material WallMaterial;
     public Mesh FloorMesh;
     public Mesh WallMesh;
 
-    GridGraph _graph;
-    GridGraphGenerator _graphGenerator;
-    GraphGridDrawer _graphDrawer;
-    MapBuilder _mapBuilder;
+    private GridGraph _graph;
+    private GridGraphGenerator _graphGenerator;
+    private GraphGridDrawer _graphDrawer;
+    private MapBuilder _mapBuilder;
 
     private int _floorHeight = 3;
 
@@ -147,6 +151,12 @@ public class LevelGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Instanced rendering takex max 1023 objects. This functions splits the array before sending it for rendering.
+    /// </summary>
+    /// <param name="rp"></param>
+    /// <param name="mesh"></param>
+    /// <param name="ms"></param>
     public void RenderInstanced(RenderParams rp, Mesh mesh, IEnumerable<Matrix4x4> ms)
     {
         List<Matrix4x4> buffer = new(1023);
@@ -164,6 +174,11 @@ public class LevelGenerator : MonoBehaviour
             Graphics.RenderMeshInstanced(rp, mesh, 0, buffer);
     }
 
+    /// <summary>
+    /// Transforms world position into a posion in the tilemap.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <returns></returns>
     public (int x, int y, int floor) GridCoordinates(Vector3 position)
     {
         Vector3 relative = position - _geometry.transform.position;
@@ -174,6 +189,10 @@ public class LevelGenerator : MonoBehaviour
         return (x, y, floor);
     }
 
+    /// <summary>
+    /// Upper floors and roofs are not rendered. This is used for instance of being in top-down view.
+    /// </summary>
+    /// <param name="floor"></param>
     public void HighlightFloor(int floor)
     {
         _activeFloor = floor;
@@ -185,6 +204,10 @@ public class LevelGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Even when no floor is highlighted, render a maximum of three floors.
+    /// </summary>
+    /// <param name="floor"></param>
     public void UnHilightFloors(int floor)
     {
         for (int i = 0; i < _floors.Length; i++)
@@ -196,6 +219,9 @@ public class LevelGenerator : MonoBehaviour
         _wide = true;
     }
 
+    /// <summary>
+    /// Uses the <see cref="BlueprintManager"/> class to map subtiles and keys C# classes to Unity spawnable classes.
+    /// </summary>
     private void RegisterBlueprints()
     {
         // Keys
@@ -223,6 +249,11 @@ public class LevelGenerator : MonoBehaviour
         BlueprintManager.Register<StairwayRoom>(() => Instantiate(StairsBlueprint));
     }
 
+    /// <summary>
+    /// Spawns the objects of Subtiles and sub objects they contain.
+    /// </summary>
+    /// <param name="subTileGrids"></param>
+    /// <returns></returns>
     private GameObject SpawnObjects(List<ASubTile[,]> subTileGrids)
     {
         GameObject level = new("Level");
@@ -234,6 +265,8 @@ public class LevelGenerator : MonoBehaviour
         int w = subTileGrids[subTileGrids.Count - 1].GetLength(0);
         int h = subTileGrids[subTileGrids.Count - 1].GetLength(1);
         subTileGrids.Add(new ASubTile[w, h]);
+
+        // Params for instanced rendering of floor and walls.
         _floors = new GameObject[subTileGrids.Count];
         _floorMatrices = new List<Matrix4x4>[subTileGrids.Count];
         for (int i = 0; i < _floorMatrices.Length; i++)
@@ -243,9 +276,10 @@ public class LevelGenerator : MonoBehaviour
         for (int i = 0; i < _wallMatrices.Length; i++)
             _wallMatrices[i] = new List<Matrix4x4>();
 
-        Debug.Log("SPAWNING OBJECTS");
+        // Spawn the actual objects
         for (int floor = subTileGrids.Count - 1; floor >= 0; floor--)
         {
+            // Objects are spawned under floor objects.
             var grid = subTileGrids[floor];
             var floorGameObject = new GameObject($"Floor {floor}");
             floorGameObject.transform.parent = geometry.transform;
@@ -254,6 +288,7 @@ public class LevelGenerator : MonoBehaviour
             for (int col = 0; col < grid.GetLength(0); col++)
                 for (int row = 0; row < grid.GetLength(1); row++)
                 {
+                    // Spawn the roof for tile beneath.
                     if (grid[col, row] == null)
                     {
                         if (floor > 0 && subTileGrids[floor - 1][col, row] != null)
@@ -263,11 +298,11 @@ public class LevelGenerator : MonoBehaviour
                             continue;
                     }
 
-                    //grid[col, row] ??= new FloorSubTile();
-
+                    // Spawn the subtile object. It contains subobjects as well.
                     GameObject obj = grid[col, row].Spawn(col, row, floor * _floorHeight);
                     obj.transform.position = obj.transform.position.Added(y: 0.1f * floor);
 
+                    // Add for instanced rendering if floor or a wall
                     if (grid[col, row] is FloorSubTile)
                     {
                         var m = new Matrix4x4();
@@ -286,6 +321,7 @@ public class LevelGenerator : MonoBehaviour
                 }
         }
 
+        // Finally, spawn the victory trigger.
         var pos = _mapBuilder.GetEndPosition();
         int victoryFloor = (int)pos.y;
         pos.y *= _floorHeight;
@@ -296,6 +332,10 @@ public class LevelGenerator : MonoBehaviour
         return level;
     }
 
+    /// <summary>
+    /// Spawns the enemies unde _floors[] objects.
+    /// </summary>
+    /// <param name="enemies"></param>
     private void SpawnEnemies(IEnumerable<EnemyParams> enemies)
     {
         if (GenerationSettings.DangerEnemies)
@@ -310,7 +350,6 @@ public class LevelGenerator : MonoBehaviour
                     Quaternion.identity);
 
                 enemyInstance.transform.parent = _floors[enemy.Floor].transform;
-
 
                 if (enemy.Behaviour == Behaviour.Patroling)
                 {

@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Parameters to spawn guards.
+/// </summary>
 public class EnemyParams
 {
     public (int, int) Spawn;

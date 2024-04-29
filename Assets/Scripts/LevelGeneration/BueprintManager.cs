@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
+/// <summary>
+/// Static class for mapping C# objects to Unity spawnable objects.
+/// </summary>
 static class BlueprintManager
 {
     private static Dictionary<Type, Func<GameObject>> _spawner = new();
