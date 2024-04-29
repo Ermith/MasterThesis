@@ -10,24 +10,24 @@ As for the release, simply unzip and run `.exe` file.
 
 ### Controls:
 
-- **Movement** - W A S D + mouse  
-- **Sprint** - hold Shift  
-- **Slide** - Space while running  
-- **Aim** - Right Mouse Button  
-- **Shoot** - Left Mous Button while aiming  
-- **Use Invisibility Camo** - R  
-- **Peek around corners** - E/Q  
-- **Interact** - F
+> - **Movement** - W A S D + mouse  
+> - **Sprint** - hold Shift  
+> - **Slide** - Space while running  
+> - **Aim** - Right Mouse Button  
+> - **Shoot** - Left Mous Button while aiming  
+> - **Use Invisibility Camo** - R  
+> - **Peek around corners** - E/Q  
+> - **Interact** - F
  
-- **First Person Camera** - F1  
-- **Top-Down Camera** - F2  
-- **Third Person Camera** - F3  
+> - **First Person Camera** - F1  
+> - **Top-Down Camera** - F2  
+> - **Third Person Camera** - F3  
  
-- **Open Map** - M  
-- **Move in Map** - W A S D  
-- **Zoom in Map** - Numpad +/-  
-- **Pause/Unpause** - Esc  
-- **Info Screen** - Tab
+> - **Open Map** - M  
+> - **Move in Map** - W A S D  
+> - **Zoom in Map** - Numpad +/-  
+> - **Pause/Unpause** - Esc  
+> - **Info Screen** - Tab
 
 ### Sounds Used:
 > - Slide: https://freesound.org/people/pfranzen/sounds/423216/
