@@ -64,9 +64,14 @@ Then, set generation parameters you desire and press `Start`.
 > - **Trap Disarming Kits** - Walk through to pick it up. Grants ability to disarm traps instantly.  
 > - **Invisibility Camo** - Makes you invisible for a certain duration.
 
+For more information, open `Assets/Scripts/GameLogic` folder.
+
 ## The Level Generation
 
 The generation itself is based on a cyclic generation algorithm by Short and Admas. While this book provides the basis for an algorithm that exactly generates interconnected levels with lock \& key puzzles, there are a lot of unspecified parts where we needed to complete the design for our purposes. Most notably, extending the concept into 3D space (multiple floors).
 
 ### This figure highlights the structure of our level generation algorithm:
 ![](./img/game_generation_structure.png)
+
+
+For more information, open `Assets/Scripts/LevelGeneration` folder.
