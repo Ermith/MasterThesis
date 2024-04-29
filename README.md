@@ -18,11 +18,11 @@ As for the release, simply unzip and run `.exe` file.
 > - **Use Invisibility Camo** - R  
 > - **Peek around corners** - E/Q  
 > - **Interact** - F
- 
+> 
 > - **First Person Camera** - F1  
 > - **Top-Down Camera** - F2  
 > - **Third Person Camera** - F3  
- 
+>
 > - **Open Map** - M  
 > - **Move in Map** - W A S D  
 > - **Zoom in Map** - Numpad +/-  
@@ -48,15 +48,15 @@ As for the release, simply unzip and run `.exe` file.
 
 ### Features
 
-> **Red Traps** - They kill you. Can be disarmed by holding interaction.  
-> **Blue Traps** - Make a lot of sound. Can be disarmed by holding interaction.    
-> **Enemies** - patrol the area, can hear and see you, they kill you if too close and see   
-> **Dark blue ground** - when you stand on such tile, you are hidden from sight  
-> **Security Cameras** - loud noise when they see you, shoot you dead if you remain in their line of sight  
-> **Power Boxes** - Interact to disable cameras (cameras somewhere in other rooms)  and Electronic doors  
-> **Keys + Red Locked Doors** - Walk through a key to pick it up. Then you can open doors to appropriate room. Unfortunately, there is no way of knowing, which key goes to which room.  
-> **Trap Disarming Kits** - Walk through to pick it up. Grants ability to disarm traps instantly.  
-> **Invisibility Camo** - Makes you invisible for a certain duration.
+> - **Red Traps** - They kill you. Can be disarmed by holding interaction.  
+> - **Blue Traps** - Make a lot of sound. Can be disarmed by holding interaction.    
+> - **Enemies** - patrol the area, can hear and see you, they kill you if too close and see   
+> - **Dark blue ground** - when you stand on such tile, you are hidden from sight  
+> - **Security Cameras** - loud noise when they see you, shoot you dead if you remain in their line of sight  
+> - **Power Boxes** - Interact to disable cameras (cameras somewhere in other rooms)  and Electronic doors  
+> - **Keys + Red Locked Doors** - Walk through a key to pick it up. Then you can open doors to appropriate room. Unfortunately, there is no way of knowing, which key goes to which room.  
+> - **Trap Disarming Kits** - Walk through to pick it up. Grants ability to disarm traps instantly.  
+> - **Invisibility Camo** - Makes you invisible for a certain duration.
 
 ## The Level Generation
 
