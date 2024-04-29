@@ -4,6 +4,9 @@ using UnityEngine;
 
 using URandom = UnityEngine.Random;
 
+/// <summary>
+/// Responsible for playing audios and audible sounds that Audition components respond to. Also contains references to all Audition components.
+/// </summary>
 public class AudioManager : MonoBehaviour
 {
     #region SERIALIZED_FIELDS
@@ -26,6 +29,12 @@ public class AudioManager : MonoBehaviour
     #region AUDIBLE EFFECTS
     public void RegisterAudition(Audition audition) => _auditions.Add(audition);
     public void UnregisterAudition(Audition audition) => _auditions.Remove(audition);
+    /// <summary>
+    /// Creates a visual effect and alerts all auditions in distance from source position.
+    /// </summary>
+    /// <param name="source">Who caused the sound.</param>
+    /// <param name="sourcePosition">The location of the sound.</param>
+    /// <param name="distance">Radius in which auditions will be alerted.</param>
     public void AudibleEffect(GameObject source, Vector3 sourcePosition, float distance)
     {
         var visual = Instantiate(SoundVisual);
@@ -41,6 +50,14 @@ public class AudioManager : MonoBehaviour
     #endregion
 
     #region SOUNDS
+    /// <summary>
+    /// Plays an audio by attatching <see cref="AudioSource"/> onto target game object. May destroy that object in the end if specified.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="target"></param>
+    /// <param name="loop"></param>
+    /// <param name="destroyTarget"></param>
+    /// <returns></returns>
     public AudioSource PlayOnTarget(string name, GameObject target, bool loop = false, bool destroyTarget = false)
     {
         Sound sound = null;
@@ -83,6 +100,15 @@ public class AudioManager : MonoBehaviour
             }
     }
 
+    /// <summary>
+    /// Plays an audio. If the position is specified, creates a new game object on that position and attattches the <see cref="AudioSource"/> onto that object.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="loop"></param>
+    /// <param name="position"></param>
+    /// <param name="pitch"></param>
+    /// <param name="volume"></param>
+    /// <returns></returns>
     public AudioSource Play(string name, bool loop = false, Vector3? position = null, float? pitch = null, float? volume = null)
     {
         Sound sound = null;
@@ -100,7 +126,7 @@ public class AudioManager : MonoBehaviour
             var audio = go.gameObject.AddComponent<AudioSource>();
 
             audio.clip = sound.Clip;
-            audio.volume = (volume == null) ? sound.Volume : volume.Value;// * Settings.SFXVolume;
+            audio.volume = (volume == null) ? sound.Volume : volume.Value;
             audio.pitch = (pitch == null) ? sound.Pitch : pitch.Value;
             audio.spatialBlend = sound.SpacialBlend;
             audio.loop = loop;
@@ -120,6 +146,16 @@ public class AudioManager : MonoBehaviour
         return sound.AudioSource;
     }
 
+    /// <summary>
+    /// Playes a random step sound of a given name.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="target"></param>
+    /// <param name="volume"></param>
+    /// <param name="pitch"></param>
+    /// <param name="spacialBlend"></param>
+    /// <param name="destroyTarget"></param>
+    /// <returns></returns>
     public AudioSource PlayStep(string name, GameObject target, float? volume = null, float? pitch = null, float? spacialBlend = null, bool destroyTarget = false)
     {
         List<Sound> stepVariations = _stepDictionary[name];

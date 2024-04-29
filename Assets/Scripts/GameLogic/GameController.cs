@@ -6,6 +6,10 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.UIElements.Experimental;
 
+/// <summary>
+/// Top level singleton responsible for tying all of the other classes together.
+/// Also contains <see cref="AudioManager"/>.
+/// </summary>
 [RequireComponent(
     typeof(AudioManager)
     )]
@@ -13,10 +17,6 @@ public class GameController : MonoBehaviour
 {
     public static GameController Instance;
     public static AudioManager AudioManager => Instance.GetComponent<AudioManager>();
-    private bool _paused = false;
-    private bool _mapPaused = false;
-    private int _objectives = 0;
-    private int _objetivesFound = 0;
     public static bool IsPaused => Instance._paused || Instance._mapPaused;
     public static int Objectives { get { return Instance._objectives; } set { Instance._objectives = value; } }
     public static int ObjectivesFound { get { return Instance._objetivesFound; } set { Instance._objetivesFound = value; } }
@@ -31,24 +31,29 @@ public class GameController : MonoBehaviour
     public Image InteractionFill;
     public GameObject InvisOverlay;
     public GameObject Pointer;
-
     public GameObject InteractionText;
+
     private GameObject _settingsMenu;
     private GameObject _menu;
     private GameObject _generationMenu;
+    private bool _paused = false;
+    private bool _mapPaused = false;
+    private int _objectives = 0;
+    private int _objetivesFound = 0;
 
 
     // Awake is called before the Start method
     private void Awake()
     {
-        Debug.Log("Game Instance");
         Instance = this;
         Time.timeScale = 1f;
+
+        // Init Random class
         if (GenerationSettings.Seed == null)
             GenerationSettings.Seed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
-
         UnityEngine.Random.InitState(GenerationSettings.Seed.Value);
-        Debug.Log(UnityEngine.Random.seed);
+        Debug.Log($"Seed: {GenerationSettings.Seed.Value}");
+
         _settingsMenu = PauseCanvas.transform.Find("SettingsPanel").gameObject;
         _menu = PauseCanvas.transform.Find("MenuPanel").gameObject;
         _generationMenu = PauseCanvas.transform.Find("GenerationSettingsPanel").gameObject;
@@ -58,6 +63,28 @@ public class GameController : MonoBehaviour
 
     // Update is called once per frame
     void Update()
+    {
+        HandlePauseAndMap();
+        HandleInfoScreen();
+
+        // When in top-down view, all of the upper floors and a roof is not rendered
+        (int _, int _, int floor) = LevelGenerator.GridCoordinates(Player.transform.position);
+        if (Player.Camera.Mode == CameraModeType.TopDown)
+        {
+            LevelGenerator.HighlightFloor(floor);
+        } else
+        {
+            LevelGenerator.UnHilightFloors(floor);
+        }
+
+        // Render crosshairs only in the first person
+        Pointer.SetActive(Player.Camera.Mode == CameraModeType.FirstPerson && !_paused && !_mapPaused);
+    }
+
+    /// <summary>
+    /// Shows and Hides Map and Pause Screen. 'ESC' backs out of both of them.
+    /// </summary>
+    private void HandlePauseAndMap()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -71,18 +98,14 @@ public class GameController : MonoBehaviour
             if (_mapPaused) CloseMap();
             else OpenMap();
         }
+    }
 
-
-        (int x, int y, int floor) = LevelGenerator.GridCoordinates(Player.transform.position);
-        if (Player.Camera.Mode == CameraModeType.TopDown)
-        {
-            LevelGenerator.HighlightFloor(floor);
-        } else
-        {
-            LevelGenerator.UnHilightFloors(floor);
-        }
-
-
+    /// <summary>
+    /// Holding an appropriate button shows the current progress and inventory. 
+    /// Needs to be updated when shown.
+    /// </summary>
+    private void HandleInfoScreen()
+    {
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             InfoScreen.gameObject.SetActive(true);
@@ -100,9 +123,11 @@ public class GameController : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.Tab))
             InfoScreen.gameObject.SetActive(false);
 
-        Pointer.SetActive(Player.Camera.Mode == CameraModeType.FirstPerson && !_paused && !_mapPaused);
     }
 
+    /// <summary>
+    /// Just reload the current screen.
+    /// </summary>
     public static void Restart()
     {
         //Instance.StartCoroutine(RestartLoad());
@@ -120,6 +145,11 @@ public class GameController : MonoBehaviour
         //yield return null;
     }
 
+    /// <summary>
+    /// Activates coroutine to do action after a given ammount of time.
+    /// </summary>
+    /// <param name="action"></param>
+    /// <param name="time"></param>
     public static void ExecuteAfter(Action action, float time)
     {
         Instance.StartCoroutine(WaitCoroutine(action, time));
@@ -127,9 +157,12 @@ public class GameController : MonoBehaviour
 
     public static void ExecuteAfterUnscaled(Action action, float time)
     {
-        Instance.StartCoroutine(WaitCoroutine(action, time));
+        Instance.StartCoroutine(WaitCoroutineUnscaled(action, time));
     }
 
+    /// <summary>
+    /// Initilizes the map with player's direction and location.
+    /// </summary>
     public static void OpenMap()
     {
         GameController.AudioManager.Play("Blick", volume: 0.3f);
@@ -163,12 +196,24 @@ public class GameController : MonoBehaviour
         action();
     }
 
+    /// <summary>
+    /// Shows a given interaction prompt on screen.
+    /// "Press F to: {interaction}." 
+    /// </summary>
+    /// <param name="text"></param>
     public static void ShowInteraction(string text)
     {
         Instance.InteractionText.gameObject.SetActive(true);
         Instance.InteractionText.GetComponentInChildren<TMPro.TMP_Text>().text = $"Press F to : {text}";
     }
 
+    /// <summary>
+    /// Shows a given interaction prompt on screen.
+    /// "Hold F to {interaction}."
+    /// Continous interaction requires holding the button and fills a bar based on progress.
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="interaction"></param>
     public static void ShowContinuousInteraction(string text, float interaction = -1)
     {
         Instance.InteractionText.gameObject.SetActive(true);
@@ -177,12 +222,18 @@ public class GameController : MonoBehaviour
         Instance.InteractionFill.fillAmount = interaction;
     }
 
+    /// <summary>
+    /// Hides the interaction prompt, whether continuous or normal.
+    /// </summary>
     public static void HideInteraction()
     {
         Instance.InteractionText.gameObject.SetActive(false);
         Instance.InteractionBar.gameObject.SetActive(false);
     }
 
+    /// <summary>
+    /// Opens the pause menu.
+    /// </summary>
     public static void Pause()
     {
         GameController.AudioManager.Play("Blick", volume: 0.3f);
@@ -192,6 +243,9 @@ public class GameController : MonoBehaviour
         ShowCursor(true);
     }
 
+    /// <summary>
+    /// Closes the pause menu and resumes the game.
+    /// </summary>
     public static void Resume()
     {
         GameController.AudioManager.Play("Blick", volume: 0.3f);
@@ -216,24 +270,38 @@ public class GameController : MonoBehaviour
         ShowCursor(false);
     }
 
+    /// <summary>
+    /// Shows or hides the cursor. To be used for example when opening a menu.
+    /// </summary>
+    /// <param name="show"></param>
     private static void ShowCursor(bool show)
     {
-        Cursor.lockState = show ? CursorLockMode.Confined : CursorLockMode.Locked;
+        Cursor.lockState = show ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = show;
     }
 
+    /// <summary>
+    /// Loads the GameScene
+    /// </summary>
     public static void NewGame()
     {
         SceneManager.LoadScene("GameScene");
         ShowCursor(false);
     }
 
+    /// <summary>
+    /// Loads the MainMenu scene.
+    /// </summary>
     public static void MainMenu()
     {
         SceneManager.LoadScene("MainMenuScene");
         ShowCursor(true);
     }
 
+    /// <summary>
+    /// Blue overlay to showcase that the player is hidden.
+    /// </summary>
+    /// <param name="active"></param>
     public static void SetInvisOverlay(bool active)
     {
         Instance.InvisOverlay.SetActive(active);

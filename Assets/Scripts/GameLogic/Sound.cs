@@ -1,6 +1,9 @@
 ﻿using System;
 using UnityEngine;
 
+/// <summary>
+/// Contains audio clip for <see cref="AudioManager"/>.
+/// </summary>
 [System.Serializable]
 public class Sound
 {

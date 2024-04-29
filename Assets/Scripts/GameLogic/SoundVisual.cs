@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 
+/// <summary>
+/// Flat round visual to show an audible sound. See <see cref="AudioManager"/>.
+/// </summary>
 public class SoundVisual : MonoBehaviour
 {
     public float Range;
