@@ -39,3 +39,11 @@ The following image depicts this process:
 These are the room layouts we implemented: 
 
 ![](../../../img/algo_layouts.png)
+
+## Locks & Keys
+
+During the graph generation process, [locks](./GraphGeneration/ILock.cs) and [keys](./GraphGeneration/IKey.cs) are attatched onto vertices and then passed to Supertiles. These also implent [IRoomFeature](./GraphGeneration/IRoomFeature.cs), meaning they implement themselves onto a given Supertile. 
+
+Relationships between locks and keys is illustrated here: 
+
+![](../../../img/game_locks_keys.png)
