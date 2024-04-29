@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Contains static functions for easing and modify these functions.
+/// </summary>
 public class Easing {
 	public static float Reverse(Func<float, float> f, float t) => 1 - f(1 -t);
 	public static float Mix(Func<float, float> a, Func<float, float> b, float t) => (1 - t) * a(t) + t * b(t);

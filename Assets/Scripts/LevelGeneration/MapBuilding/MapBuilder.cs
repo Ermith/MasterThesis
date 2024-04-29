@@ -104,7 +104,7 @@ class MapBuilder
                 (int fromX, int fromY, int _) = positions[i - 1];
                 (int toX, int toY, int _) = positions[i];
 
-                path.AddRange(Utils.GetShortPath(fromX, fromY, toX, toY).Skip(1));
+                path.AddRange(ASuperTile.GetShortPath(fromX, fromY, toX, toY).Skip(1));
             }
 
             for (int i = 1; i < path.Count - 1; i++)

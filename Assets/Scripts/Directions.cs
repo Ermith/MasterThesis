@@ -8,6 +8,9 @@ using UnityEngine;
 
 using URandom = UnityEngine.Random;
 
+/// <summary>
+/// World based directions North, West, South, East. Can contain multiple directions at once or none at all.
+/// </summary>
 [Flags]
 public enum Directions
 {
@@ -18,24 +21,77 @@ public enum Directions
     West = 0b1000,
 }
 
+// Useful direction for manipulating Directions.
 public static class DirectionsExtensions
 {
+    /// <summary>
+    /// Returns true if directions are empty.
+    /// </summary>
+    /// <param name="directions"></param>
+    /// <returns></returns>
     public static bool None(this Directions directions) => directions == Directions.None;
+
+    /// <summary>
+    /// Returns returns true if directions contain North.
+    /// </summary>
+    /// <param name="directions"></param>
+    /// <returns></returns>
     public static bool North(this Directions directions) => (directions & Directions.North) != Directions.None;
+
+    /// <summary>
+    /// Returns returns true if directions contain South.
+    /// </summary>
+    /// <param name="directions"></param>
+    /// <returns></returns>
     public static bool South(this Directions directions) => (directions & Directions.South) != Directions.None;
+
+    /// <summary>
+    /// Returns returns true if directions contain East.
+    /// </summary>
+    /// <param name="directions"></param>
+    /// <returns></returns>
     public static bool East(this Directions directions) => (directions & Directions.East) != Directions.None;
+
+    /// <summary>
+    /// Returns returns true if directions contain West.
+    /// </summary>
+    /// <param name="directions"></param>
+    /// <returns></returns>
     public static bool West(this Directions directions) => (directions & Directions.West) != Directions.None;
+
+    /// <summary>
+    /// Returns true if contains all of the dirs are present in original directions.
+    /// </summary>
+    /// <param name="directions"></param>
+    /// <param name="dirs"></param>
+    /// <returns></returns>
     public static bool Contains(this Directions directions, Directions dirs) => (directions & dirs) == dirs;
+
+    /// <summary>
+    /// Returns true if contains East or West, but does not contain North and East.
+    /// </summary>
+    /// <param name="directions"></param>
+    /// <returns></returns>
     public static bool Horizontal(this Directions directions) =>
         (directions.West() || directions.East())
         && !directions.North()
         && !directions.South();
 
+    /// <summary>
+    /// Returns true if contains North or South, but does not contain East adn West.
+    /// </summary>
+    /// <param name="directions"></param>
+    /// <returns></returns>
     public static bool Vertical(this Directions directions) =>
         (directions.North() || directions.South())
         && !directions.West()
         && !directions.East();
 
+    /// <summary>
+    /// If original directions contains horizontal directions, returns vertical directions and vice versa.
+    /// </summary>
+    /// <param name="directions"></param>
+    /// <returns></returns>
     public static Directions Perpendicular(this Directions directions)
     {
         var perpendicular = Directions.None;
@@ -49,8 +105,19 @@ public static class DirectionsExtensions
         return perpendicular;
     }
 
+    /// <summary>
+    /// Returns original directions without given directions.
+    /// </summary>
+    /// <param name="directions"></param>
+    /// <param name="without"></param>
+    /// <returns></returns>
     public static Directions Without(this Directions directions, Directions without) => directions & ~without;
 
+    /// <summary>
+    /// Returns directions opposite to the original ones. N <-> S, E<->W
+    /// </summary>
+    /// <param name="directions"></param>
+    /// <returns></returns>
     public static Directions Opposite(this Directions directions)
     {
         var opposite = Directions.None;
@@ -62,6 +129,11 @@ public static class DirectionsExtensions
         return opposite;
     }
 
+    /// <summary>
+    /// Returns IEnumerable, each <see cref="Directions"/> containing only single direction.
+    /// </summary>
+    /// <param name="directions"></param>
+    /// <returns></returns>
     public static IEnumerable<Directions> Enumerate(this Directions directions)
     {
         if (directions.North()) yield return Directions.North;
@@ -70,6 +142,11 @@ public static class DirectionsExtensions
         if (directions.East()) yield return Directions.East;
     }
 
+    /// <summary>
+    /// Returns direction in Unity world coordinates.
+    /// </summary>
+    /// <param name="directions"></param>
+    /// <returns></returns>
     public static Vector3 ToVector3(this Directions directions)
     {
         Vector3 vector = new();
@@ -82,6 +159,11 @@ public static class DirectionsExtensions
         return vector;
     }
 
+    /// <summary>
+    /// Returns (x, y) direction.
+    /// </summary>
+    /// <param name="directions"></param>
+    /// <returns></returns>
     public static (int x, int y) ToCoords(this Directions directions)
     {
         int x = 0, y = 0;
@@ -93,6 +175,11 @@ public static class DirectionsExtensions
         return (x, y);
     }
 
+    /// <summary>
+    /// Returns string of 'N' 'S' 'W' 'E' characters.
+    /// </summary>
+    /// <param name="directions"></param>
+    /// <returns></returns>
     public static string ToStr(this Directions directions)
     {
         StringBuilder sb = new();
@@ -104,6 +191,10 @@ public static class DirectionsExtensions
         return sb.ToString();
     }
 
+    /// <summary>
+    /// Return directions randomly filled. Can contain all or none.
+    /// </summary>
+    /// <returns></returns>
     public static Directions GetRandom()
     {
         var dirs = Directions.None;
@@ -117,6 +208,12 @@ public static class DirectionsExtensions
 
         return dirs;
     }
+
+    /// <summary>
+    /// Returns a single direction from the original ones.
+    /// </summary>
+    /// <param name="directions"></param>
+    /// <returns></returns>
     public static Directions ChooseRandom(this Directions directions)
     {
         Directions[] dirs = directions.Enumerate().ToArray();
@@ -126,6 +223,10 @@ public static class DirectionsExtensions
         return dirs[URandom.Range(0, count)];
     }
 
+    /// <summary>
+    /// Returns <see cref="Directions"/> containing every single direction.
+    /// </summary>
+    /// <returns></returns>
     public static Directions GetAll() =>
         Directions.South | Directions.North | Directions.East | Directions.West;
 }

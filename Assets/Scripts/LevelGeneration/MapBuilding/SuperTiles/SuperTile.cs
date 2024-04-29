@@ -100,7 +100,7 @@ public abstract class ASuperTile
     /// <param name="endY"></param>
     /// <param name="yFirst">How is 'L' direction oriented.</param>
     /// <returns></returns>
-    internal IEnumerable<(int, int)> GetShortPath(int startX, int startY, int endX, int endY, bool yFirst = false)
+    public static IEnumerable<(int, int)> GetShortPath(int startX, int startY, int endX, int endY, bool yFirst = false)
     {
         if (yFirst)
         {
