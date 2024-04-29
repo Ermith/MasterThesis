@@ -7,7 +7,6 @@ using UnityEngine;
 /// If they see the player, they will stop turning and play a loud sound that alerts guards.
 /// If looking at the player for too long, they will shoot him.
 /// </summary>
-[RequireComponent(typeof(Sight))]
 public class SecurityCameraController : MonoBehaviour, ILockObject
 {
     [HideInInspector] public ILock Lock { get; set; }
@@ -41,7 +40,9 @@ public class SecurityCameraController : MonoBehaviour, ILockObject
     /// </summary>
     public void Unlock()
     {
-        GetComponentInChildren<MeshRenderer>().material.color = Color.black;
+        foreach (var renderer in GetComponentsInChildren<MeshRenderer>())
+            renderer.material.color = Color.black;
+
         _sight.VisionConeVisible = false;
         enabled = false;
     }
