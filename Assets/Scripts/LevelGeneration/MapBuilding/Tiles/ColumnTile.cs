@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
+/// <summary>
+/// Tile with walls in the middle and based on directions.
+/// </summary>
 public class ColumnTile : ATile
 {
     Directions Directions { get; set; }

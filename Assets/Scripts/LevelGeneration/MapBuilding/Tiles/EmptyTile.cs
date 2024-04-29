@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Just a tile of floors.
+/// </summary>
 public class EmptyTile : ATile
 {
     public override void BuildSubTiles(int x, int y, ASubTile[,] subTileGrid)

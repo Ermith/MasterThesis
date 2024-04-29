@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Tile with walls on the sides based on given directions. Also can spawn empty spaces for exits.
+/// </summary>
 public class EdgeTile : ATile
 {
     public Directions Edges { get; set; }
@@ -19,6 +22,12 @@ public class EdgeTile : ATile
         Floor = floor;
     }
 
+    /// <summary>
+    /// Returns true if it's on the edge nad not in exit coordinates.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
     private bool IsWall(int x, int y)
     {
         int midX = WIDTH / 2;

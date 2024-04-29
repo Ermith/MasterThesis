@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
+/// <summary>
+/// Spawns only empty game object.
+/// </summary>
 class NoneSubTile : ASubTile
 {
     protected override GameObject SpawnObject()

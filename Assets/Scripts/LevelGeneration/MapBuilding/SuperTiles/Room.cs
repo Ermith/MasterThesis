@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
+// A simple empty room with refuges at the sides.
 public class Room : ASuperTile
 {
 
@@ -15,10 +16,13 @@ public class Room : ASuperTile
     public override List<EnemyParams> BuildTiles(int x, int y, ATile[,] tileGrid)
     {
         Description = CreateDescription(x, y, tileGrid);
+
+        // Build the room itself
         BuildSubRoom(x, y, 0, 0, Width, Height, Description, Exits, internalRoom: false, refuges: true);
         int midX = Width / 2;
         int midY = Height / 2;
 
+        // Spawn door exit tiles.
         foreach ((Directions dir, (int ex, int ey)) in Description.ExitsTiles)
         {
             var door = new DoorTile(
@@ -32,6 +36,7 @@ public class Room : ASuperTile
         }
 
 
+        // Determine patrol path for enemies.
         List<(int, int)> patrol = new();
 
         foreach (Directions dir in Exits.Enumerate())

@@ -6,6 +6,9 @@ using UnityEngine;
 
 using URandom = UnityEngine.Random;
 
+/// <summary>
+/// Describes what the supertile actually built.
+/// </summary>
 public class SuperTileDescription
 {
     public HashSet<(int, int)> FreeTiles = new();
@@ -25,7 +28,9 @@ public class SuperTileDescription
     public ATile Get(int x, int y) => TileGrid[x + X, y + Y];
 }
 
-
+/// <summary>
+/// Abstract class for all supertiles.
+/// </summary>
 public abstract class ASuperTile
 {
     public int Width { get; set; }
@@ -41,6 +46,10 @@ public abstract class ASuperTile
     public Directions Exits { get; set; }
     public Dictionary<Directions, (int, int)> ExitTiles;
     public List<(int, int)> InternalExitTiles;
+
+    /// <summary>
+    /// Describes what the supertile actually built.
+    /// </summary>
     public SuperTileDescription Description { get; protected set; }
 
     public string GetName()
@@ -60,6 +69,14 @@ public abstract class ASuperTile
         Floor = floor;
     }
 
+    /// <summary>
+    /// Gives directions of edges if x and y are on an edge or in a corner.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    /// <returns></returns>
     internal Directions EdgeDirectinons(int x, int y, int width, int height)
     {
         Directions directions = Directions.None;
@@ -74,6 +91,15 @@ public abstract class ASuperTile
 
     public abstract List<EnemyParams> BuildTiles(int x, int y, ATile[,] tileGrid);
 
+    /// <summary>
+    /// Gets series of coordinates going in straight or 'L' pattern.
+    /// </summary>
+    /// <param name="startX"></param>
+    /// <param name="startY"></param>
+    /// <param name="endX"></param>
+    /// <param name="endY"></param>
+    /// <param name="yFirst">How is 'L' direction oriented.</param>
+    /// <returns></returns>
     internal IEnumerable<(int, int)> GetShortPath(int startX, int startY, int endX, int endY, bool yFirst = false)
     {
         if (yFirst)
@@ -124,6 +150,12 @@ public abstract class ASuperTile
         };
     }
 
+    /// <summary>
+    /// Enumerates over edge coordinates of a width/height square.
+    /// </summary>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    /// <returns></returns>
     internal IEnumerable<(int, int)> EdgeLocations(int width, int height)
     {
         for (int x = 0; x < width; x++)
@@ -139,6 +171,19 @@ public abstract class ASuperTile
         }
     }
 
+    /// <summary>
+    /// Builds an internal room.
+    /// </summary>
+    /// <param name="x">Location of the subroom on the TileGrid.</param>
+    /// <param name="y">Location of the subroom on the TileGrid.</param>
+    /// <param name="ox">Offset from original X of the supertile.</param>
+    /// <param name="oy">Offset from original X of the supertile.</param>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    /// <param name="description"></param>
+    /// <param name="roomExits"></param>
+    /// <param name="internalRoom">Can be used to build entire room as well.</param>
+    /// <param name="refuges">Spawns refuges at the sides.</param>
     internal void BuildSubRoom(
         int x, int y,
         int ox, int oy,
@@ -159,7 +204,7 @@ public abstract class ASuperTile
         if (roomExits.East()) exits[Directions.East] = (width - 1, midY);
         if (roomExits.West()) exits[Directions.West] = (0, midY);
 
-
+        // Spawns the room itself.
         for (int i = 0; i < width; i++)
             for (int j = 0; j < height; j++)
             {
@@ -181,6 +226,7 @@ public abstract class ASuperTile
                 tileGrid[x + i, y + j] = tile;
             }
 
+        // Spawn door exit tiles
         foreach ((Directions dir, (int ex, int ey)) in exits)
         {
             Directions edgeFlags = EdgeDirectinons(ex, ey, width, height);
@@ -192,6 +238,14 @@ public abstract class ASuperTile
         }
     }
 
+    /// <summary>
+    /// Filles the space with impassable walls.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    /// <param name="description"></param>
     internal void BuildWall(int x, int y, int width, int height, SuperTileDescription description)
     {
         for (int i = x; i < x + width; i++)
@@ -199,6 +253,10 @@ public abstract class ASuperTile
                 description.TileGrid[i, j] = new WallTile();
     }
 
+    /// <summary>
+    /// Adds game object to a random free tile.
+    /// </summary>
+    /// <param name="go"></param>
     public void AddObject(GameObject go)
     {
         var i = URandom.Range(0, Description.FreeTiles.Count);

@@ -8,13 +8,26 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-
+/// <summary>
+/// Abstract class for all subitles.
+/// </summary>
 public abstract class ASubTile
 {
     public List<Func<GameObject>> Objects = new();
 
+    /// <summary>
+    /// Instantiates the subtile object.
+    /// </summary>
+    /// <returns></returns>
     protected abstract GameObject SpawnObject();
 
+    /// <summary>
+    /// Spawns the subtile object and all of the objects attatched to it. Like keys for example.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="z"></param>
+    /// <returns></returns>
     public virtual GameObject Spawn(int x, int y, int z)
     {
         var tileObj = SpawnObject();

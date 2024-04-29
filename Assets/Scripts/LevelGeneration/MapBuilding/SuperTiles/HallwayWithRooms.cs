@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Hallway layout with liitle rooms at the corners.
+/// </summary>
 public class HallwayWithRooms : Hallway
 {
     public HallwayWithRooms(int width, int height, int floor, in Directions exits = Directions.None) : base(width, height, floor, exits)
@@ -18,6 +21,7 @@ public class HallwayWithRooms : Hallway
         int midY = Height / 2;
         List<(int, int)> patrol = new();
 
+        // Spawn the hallway itself
         foreach ((Directions dir, (int ex, int ey)) in Description.ExitsTiles)
             foreach ((int px, int py) in GetShortPath(midX, midY, ex, ey))
             {
@@ -34,6 +38,7 @@ public class HallwayWithRooms : Hallway
         Directions midWalls = ~Exits;
         tileGrid[x + midX, y + midY] = new EdgeTile(midWalls);
 
+        // Determine exits of each room
         Directions nwExits, neExits, swExits, seExits;
         nwExits = neExits = swExits = seExits = Directions.None;
         int roomWidth = (Width - 1) / 2;
@@ -70,6 +75,8 @@ public class HallwayWithRooms : Hallway
             var tile = Description.Get(midX + 1 + roomWidth / 2, midY) as EdgeTile;
             tile.Exits |= neExits | seExits;
         }
+
+        // Spawn the subrooms
 
         if (!swExits.None())
             BuildSubRoom(

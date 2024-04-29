@@ -22,6 +22,7 @@ class StairwayRoom : ASuperTile
     {
         Description = CreateDescription(x, y, tileGrid);
 
+        // Spawns the door exit tiles.
         foreach ((Directions dir, (int ex, int ey)) in Description.ExitsTiles)
         {
                 var door = new DoorTile(
@@ -35,6 +36,7 @@ class StairwayRoom : ASuperTile
             door.Type = HasDefaultDoor.Contains(dir) ? DoorType.Door : DoorType.None;
         }
 
+        // Spawn the outside edges.
         foreach ((int ex, int ey) in EdgeLocations(Width, Height))
         {
             if (tileGrid[x + ex, y + ey] == null)
@@ -44,6 +46,7 @@ class StairwayRoom : ASuperTile
             }
         }
 
+        // Spawn the inner room.
         BuildSubRoom(
                 x + 1, y + 1,
                 1, 1,
@@ -52,6 +55,7 @@ class StairwayRoom : ASuperTile
                 Directions.North | Directions.South,
                 internalRoom: true);
 
+        // Spawn the inner inner room for stairs upwards.
         if (_upExit)
         {
             Directions upDir = _reversed ? Directions.West : Directions.East;
@@ -79,6 +83,7 @@ class StairwayRoom : ASuperTile
             Description.UpExit = (upX - x, 1);
         }
 
+        // Spawns the inner inner door with opening for the stairs beneath.
         if (_downExit)
         {
             Directions downDir = _reversed ? Directions.East : Directions.West;
@@ -102,6 +107,7 @@ class StairwayRoom : ASuperTile
             Description.DownExit = (downX - x, 3);
         }
 
+        // Determine patrol path for enemies.
         var corners = new (int, int)[] {
             (0, 0),
             (0, Height - 1),

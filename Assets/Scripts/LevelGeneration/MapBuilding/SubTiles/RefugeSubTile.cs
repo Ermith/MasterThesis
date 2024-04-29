@@ -1,7 +1,8 @@
-﻿
+﻿using UnityEngine;
 
-using UnityEngine;
-
+/// <summary>
+/// Spawns a tile that player can take refuge on.
+/// </summary>
 public class RefugeSubTile : ASubTile
 {
     public Directions Orientation;

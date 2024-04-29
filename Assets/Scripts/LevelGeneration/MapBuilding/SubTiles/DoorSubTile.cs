@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
+/// <summary>
+/// Door to be spawned at exits. The door itself spans two tiles.
+/// </summary>
 public class DoorSubTile : ASubTile
 {
     public DoorLock DoorLock = null;

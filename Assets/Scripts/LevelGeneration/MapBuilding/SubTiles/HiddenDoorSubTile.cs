@@ -5,6 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
+
+/// <summary>
+/// Hidden door to be spawned at exits. The door itself spans two tiles.
+/// </summary>
 class HiddenDoorSubTile : ASubTile
 {
     public Directions Orientation = Directions.North;

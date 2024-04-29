@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Tile of nothing but impassable walls.
+/// </summary>
 public class WallTile : ATile
 {
     public override void BuildSubTiles(int x, int y, ASubTile[,] subTileGrid)

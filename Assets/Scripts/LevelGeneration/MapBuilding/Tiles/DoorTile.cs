@@ -13,6 +13,9 @@ public enum DoorType
     HiddenDoor
 }
 
+/// <summary>
+/// Tile containing exits. Can be either empty space or a certain type of a door. Door usually spans two subtiles.
+/// </summary>
 public class DoorTile : EdgeTile
 {
     public ILock Lock = null;
@@ -33,6 +36,8 @@ public class DoorTile : EdgeTile
         base.BuildSubTiles(x, y, subTileGrid);
         List<(int, int, Directions dir)> doors = new();
 
+        // Exits take 2 subtiles
+
         if (DoorExits.South()) doors.Add((x + HalfWidth, y, Directions.South));
         if (DoorExits.South()) subTileGrid[x + HalfWidth - 1, y] = new FloorSubTile();
 
@@ -45,6 +50,7 @@ public class DoorTile : EdgeTile
         if (DoorExits.East()) doors.Add((x + WIDTH - 1, y + HalfHeight, Directions.East));
         if (DoorExits.East()) subTileGrid[x + WIDTH - 1, y + HalfHeight - 1] = new FloorSubTile();
 
+        // Just empty space to pass through
         if (Type == DoorType.None)
             foreach((int dx, int dy, Directions _) in doors)
             {

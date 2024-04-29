@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
 
+/// <summary>
+/// Wide hallway that has columns inside for cover.
+/// </summary>
 public class WideHallway : ASuperTile
 {
     public WideHallway(int width, int height, int floor, Directions exits)
@@ -20,8 +23,10 @@ public class WideHallway : ASuperTile
         int midX = Width / 2;
         int midY = Height / 2;
 
+        // This is the cover.
         tileGrid[x + midX, y + midY] = new ColumnTile(DirectionsExtensions.GetAll());
 
+        // Spawn the middle middle part of the hallway that forks into exits.
         foreach ((int i, int j) in EdgeLocations(3, 3))
         {
             Directions edgeFlags = EdgeDirectinons(i, j, 3, 3);
@@ -30,6 +35,7 @@ public class WideHallway : ASuperTile
             tileGrid[x + midX + i - 1, y + midY + j - 1] = new EdgeTile(edgeFlags);
         }
 
+        // Spawns the paths from the middle to the exits
         foreach ((Directions dir, (int ex, int ey)) in Description.ExitsTiles)
             foreach ((int px, int py) in GetShortPath(midX, midY, ex, ey))
             {
@@ -57,48 +63,42 @@ public class WideHallway : ASuperTile
 
                 tileGrid[x + nx1, y + ny1] ??= new EdgeTile(edges1);
                 tileGrid[x + nx2, y + ny2] ??= new EdgeTile(edges2);
-                //tileGrid[x + px, y + py] ??= new ColumnTile(dir.Opposite(), mid: false)
                 tileGrid[x + px, y + py] ??= new EmptyTile();
             }
 
-
+        // Determine patrol path for enemies.
+        // Goes in a loop besides the edges of the entire hallway.
         List<(int, int)> patrol = new();
         List<(int, int)> keyPoints = new();
 
         keyPoints.Add((midX - 1, midY - 1));
-        //*/
         if (Exits.North())
         {
             keyPoints.Add((midX - 1, 0));
             keyPoints.Add((midX + 1, 0));
         }
-        //*/
+
         keyPoints.Add((midX + 1, midY - 1));
-        //*/
         if (Exits.East())
         {
             keyPoints.Add((Width - 1, midY - 1));
             keyPoints.Add((Width - 1, midY + 1));
         }
-        //*/
+
         keyPoints.Add((midX + 1, midY + 1));
-        //*/
         if (Exits.South())
         {
             keyPoints.Add((midX + 1, Height - 1));
             keyPoints.Add((midX - 1, Height - 1));
         }
-        //*/
+
         keyPoints.Add((midX - 1, midY + 1));
-        //*/
         if (Exits.West())
         {
             keyPoints.Add((0, midY + 1));
             keyPoints.Add((0, midY - 1));
         }
-        //*/
         
-
         for (int i = 0; i < keyPoints.Count; i++)
         {
             (int currentX, int currentY) = keyPoints[i];

@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Room inside of another room.
+/// </summary>
 public class RecursiveRoom : ASuperTile
 {
     public RecursiveRoom(int width, int height, int floor, Directions exits = Directions.None) : base(width, height, floor, exits)
@@ -14,6 +17,7 @@ public class RecursiveRoom : ASuperTile
     {
         Description = CreateDescription(x, y, tileGrid);
 
+        // Spawn doors tiles.
         foreach ((Directions dir, (int ex, int ey)) in Description.ExitsTiles)
         {
             var door = new DoorTile(
@@ -26,7 +30,7 @@ public class RecursiveRoom : ASuperTile
             door.Type = HasDefaultDoor.Contains(dir) ? DoorType.Door : DoorType.None;
         }
 
-
+        // Spawns edges on the outside.
         foreach ((int ex, int ey) in EdgeLocations(Width, Height))
         {
             if (tileGrid[x + ex, y + ey] == null)
@@ -36,6 +40,7 @@ public class RecursiveRoom : ASuperTile
             }
         }
 
+        // Spawn the inner room.
         BuildSubRoom(
             x + 1, y + 1,
             1, 1,
@@ -44,6 +49,7 @@ public class RecursiveRoom : ASuperTile
             DirectionsExtensions.GetAll(),
             internalRoom: true);
 
+        // Determine Patrol Path
         var corners = new (int, int)[] {
             (0, 0),
             (0, Height - 1),

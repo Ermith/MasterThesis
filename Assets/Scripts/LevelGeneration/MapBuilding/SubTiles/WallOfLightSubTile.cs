@@ -5,6 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
+
+/// <summary>
+/// Wall of Light to be spawned at exits. The door itself spans two tiles.
+/// </summary>
 public class WallOfLightSubTile : ASubTile
 {
     public WallOfLightLock Lock = null;

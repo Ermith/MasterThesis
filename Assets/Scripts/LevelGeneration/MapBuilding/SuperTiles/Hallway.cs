@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 using URandom = UnityEngine.Random;
 
+/// <summary>
+/// A simple hallway layout with refuges on the sides.
+/// </summary>
 public class Hallway : ASuperTile
 {
     public Hallway(int width, int height, int floor, Directions exits = Directions.None) : base(width, height, floor, exits)
@@ -26,9 +29,7 @@ public class Hallway : ASuperTile
                 patrol.Add(ATile.FromSuperMid(x + px, y + py));
                 if ((px, py) == (midX, midY)) continue;
 
-                //description.FreeTiles.Add((px, py));
-
-                if ((px + py) % 2 == 0)
+                if ((px + py) % 2 == 0) // spawn refuge tile every second tile
                     tileGrid[x + px, y + py] = new EdgeTile(dir.Perpendicular(), thickness: 2);
                 else
                     tileGrid[x + px, y + py] = new RefugeEdgeTile(dir.Perpendicular(), dir.Perpendicular(), thickness: 2);
@@ -37,7 +38,6 @@ public class Hallway : ASuperTile
         Description.PatrolPath = patrol;
         Description.PatrolLooped = false;
         
-
         Directions midWalls = ~Exits;
         tileGrid[x + midX, y + midY] = new RefugeEdgeTile(midWalls, midWalls, thickness: 2);
         Description.FreeTiles.Add((midX, midY));

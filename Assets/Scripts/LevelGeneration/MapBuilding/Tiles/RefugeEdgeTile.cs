@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Edge Tile, but with refuge tiles inbetween the walls.
+/// </summary>
 public class RefugeEdgeTile : EdgeTile
 {
     Directions Refuges;
@@ -23,7 +26,6 @@ public class RefugeEdgeTile : EdgeTile
 
             subTileGrid[rx, ry] = new RefugeSubTile();
             subTileGrid[rx - 1, ry] = new RefugeSubTile();
-            //subTileGrid[rx + 1, ry] = new RefugeSubTile();
         }
 
         if (Refuges.South())
@@ -33,7 +35,6 @@ public class RefugeEdgeTile : EdgeTile
 
             subTileGrid[rx, ry] = new RefugeSubTile();
             subTileGrid[rx - 1, ry] = new RefugeSubTile();
-            //subTileGrid[rx + 1, ry] = new RefugeSubTile();
         }
 
         if (Refuges.West())
@@ -43,7 +44,6 @@ public class RefugeEdgeTile : EdgeTile
 
             subTileGrid[rx, ry] = new RefugeSubTile();
             subTileGrid[rx, ry - 1] = new RefugeSubTile();
-            //subTileGrid[rx, ry + 1] = new RefugeSubTile();
         }
 
         if (Refuges.East())
@@ -53,7 +53,6 @@ public class RefugeEdgeTile : EdgeTile
 
             subTileGrid[rx, ry] = new RefugeSubTile();
             subTileGrid[rx, ry - 1] = new RefugeSubTile();
-            //subTileGrid[rx, ry + 1] = new RefugeSubTile();
         }
     }
 }

@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Hallway that gous in a cycle.
+/// </summary>
 class Roundabout : ASuperTile
 {
     public Roundabout(int width, int height, int floor, Directions exits = Directions.None) : base(width, height, floor, exits)
@@ -14,6 +17,7 @@ class Roundabout : ASuperTile
     {
         Description = CreateDescription(x, y, tileGrid);
 
+        // Spawns the door tiles.
         foreach ((Directions dir, (int ex, int ey)) in Description.ExitsTiles)
         {
             var door = new DoorTile(
@@ -26,7 +30,7 @@ class Roundabout : ASuperTile
             door.Type = HasDefaultDoor.Contains(dir) ? DoorType.Door : DoorType.None;
         }
 
-
+        // Build the edges.
         foreach ((int ex, int ey) in EdgeLocations(Width, Height))
         {
             if (tileGrid[x + ex, y + ey] == null)
@@ -36,11 +40,13 @@ class Roundabout : ASuperTile
             }
         }
 
+        // Build wall on the inside, creating the loop.
         BuildWall(
             x + 1, y + 1,
             Width - 2, Height - 2,
             Description);
 
+        // Spawn refuges every second tile on the inside
         foreach ((int ex, int ey) in EdgeLocations(Width - 2, Height - 2))
         {
             if ((ex + ey) % 2 == 0)
@@ -50,6 +56,7 @@ class Roundabout : ASuperTile
             tileGrid[x + 1 + ex, y + 1 + ey] = new RefugeEdgeTile(dirs, dirs, thickness: ATile.WIDTH);
         }
 
+        // Determine the patrol path for enemies.
         var corners = new (int, int)[] {
             (0, 0),
             (0, Height - 1),

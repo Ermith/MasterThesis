@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
+/// <summary>
+/// Impassable wall.
+/// </summary>
 public class WallSubTile : ASubTile
 {
     protected override GameObject SpawnObject()
