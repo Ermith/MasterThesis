@@ -18,11 +18,9 @@ As for the release, simply unzip and run `.exe` file.
 > - **Use Invisibility Camo** - R  
 > - **Peek around corners** - E/Q  
 > - **Interact** - F
-> 
 > - **First Person Camera** - F1  
 > - **Top-Down Camera** - F2  
 > - **Third Person Camera** - F3  
->
 > - **Open Map** - M  
 > - **Move in Map** - W A S D  
 > - **Zoom in Map** - Numpad +/-  
