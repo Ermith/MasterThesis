@@ -8,6 +8,7 @@ using UnityEngine;
 public class CamoObject : SmartCollider, IKeyObject
 {
     public IKey MyKey { get; set; }
+    [Tooltip("Number of camos the player will recieve.")]
     public int Count = 1;
 
     // Start is called before the first frame update

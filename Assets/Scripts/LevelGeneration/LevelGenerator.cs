@@ -14,7 +14,9 @@ using UnityEngine.UIElements;
 /// </summary>
 public class LevelGenerator : MonoBehaviour
 {
+    [Tooltip("Width of Supertile in Tiles.")]
     public int SuperWidth = 3;
+    [Tooltip("Height of Supertile in Tiles.")]
     public int SuperHeight = 3;
 
     // Blueprints
@@ -40,9 +42,13 @@ public class LevelGenerator : MonoBehaviour
     public Map Map;
 
     // Rendering
+    [Tooltip("Floor material for instanced rendering.")]
     public Material FloorMaterial;
+    [Tooltip("Wall material for instanced rendering.")]
     public Material WallMaterial;
+    [Tooltip("Floor mesh for instanced rendering.")]
     public Mesh FloorMesh;
+    [Tooltip("Wall mesh for instanced rendering.")]
     public Mesh WallMesh;
 
     private GridGraph _graph;

@@ -13,7 +13,9 @@ public class Door : MonoBehaviour, IInteractableObject, ILockObject
     private Coroutine _clopenCoroutine;
     private bool _open = false;
 
+    [Tooltip("Time it takes to open or close the door.")]
     public float Duration = 0.5f;
+    [Tooltip("Does the door change color if locked?")]
     public bool ChangeColor = true;
     [HideInInspector] public ILock Lock { get; set; }
 

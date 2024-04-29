@@ -9,7 +9,7 @@ using UnityEngine;
 /// </summary>
 public class SecurityCameraController : MonoBehaviour, ILockObject
 {
-    [HideInInspector] public ILock Lock { get; set; }
+    public ILock Lock { get; set; }
     private Directions lookDirection = Directions.None;
     private Sight _sight;
     private PlayerController _player;
@@ -19,10 +19,15 @@ public class SecurityCameraController : MonoBehaviour, ILockObject
     private Vector3 _defaultRotation;
     private bool _right = false;
 
+    [Tooltip("Range of audible sound that happens when the player is spotted.")]
     public float SoundRange = 22f;
+    [Tooltip("Degree to which the camera turns left and right.")]
     public float TurnDegree = 80;
+    [Tooltip("Time it takes for the camera tu turn left to right and vice versa.")]
     public float TurnPeriod = 3f;
+    [Tooltip("Duration it takes for the camera to take bhaviour of a turret.")]
     public float ShootDuration = 2;
+    [Tooltip("Point the camera turns around.")]
     public Transform TurnPoint;
 
     /// <summary>

@@ -15,12 +15,16 @@ public class Sight : MonoBehaviour
     private Color _baseColor;
     private Color _highlightColor = Color.red;
 
+    [Tooltip("'Resolution' of the view cone mesh.")]
     public int Segments = 20;
+    [Tooltip("Angle of the view cone in radians.")]
     public float Angle = 90 * Mathf.Deg2Rad;
+    [Tooltip("Range of the view cone.")]
     public float Range = 20;
     public Material VisionConeMaterial;
-    public bool VisionConeVisible = true;
-    public bool VisionConeHilighted = false;
+
+    [HideInInspector] public bool VisionConeVisible = true;
+    [HideInInspector] public bool VisionConeHilighted = false;
 
     // Start is called before the first frame update
     void Start()

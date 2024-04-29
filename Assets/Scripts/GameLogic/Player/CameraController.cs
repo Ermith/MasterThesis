@@ -8,11 +8,17 @@ public class CameraController : MonoBehaviour
 {
     #region FIELDS
     // Control Parameters
+    [Tooltip("Target to follow.")]
     public Transform Target;
+    [Tooltip("Vertical angle of top-down view.")]
     public float TopDownInclanation = 3f;
+    [Tooltip("Distance from the target in top-down view.")]
     public float TopDownDistance = 20f;
+    [Tooltip("Damping time whe the target moves while in top-down view.")]
     public float TopDownDampTime = 0.1f;
+    [Tooltip("Distance from the target when in third person view.")]
     public float ThirdPersonDistance = 5f;
+    [Tooltip("Damping time when the target moves while in third person view.")]
     public float ThirdPersonDampTime = 0.1f;
 
     public CameraModeType Mode { get; private set; } = CameraModeType.FirstPerson;
@@ -33,9 +39,9 @@ public class CameraController : MonoBehaviour
 
     // Camera Bob
     private enum BobState { None, RightStep, RightRise, LeftStep, LeftRise }
-    public float BobDuration = 0.35f;
-    public float BobScale = 0.075f;
-    public bool BobEnabled = true;
+    [HideInInspector] public float BobDuration = 0.35f;
+    [HideInInspector] public float BobScale = 0.075f;
+    [HideInInspector] public bool BobEnabled = true;
     private BobState _bobState = BobState.None;
     private float _bobTime = 0f;
     private Vector3 _previousOffset;

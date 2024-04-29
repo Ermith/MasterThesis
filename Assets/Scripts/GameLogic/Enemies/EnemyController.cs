@@ -35,13 +35,21 @@ public class EnemyController : MonoBehaviour, ILockObject
     private Vector3[] _patrolPath = null;
 
     // Adjustable in inspector
+    [Tooltip("Range of view cone when guarding something.")]
     public float GuardViewDistance = 5f;
+    [Tooltip("Range of view cone.")]
     public float DefaultViewDistance = 20f;
+    [Tooltip("Time it takes to return to default position when chasing and can't move.")]
     public float FrustrationTime = 1f;
+    [Tooltip("Time it takes to investigate a sound or appearance of the player.")]
     public float InvestigationTime = 5f;
+    [Tooltip("Time between step sounds.")]
     public float StepTime = 0.6f;
+    [Tooltip("Walking Speed.")]
     public float NormalSpeed = 3f;
+    [Tooltip("Speed when chasing the player.")]
     public float ChasingSpeed = 5f;
+    [Tooltip("Rate of rotation.")]
     public float TurnRate = 4f;
 
     // Movement and Behavior
@@ -52,8 +60,8 @@ public class EnemyController : MonoBehaviour, ILockObject
     private float _lastMovement = float.MaxValue;
     private Vector3 _lastPosition = Vector3.zero;
     private PlayerController _player = null;
-    [HideInInspector] public ILock Lock { get; set; }
-    [HideInInspector] public Behaviour Behaviour { get; set; }
+    public ILock Lock { get; set; }
+    public Behaviour Behaviour { get; set; }
     [HideInInspector] public Vector3 DefaultPosition = Vector3.zero;
     [HideInInspector] public Vector3 DefaultDirection = Vector3.forward;
     #endregion

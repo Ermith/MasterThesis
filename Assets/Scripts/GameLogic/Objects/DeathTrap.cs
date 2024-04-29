@@ -14,6 +14,7 @@ public class DeathTrap : SmartCollider, ILockObject, IInteractableObject
 
     [HideInInspector] public InteractionType InteractionType => InteractionType.Continuous;
 
+    [Tooltip("Time it takes to interact if Trap Disarming not in inventory.")]
     public float InteractionTime = 1f;
     private float _interactionTimer;
     private bool _lastInteract = false;

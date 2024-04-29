@@ -17,6 +17,7 @@ public class SoundTrap : SmartCollider, ILockObject, IInteractableObject
 
     public InteractionType InteractionType => InteractionType.Continuous;
 
+    [Tooltip("Time it takes to disarm the trap without Trap Disarming Kit.")]
     public float InteractionTime = 1f;
     private float _interactionTimer;
     private bool _lastInteract = false;

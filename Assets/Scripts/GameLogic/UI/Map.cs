@@ -12,15 +12,24 @@ using UnityEngine;
 public class Map : MonoBehaviour
 {
     public GraphDrawing<GridVertex> Drawing;
+    [Tooltip("Blueprint of a room tile.")]
     public MapTile Room;
+    [Tooltip("Blueprint for the lines that represent edges.")]
     public LineRenderer Edge;
+    [Tooltip("Blueprint for the lines that represent grid lines.")]
     public LineRenderer GridLine;
-    public GameObject MapVisual;
+    [HideInInspector] public GameObject MapVisual;
+    [Tooltip("Duration of animation it takes to switch floors.")]
     public float Duration = 1.0f;
+    [Tooltip("Text to display number of floors and the selected floor.")]
     public TMP_Text Text;
+    [Tooltip("Map has a separate orthogonal camera.")]
     public Camera Camera;
+    [Tooltip("Transform that contains the camera.")]
     public Transform CameraPoint;
+    [Tooltip("Blueprint used to highlight the room that player is standing on.")]
     public GameObject HighlightTile;
+    [Tooltip("Image rotated based on the player rotation.")]
     public GameObject Compass;
 
     private List<GameObject> _floors = new();

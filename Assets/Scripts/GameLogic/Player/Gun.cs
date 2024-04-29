@@ -8,6 +8,7 @@ using UnityEngine;
 [RequireComponent(typeof(LineRenderer))]
 public class Gun : MonoBehaviour
 {
+    [Tooltip("Projectile to appear when gun shoots.")]
     public Projectile Projectile;
     public bool Aiming => _aiming;
 

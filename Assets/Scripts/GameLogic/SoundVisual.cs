@@ -8,7 +8,9 @@ using UnityEngine;
 /// </summary>
 public class SoundVisual : MonoBehaviour
 {
+    [Tooltip("Radius of the visual.")]
     public float Range;
+    [Tooltip("Time after which it disappears.")]
     public float Duration = 1;
     private float _time = -1;
 

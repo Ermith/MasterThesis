@@ -11,28 +11,44 @@ using static UnityEngine.GraphicsBuffer;
 public class PlayerController : MonoBehaviour
 {
     #region Exposed Parameters
+    [Tooltip("Affects how fast the camera turns.")]
     public float MouseSensitivity = 0.7f;
 
+    [Tooltip("Speed of default walking speed.")]
     public float WalkingSpeed = 3f;
+    [Tooltip("Speed of running when holding the run button.")]
     public float RunningSpeed = 10f;
+    [Tooltip("Initial speed when sliding.")]
     public float SlidingSpeed = 15f;
+    [Tooltip("Time it takes to finish sliding.")]
     public float SlidingDuration = 1.3f;
 
+    [Tooltip("Range of sound of steps when running.")]
     public float RunningStepRadius = 10f;
+    [Tooltip("Range of sound of steps when walking.")]
     public float WalkingStepRadius = 1.5f;
 
+    [Tooltip("Time it takes to take a step while running.")]
     public float WalkingStepPeriod = 0.35f;
+    [Tooltip("Time it takes to take a step while walking.")]
     public float RunningStepPeriod = 0.15f;
 
+    [Tooltip("The range to which camera bobs while walking.")]
     public float WalkingBobScale = 0.03f;
+    [Tooltip("The range to which camera bobs while running.")]
     public float RunningBobScale = 0.07f;
 
+    [Tooltip("Camera rotation while peeking.")]
     public float PeekAngle = 20f;
+    [Tooltip("Time it takes to peek.")]
     public float PeekTime = 0.15f;
+    [Tooltip("Offset of peeking.")]
     public Vector3 PeekOffset = new Vector3(1, -0.5f, 0);
 
+    [Tooltip("Time the player remains invisible when Invisibility Camo is used.")]
     public float InvisibilityTime;
 
+    [Tooltip("Camera that should follow the player.")]
     public CameraController Camera;
     #endregion
 

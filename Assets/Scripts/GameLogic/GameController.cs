@@ -21,16 +21,27 @@ public class GameController : MonoBehaviour
     public static int Objectives { get { return Instance._objectives; } set { Instance._objectives = value; } }
     public static int ObjectivesFound { get { return Instance._objetivesFound; } set { Instance._objetivesFound = value; } }
 
+    [Tooltip("The menu to be shown when the game is paused.")]
     public Canvas PauseCanvas;
+    [Tooltip("HUD displayed when playing the game.")]
     public Canvas HUDCanvas;
+    [Tooltip("Map that will display the generated level.")]
     public Map Map;
+    [Tooltip("The player...")]
     public PlayerController Player;
+    [Tooltip("Used to get the generated level.")]
     public LevelGenerator LevelGenerator;
+    [Tooltip("Screen that is displayed when a certain button is held.")]
     public InfoScreen InfoScreen;
+    [Tooltip("Bar that shows the progress of an interaction.")]
     public GameObject InteractionBar;
+    [Tooltip("Bar that fills with progress of an interaciton.")]
     public Image InteractionFill;
+    [Tooltip("Overlay in first person when player is hidden or invisible.")]
     public GameObject InvisOverlay;
+    [Tooltip("Crosshairs.")]
     public GameObject Pointer;
+    [Tooltip("Text that displays what interaction does.")]
     public GameObject InteractionText;
 
     private GameObject _settingsMenu;

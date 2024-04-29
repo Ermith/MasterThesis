@@ -8,6 +8,7 @@ using UnityEngine;
 public class TrapKitObject : SmartCollider, IKeyObject
 {
     public IKey MyKey { get; set; }
+    [Tooltip("Number of Trap Disarming Kits recieved when picked up.")]
     public int Count = 5;
 
     // Start is called before the first frame update

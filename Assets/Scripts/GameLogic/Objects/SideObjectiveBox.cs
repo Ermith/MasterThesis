@@ -11,6 +11,7 @@ public class SideObjectiveBox : MonoBehaviour, IInteractableObject
 
     public InteractionType InteractionType => InteractionType.Continuous;
 
+    [Tooltip("Time it takes to hold interaction button to finish interaction.")]
     public float InteractionTime = 1f;
     private float _interactionTimer;
     private bool _lastInteract = false;

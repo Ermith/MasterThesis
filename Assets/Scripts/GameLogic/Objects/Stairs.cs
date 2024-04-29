@@ -11,8 +11,9 @@ public class Stairs : MonoBehaviour
 {
     private Mesh _mesh;
 
-    [Range(1, 100)]
+    [Range(1, 100), Tooltip("Number of steps. Does not affect the size.")]
     public int Steps;
+    [Tooltip("Dimensions of the steps.")]
     public Vector3 Size;
 
     // Start is called before the first frame update
